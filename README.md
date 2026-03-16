@@ -12,20 +12,22 @@ npm test
 npm run build:web
 ```
 
-2. Fill in `.env`:
+2. Copy `.env.example` to `.env` and fill in:
 
 ```env
+NODE_ENV=development
 BOT_TOKEN=your_bot_token
 ADMIN_ID=your_telegram_id
-DB_PATH=C:/Users/fear7/Desktop/Bot_noct/data/bot.sqlite
+DB_PATH=./data/bot.sqlite
 BACKUP_RETENTION=50
-BACKUP_DIR=backups
+BACKUP_DIR=./backups
 PORT=3000
 WEBAPP_URL=https://your-service.onrender.com
 WEBAPP_BOT_USERNAME=your_bot_username
-DEBUG_INGEST_URL=
-DEBUG_SESSION_ID=
+CORS_ORIGIN=https://your-miniapp.vercel.app
 ```
+
+For production: set `NODE_ENV=production`, set `CORS_ORIGIN` to the Mini App origin (or comma-separated list). Optional: `DEBUG_INGEST_URL`, `DEBUG_SESSION_ID` — leave empty to disable debug ingest.
 
 3. Start the bot:
 

@@ -28,6 +28,8 @@ body {
   font-size: 14px;
 }
 
+/* ── Tabs ────────────────────────────────────────── */
+
 .tabs {
   display: flex;
   gap: 8px;
@@ -36,26 +38,61 @@ body {
 }
 
 .tab {
-  border: 1px solid #666;
+  border: 1px solid var(--tg-theme-hint-color, #666);
   background: transparent;
   color: inherit;
   padding: 8px 12px;
   border-radius: 8px;
   cursor: pointer;
+  transition: border-color 0.15s, opacity 0.15s;
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--tg-theme-button-color, #4a90e2);
+  outline-offset: 2px;
 }
 
 .tab.active {
-  border-color: #4a90e2;
+  border-color: var(--tg-theme-button-color, #4a90e2);
 }
 
+/* ── Error banner ────────────────────────────────── */
+
 .error {
-  border: 1px solid #c44;
-  background: #5c1f1f;
-  color: #ffd8d8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: 1px solid var(--tg-theme-destructive-text-color, #c44);
+  background: color-mix(in srgb, var(--tg-theme-destructive-text-color, #c44) 15%, var(--tg-theme-bg-color, #111));
+  color: var(--tg-theme-text-color, #ffd8d8);
   padding: 10px;
   border-radius: 8px;
   margin-bottom: 10px;
 }
+
+.error-dismiss {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  opacity: 0.7;
+}
+
+.error-dismiss:hover {
+  opacity: 1;
+}
+
+.error-dismiss:focus-visible {
+  outline: 2px solid var(--tg-theme-button-color, #4a90e2);
+  outline-offset: 2px;
+}
+
+/* ── Row / Card ──────────────────────────────────── */
 
 .row {
   display: flex;
@@ -65,12 +102,19 @@ body {
 }
 
 .card {
-  border: 1px solid #666;
+  border: 1px solid var(--tg-theme-hint-color, #666);
   padding: 12px;
   border-radius: 10px;
   margin-bottom: 14px;
   display: grid;
   gap: 8px;
+}
+
+/* ── Tables ───────────────────────────────────────── */
+
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 table {
@@ -81,11 +125,13 @@ table {
 
 th,
 td {
-  border-bottom: 1px solid #444;
+  border-bottom: 1px solid var(--tg-theme-hint-color, #444);
   text-align: left;
   padding: 8px;
   vertical-align: top;
 }
+
+/* ── Form controls ───────────────────────────────── */
 
 input,
 textarea,
@@ -94,11 +140,59 @@ button {
   font: inherit;
   color: inherit;
   background: transparent;
-  border: 1px solid #666;
+  border: 1px solid var(--tg-theme-hint-color, #666);
   border-radius: 8px;
   padding: 8px;
 }
 
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--tg-theme-button-color, #4a90e2);
+  outline-offset: 2px;
+}
+
 button {
   cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Empty state ─────────────────────────────────── */
+
+.empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  opacity: 0.6;
+  font-size: 15px;
+}
+
+/* ── Loading skeleton ────────────────────────────── */
+
+.skeleton-container {
+  display: grid;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.skeleton-row {
+  height: 18px;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    var(--tg-theme-hint-color, #333) 25%,
+    var(--tg-theme-secondary-bg-color, #444) 50%,
+    var(--tg-theme-hint-color, #333) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }

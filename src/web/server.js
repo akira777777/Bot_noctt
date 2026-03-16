@@ -7,22 +7,50 @@ const {
   createVerifyTelegramInitData,
 } = require("./middleware/verify-telegram-init-data");
 
-function createWebServer({ repos, botToken, adminId }) {
+function createWebServer({
+  repos,
+  botToken,
+  adminId,
+  corsOrigin,
+  isProduction,
+}) {
   const app = express();
   const webappDistPath = path.join(process.cwd(), "webapp", "dist");
   const hasBuiltFrontend = fs.existsSync(
     path.join(webappDistPath, "index.html"),
   );
 
-  const corsOrigin = process.env.CORS_ORIGIN;
   app.use(
     cors(
       corsOrigin
-        ? { origin: corsOrigin.split(",").map((s) => s.trim()), credentials: true }
+        ? {
+            origin: corsOrigin.split(",").map((s) => s.trim()),
+            credentials: true,
+          }
         : undefined,
     ),
   );
   app.use(express.json({ limit: "1mb" }));
+
+  app.use((req, res, next) => {
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("X-Frame-Options", "SAMEORIGIN");
+    res.setHeader("X-XSS-Protection", "1; mode=block");
+    next();
+  });
+
+  if (!isProduction) {
+    app.use((req, res, next) => {
+      const start = Date.now();
+      res.on("finish", () => {
+        // eslint-disable-next-line no-console
+        console.log(
+          `[${new Date().toISOString()}] ${req.method} ${req.originalUrl} ${res.statusCode} ${Date.now() - start}ms`,
+        );
+      });
+      next();
+    });
+  }
 
   app.get("/healthz", (_req, res) => {
     res.json({ ok: true, service: "bot_noct_web" });
@@ -32,7 +60,11 @@ function createWebServer({ repos, botToken, adminId }) {
     botToken,
     adminId,
   });
-  app.use("/api", verifyTelegramInitData, createApiRouter({ repos }));
+  app.use(
+    "/api",
+    verifyTelegramInitData,
+    createApiRouter({ repos, isProduction }),
+  );
 
   if (hasBuiltFrontend) {
     app.use(express.static(webappDistPath));
@@ -50,6 +82,14 @@ function createWebServer({ repos, botToken, adminId }) {
         .send("Mini App frontend is not built yet. Run: npm run build:web");
     });
   }
+
+  app.use((err, _req, res, _next) => {
+    const status = err.status ?? err.statusCode ?? 500;
+    const message = isProduction ? "Internal server error" : err.message;
+    if (!res.headersSent) {
+      res.status(status).json({ ok: false, error: message });
+    }
+  });
 
   return app;
 }

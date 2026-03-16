@@ -6,6 +6,8 @@ const {
   ADMIN_ID,
   PORT,
   WEBAPP_URL,
+  CORS_ORIGIN,
+  isProduction,
 } = require("./src/config/env");
 const { createWebServer } = require("./src/web/server");
 const { logError, logInfo } = require("./src/utils/logger");
@@ -119,6 +121,8 @@ async function bootstrap() {
     repos,
     botToken: BOT_TOKEN,
     adminId: ADMIN_ID,
+    corsOrigin: CORS_ORIGIN,
+    isProduction,
   });
 
   const resources = {

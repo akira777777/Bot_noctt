@@ -7,7 +7,7 @@ const {
   normalizeLeadRecords,
 } = require("../../domain/lead-status");
 
-function createApiRouter({ repos }) {
+function createApiRouter({ repos, isProduction = false }) {
   const router = express.Router();
   const adminService = createAdminService({ repos });
 
@@ -185,6 +185,17 @@ function createApiRouter({ repos }) {
 
   router.get("/stats", requireAdmin, (req, res) => {
     return res.json({ ok: true, stats: adminService.getStats() });
+  });
+
+  router.use((err, _req, res, next) => {
+    if (res.headersSent) {
+      return next(err);
+    }
+    const status = err.status ?? err.statusCode ?? 500;
+    const message = isProduction
+      ? "Internal server error"
+      : err.message || "Internal server error";
+    res.status(status).json({ ok: false, error: message });
   });
 
   return router;

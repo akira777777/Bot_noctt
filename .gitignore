@@ -17,3 +17,9 @@ webapp/dist/
 
 # Local env overrides
 .env.local
+
+# Windows reserved names (avoid git add failures)
+nul
+con
+prn
+aux
