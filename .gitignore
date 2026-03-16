@@ -8,3 +8,5 @@ data/*.sqlite-shm
 
 # Backups
 backups/
+.vercel
+.env*.local

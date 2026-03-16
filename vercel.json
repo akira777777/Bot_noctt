@@ -1,5 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npm run build:web",
-  "outputDirectory": "webapp/dist"
+  "buildCommand": "cd webapp && npm install && npm run build",
+  "outputDirectory": "webapp/dist",
+  "installCommand": "cd webapp && npm install"
 }
