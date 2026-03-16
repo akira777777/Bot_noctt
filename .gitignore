@@ -8,3 +8,12 @@ data/*.sqlite-shm
 
 # Backups
 backups/
+
+# Build output
+webapp/dist/
+
+# Vercel
+.vercel/
+
+# Local env overrides
+.env.local

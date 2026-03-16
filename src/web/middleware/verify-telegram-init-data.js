@@ -63,32 +63,6 @@ function createVerifyTelegramInitData({ botToken, adminId }) {
     const initData = bearer || req.headers["x-telegram-init-data"];
 
     if (!initData) {
-      // #region agent log
-      fetch(
-        "http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Debug-Session-Id": "8930e6",
-          },
-          body: JSON.stringify({
-            sessionId: "8930e6",
-            runId: "pre-fix",
-            hypothesisId: "H1_INITDATA_SOURCE",
-            location: "src/web/middleware/verify-telegram-init-data.js:66",
-            message: "Request rejected: missing init data",
-            data: {
-              path: req.path,
-              method: req.method,
-              hasAuthorizationHeader: Boolean(authorization),
-              hasXTelegramHeader: Boolean(req.headers["x-telegram-init-data"]),
-            },
-            timestamp: Date.now(),
-          }),
-        },
-      ).catch(() => {});
-      // #endregion
       return res
         .status(401)
         .json({ ok: false, error: "Missing Telegram init data" });
@@ -100,31 +74,6 @@ function createVerifyTelegramInitData({ botToken, adminId }) {
     });
 
     if (!result.ok) {
-      // #region agent log
-      fetch(
-        "http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Debug-Session-Id": "8930e6",
-          },
-          body: JSON.stringify({
-            sessionId: "8930e6",
-            runId: "pre-fix",
-            hypothesisId: "H2_INITDATA_VALIDATION",
-            location: "src/web/middleware/verify-telegram-init-data.js:78",
-            message: "Request rejected: invalid init data",
-            data: {
-              path: req.path,
-              method: req.method,
-              reason: result.reason || "unknown",
-            },
-            timestamp: Date.now(),
-          }),
-        },
-      ).catch(() => {});
-      // #endregion
       return res
         .status(401)
         .json({ ok: false, error: "Invalid Telegram auth data" });
@@ -139,30 +88,6 @@ function createVerifyTelegramInitData({ botToken, adminId }) {
       auth_date: result.authDate,
       init_data: initData,
     };
-    // #region agent log
-    fetch("http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "8930e6",
-      },
-      body: JSON.stringify({
-        sessionId: "8930e6",
-        runId: "pre-fix",
-        hypothesisId: "H3_AUTH_CONTEXT",
-        location: "src/web/middleware/verify-telegram-init-data.js:93",
-        message: "Telegram auth accepted",
-        data: {
-          path: req.path,
-          method: req.method,
-          userId,
-          adminId,
-          isAdmin: userId === adminId,
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
     return next();
   };
 }

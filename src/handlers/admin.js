@@ -400,29 +400,6 @@ function registerAdminCommands(bot, deps) {
 }
 
 async function handleAdminStart(ctx, deps) {
-  // #region agent log
-  fetch("http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Debug-Session-Id": "9080fe",
-    },
-    body: JSON.stringify({
-      sessionId: "9080fe",
-      runId: "pre-fix",
-      hypothesisId: "H4_START_BUTTON_VALUE",
-      location: "src/handlers/admin.js:handleAdminStart:entry",
-      message: "Admin start rendering webapp button",
-      data: {
-        fromId: ctx?.from?.id,
-        webappUrl: deps?.webappUrl,
-        hasWebappUrl: Boolean(deps?.webappUrl),
-      },
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
-
   deps.services.admin.upsertAdmin(ctx.from);
   const activeClientId = deps.services.admin.getActiveClientId(ctx.from.id);
   const selectedText = activeClientId

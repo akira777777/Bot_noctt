@@ -14,42 +14,15 @@ function createWebServer({ repos, botToken, adminId }) {
     path.join(webappDistPath, "index.html"),
   );
 
-  app.use(cors());
+  const corsOrigin = process.env.CORS_ORIGIN;
+  app.use(
+    cors(
+      corsOrigin
+        ? { origin: corsOrigin.split(",").map((s) => s.trim()), credentials: true }
+        : undefined,
+    ),
+  );
   app.use(express.json({ limit: "1mb" }));
-
-  app.use((req, _res, next) => {
-    if (!req.path.startsWith("/api")) {
-      // #region agent log
-      fetch(
-        "http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Debug-Session-Id": "9080fe",
-          },
-          body: JSON.stringify({
-            sessionId: "9080fe",
-            runId: "post-fix",
-            hypothesisId: "H8_WEBAPP_REQUEST_PATH",
-            location: "src/web/server.js:app.use(requestProbe)",
-            message: "Incoming non-API web request",
-            data: {
-              method: req.method,
-              path: req.path,
-              originalUrl: req.originalUrl,
-              host: req.headers.host || null,
-              userAgent: req.headers["user-agent"] || null,
-              referer: req.headers.referer || null,
-            },
-            timestamp: Date.now(),
-          }),
-        },
-      ).catch(() => {});
-      // #endregion
-    }
-    next();
-  });
 
   app.get("/healthz", (_req, res) => {
     res.json({ ok: true, service: "bot_noct_web" });

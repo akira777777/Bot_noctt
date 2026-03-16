@@ -211,74 +211,9 @@ async function handleClientStart(ctx, deps) {
           web_app: { url: deps.webappUrl },
         },
       });
-      // #region agent log
-      fetch(
-        "http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Debug-Session-Id": "9080fe",
-          },
-          body: JSON.stringify({
-            sessionId: "9080fe",
-            runId: "post-fix",
-            hypothesisId: "H11_CLIENT_MENU_BUTTON",
-            location:
-              "src/handlers/client.js:handleClientStart:setChatMenuButton:success",
-            message: "Configured client-specific menu button",
-            data: { chatId: ctx?.from?.id, webappUrl: deps.webappUrl },
-            timestamp: Date.now(),
-          }),
-        },
-      ).catch(() => {});
-      // #endregion
     } catch (error) {
-      // #region agent log
-      fetch(
-        "http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Debug-Session-Id": "9080fe",
-          },
-          body: JSON.stringify({
-            sessionId: "9080fe",
-            runId: "post-fix",
-            hypothesisId: "H11_CLIENT_MENU_BUTTON",
-            location:
-              "src/handlers/client.js:handleClientStart:setChatMenuButton:failed",
-            message: "Failed to configure client-specific menu button",
-            data: {
-              chatId: ctx?.from?.id,
-              webappUrl: deps.webappUrl,
-              errorMessage: error?.message || String(error),
-            },
-            timestamp: Date.now(),
-          }),
-        },
-      ).catch(() => {});
-      // #endregion
+      // setChatMenuButton failed silently — non-critical
     }
-    // #region agent log
-    fetch("http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "9080fe",
-      },
-      body: JSON.stringify({
-        sessionId: "9080fe",
-        runId: "post-fix",
-        hypothesisId: "H10_CLIENT_START_WEBAPP_BUTTON",
-        location: "src/handlers/client.js:handleClientStart:webappButton",
-        message: "Sending web app button to client on /start",
-        data: { fromId: ctx?.from?.id, webappUrl: deps.webappUrl },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
     await ctx.reply(
       "Открыть Mini App:",
       Markup.inlineKeyboard([

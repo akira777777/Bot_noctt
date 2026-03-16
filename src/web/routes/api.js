@@ -12,29 +12,6 @@ function createApiRouter({ repos }) {
   const adminService = createAdminService({ repos });
 
   function requireAdmin(req, res, next) {
-    // #region agent log
-    fetch("http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "8930e6",
-      },
-      body: JSON.stringify({
-        sessionId: "8930e6",
-        runId: "pre-fix",
-        hypothesisId: "H4_ADMIN_GATE",
-        location: "src/web/routes/api.js:15",
-        message: "Admin gate evaluation",
-        data: {
-          path: req.path,
-          method: req.method,
-          authUserId: req.auth?.telegram_id || null,
-          isAdmin: Boolean(req.auth?.is_admin),
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
     if (!req.auth?.is_admin) {
       return res.status(403).json({ ok: false, error: "Forbidden" });
     }
@@ -62,29 +39,6 @@ function createApiRouter({ repos }) {
       leads = leads.filter((lead) => lead.status === statusFilter);
     }
 
-    // #region agent log
-    fetch("http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "8930e6",
-      },
-      body: JSON.stringify({
-        sessionId: "8930e6",
-        runId: "pre-fix",
-        hypothesisId: "H5_STATUS_FILTER",
-        location: "src/web/routes/api.js:46",
-        message: "Leads endpoint filter evaluation",
-        data: {
-          rawStatus: req.query.status || null,
-          normalizedStatus: statusFilter || null,
-          afterCount: leads.length,
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
-
     return res.json({ ok: true, leads });
   });
 
@@ -93,32 +47,6 @@ function createApiRouter({ repos }) {
     const status = normalizeLeadStatus(req.body?.status);
 
     if (!leadId || !status) {
-      // #region agent log
-      fetch(
-        "http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Debug-Session-Id": "8930e6",
-          },
-          body: JSON.stringify({
-            sessionId: "8930e6",
-            runId: "pre-fix",
-            hypothesisId: "H6_STATUS_UPDATE_PAYLOAD",
-            location: "src/web/routes/api.js:56",
-            message: "Lead status update rejected as invalid payload",
-            data: {
-              rawLeadId: req.params.id,
-              parsedLeadId: leadId,
-              rawStatus: req.body?.status ?? null,
-              normalizedStatus: status,
-            },
-            timestamp: Date.now(),
-          }),
-        },
-      ).catch(() => {});
-      // #endregion
       return res.status(400).json({
         ok: false,
         error: "Invalid payload",
@@ -136,29 +64,6 @@ function createApiRouter({ repos }) {
     }
 
     const updated = repos.leads.updateStatus(leadId, status);
-    // #region agent log
-    fetch("http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "8930e6",
-      },
-      body: JSON.stringify({
-        sessionId: "8930e6",
-        runId: "post-fix",
-        hypothesisId: "H10_STATUS_UPDATE_SUCCESS",
-        location: "src/web/routes/api.js:138",
-        message: "Lead status update succeeded",
-        data: {
-          leadId,
-          previousStatus: existing.status,
-          nextStatus: status,
-          persistedStatus: updated?.status || null,
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
     return res.json({ ok: true, lead: normalizeLeadRecord(updated) });
   });
 
