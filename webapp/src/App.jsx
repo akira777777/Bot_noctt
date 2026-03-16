@@ -90,31 +90,6 @@ export default function App() {
     try {
       await fn();
     } catch (err) {
-      // #region agent log
-      fetch(
-        "http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Debug-Session-Id": "8930e6",
-          },
-          body: JSON.stringify({
-            sessionId: "8930e6",
-            runId: "post-fix",
-            hypothesisId: "H12_UI_ERROR_SURFACE",
-            location: "webapp/src/App.jsx:93",
-            message: "UI surfaced operation error",
-            data: {
-              errorMessage: err?.message || "unknown",
-              activeTab,
-              statusFilter,
-            },
-            timestamp: Date.now(),
-          }),
-        },
-      ).catch(() => {});
-      // #endregion
       setError(err.message || "Operation failed");
     } finally {
       setLoading(false);
@@ -201,30 +176,6 @@ export default function App() {
   async function updateLeadStatus(leadId, status) {
     const normalizedStatus = normalizeLeadStatus(status);
     if (!normalizedStatus) {
-      // #region agent log
-      fetch(
-        "http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Debug-Session-Id": "8930e6",
-          },
-          body: JSON.stringify({
-            sessionId: "8930e6",
-            runId: "post-fix",
-            hypothesisId: "H9_FRONTEND_STATUS_GUARD",
-            location: "webapp/src/App.jsx:updateLeadStatus",
-            message: "Rejected invalid lead status on client",
-            data: {
-              leadId,
-              rawStatus: status,
-            },
-            timestamp: Date.now(),
-          }),
-        },
-      ).catch(() => {});
-      // #endregion
       setError("Некорректный статус заявки.");
       return;
     }
