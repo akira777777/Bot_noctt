@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: bot-noct
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build:web
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_ID
+        sync: false
+      - key: DB_PATH
+        value: /opt/render/project/src/data/bot.sqlite
+      - key: PORT
+        value: 10000
+      - key: WEBAPP_BOT_USERNAME
+        sync: false
+    disks:
+      - name: sqlite-data
+        mountPath: /opt/render/project/src/data
+        sizeGB: 1

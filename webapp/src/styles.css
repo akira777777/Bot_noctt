@@ -1,0 +1,104 @@
+:root {
+  color-scheme: light dark;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--tg-theme-bg-color, #111);
+  color: var(--tg-theme-text-color, #f4f4f4);
+}
+
+.container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.subtle {
+  opacity: 0.7;
+  font-size: 14px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  border: 1px solid #666;
+  background: transparent;
+  color: inherit;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.tab.active {
+  border-color: #4a90e2;
+}
+
+.error {
+  border: 1px solid #c44;
+  background: #5c1f1f;
+  color: #ffd8d8;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.card {
+  border: 1px solid #666;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+th,
+td {
+  border-bottom: 1px solid #444;
+  text-align: left;
+  padding: 8px;
+  vertical-align: top;
+}
+
+input,
+textarea,
+select,
+button {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 1px solid #666;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+button {
+  cursor: pointer;
+}

@@ -1,0 +1,10 @@
+.env
+node_modules/
+
+# Local SQLite data
+data/*.sqlite
+data/*.sqlite-wal
+data/*.sqlite-shm
+
+# Backups
+backups/

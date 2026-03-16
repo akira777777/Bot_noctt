@@ -1,0 +1,21 @@
+{
+  "canonical": [
+    "new",
+    "in_progress",
+    "called_back",
+    "awaiting_payment",
+    "fulfilled",
+    "closed"
+  ],
+  "aliases": {
+    "open": "new"
+  },
+  "labels": {
+    "new": "Новая — ожидает рассмотрения",
+    "in_progress": "В работе — менеджер занимается вашей заявкой",
+    "called_back": "Перезвонили — менеджер связывается с вами",
+    "awaiting_payment": "Ожидает оплаты",
+    "fulfilled": "Выполнена",
+    "closed": "Закрыта"
+  }
+}
