@@ -110,6 +110,47 @@
   gap: 8px;
 }
 
+/* ── Menu home screen ────────────────────────────── */
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.menu-card {
+  padding: 24px 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  font-size: 16px;
+  font-weight: 600;
+  background: var(--surface);
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+}
+
+.menu-card:hover {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+}
+
+.tab-back {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: 8px 4px;
+  cursor: pointer;
+  font-size: 13px;
+  margin-right: 8px;
+}
+
+.tab-back:hover {
+  color: var(--text-primary);
+}
+
 /* ── Tables ───────────────────────────────────────── */
 
 .table-wrapper {
