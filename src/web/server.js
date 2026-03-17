@@ -9,6 +9,7 @@ const {
 
 function createWebServer({
   repos,
+  notifyAdmin,
   botToken,
   adminId,
   corsOrigin,
@@ -68,7 +69,7 @@ function createWebServer({
   app.use(
     "/api",
     verifyTelegramInitData,
-    createApiRouter({ repos, isProduction }),
+    createApiRouter({ repos, notifyAdmin, isProduction }),
   );
 
   if (hasBuiltFrontend) {

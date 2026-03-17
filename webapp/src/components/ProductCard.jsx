@@ -36,7 +36,15 @@ export default function ProductCard({ product, onOrder }) {
           <div className="product-desc">{product.description}</div>
         ) : null}
         <div className="product-footer">
-          <span className="product-price">{product.price_text || "—"}</span>
+          <div className="product-prices">
+            {product.price_per_unit ? (
+              <span className="product-unit-price">
+                {product.price_per_unit.toLocaleString("ru-RU")} ₽/шт.
+              </span>
+            ) : (
+              <span className="product-price">{product.price_text || "—"}</span>
+            )}
+          </div>
           <button className="order-btn" onClick={onOrder}>
             Заказать
           </button>

@@ -72,7 +72,7 @@ function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
     return repos.products.listAll();
   }
 
-  function addProduct({ code, title, description, price_text, sort_order }) {
+  function addProduct({ code, title, description, price_text, price_per_unit, image_url, sort_order }) {
     const existing = repos.products.getByCode(code);
     if (existing) {
       return { ok: false, error: `Товар с кодом "${code}" уже существует.` };
@@ -82,12 +82,14 @@ function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
       title,
       description: description || "",
       price_text: price_text || "",
+      price_per_unit: price_per_unit ?? null,
+      image_url: image_url ?? null,
       sort_order: sort_order || 0,
     });
     return { ok: true, product };
   }
 
-  function editProduct({ id, title, description, price_text, sort_order }) {
+  function editProduct({ id, title, description, price_text, price_per_unit, image_url, sort_order }) {
     const existing = repos.products.getById(id);
     if (!existing) {
       return { ok: false, error: `Товар #${id} не найден.` };
@@ -95,9 +97,10 @@ function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
     const product = repos.products.update({
       id,
       title: title !== undefined ? title : existing.title,
-      description:
-        description !== undefined ? description : existing.description,
+      description: description !== undefined ? description : existing.description,
       price_text: price_text !== undefined ? price_text : existing.price_text,
+      price_per_unit: price_per_unit !== undefined ? price_per_unit : existing.price_per_unit,
+      image_url: image_url !== undefined ? image_url : existing.image_url,
       sort_order: sort_order !== undefined ? sort_order : existing.sort_order,
     });
     return { ok: true, product };

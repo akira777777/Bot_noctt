@@ -117,8 +117,16 @@ async function bootstrap() {
   const db = createDatabase();
   const repos = createRepositories(db);
   const bot = createBot({ db, repos });
+
+  function notifyAdmin(text) {
+    return bot.telegram
+      .sendMessage(ADMIN_ID, text, { parse_mode: "HTML" })
+      .catch((err) => logError("Admin notification failed", err));
+  }
+
   const webServer = createWebServer({
     repos,
+    notifyAdmin,
     botToken: BOT_TOKEN,
     adminId: ADMIN_ID,
     corsOrigin: CORS_ORIGIN,

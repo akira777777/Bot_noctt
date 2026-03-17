@@ -122,6 +122,12 @@ function createRepositories(db) {
     `),
     countLeads: db.prepare(`SELECT COUNT(*) AS cnt FROM leads`),
     countLeadsByStatus: db.prepare(`SELECT COUNT(*) AS cnt FROM leads WHERE status = ?`),
+    listLeadsByClient: db.prepare(`
+      SELECT * FROM leads
+      WHERE client_telegram_id = ?
+      ORDER BY datetime(created_at) DESC
+      LIMIT 50
+    `),
     countProducts: db.prepare(`SELECT COUNT(*) AS cnt FROM products`),
     countActiveProducts: db.prepare(`SELECT COUNT(*) AS cnt FROM products WHERE is_active = 1`),
     updateLeadStatus: db.prepare(`
@@ -142,13 +148,13 @@ function createRepositories(db) {
       SELECT * FROM products WHERE code = ?
     `),
     insertProduct: db.prepare(`
-      INSERT INTO products (code, title, description, price_text, image_url, is_active, sort_order)
-      VALUES (@code, @title, @description, @price_text, @image_url, 1, @sort_order)
+      INSERT INTO products (code, title, description, price_text, price_per_unit, image_url, is_active, sort_order)
+      VALUES (@code, @title, @description, @price_text, @price_per_unit, @image_url, 1, @sort_order)
     `),
     updateProduct: db.prepare(`
       UPDATE products
       SET title = @title, description = @description, price_text = @price_text,
-          image_url = @image_url, sort_order = @sort_order
+          price_per_unit = @price_per_unit, image_url = @image_url, sort_order = @sort_order
       WHERE id = @id
     `),
     setProductActive: db.prepare(`
@@ -285,6 +291,9 @@ function createRepositories(db) {
       },
       getLatestByClient(telegramId) {
         return statements.getLatestLeadByClient.get(telegramId);
+      },
+      listByClient(telegramId) {
+        return statements.listLeadsByClient.all(telegramId);
       },
       getOpenByClientAndProduct(telegramId, productCode) {
         return statements.getOpenLeadByClientAndProduct.get(

@@ -7,7 +7,7 @@ const {
   normalizeLeadRecords,
 } = require("../../domain/lead-status");
 
-function createApiRouter({ repos, isProduction = false }) {
+function createApiRouter({ repos, notifyAdmin = null, isProduction = false }) {
   const router = express.Router();
   const adminService = createAdminService({ repos });
 
@@ -60,7 +60,30 @@ function createApiRouter({ repos, isProduction = false }) {
       status: "new",
     });
 
+    // Notify admin via Telegram (fire-and-forget)
+    if (notifyAdmin) {
+      const clientTag = req.auth.username
+        ? `@${req.auth.username}`
+        : req.auth.first_name || String(req.auth.telegram_id);
+      const commentLine = lead.comment ? `\n💬 <i>${lead.comment}</i>` : "";
+      const contactLine = lead.contact_label
+        ? `\n📞 Контакт: ${lead.contact_label}`
+        : "";
+      notifyAdmin(
+        `🛒 <b>Новая заявка #${lead.id} (Mini App)</b>\n` +
+          `📦 Товар: ${product.title}\n` +
+          `🔢 Количество: ${qty}${contactLine}${commentLine}\n` +
+          `👤 Клиент: ${clientTag} (<code>${req.auth.telegram_id}</code>)`,
+      );
+    }
+
     return res.status(201).json({ ok: true, lead });
+  });
+
+  // GET /api/my-leads — authenticated user's own order history
+  router.get("/my-leads", requireAuth, (req, res) => {
+    const leads = repos.leads.listByClient(req.auth.telegram_id);
+    return res.json({ ok: true, leads: normalizeLeadRecords(leads) });
   });
 
   router.get("/admin/me", requireAdmin, (req, res) => {
@@ -77,7 +100,7 @@ function createApiRouter({ repos, isProduction = false }) {
 
   // GET /api/leads/export.csv — must be declared before /leads/:id to avoid param conflict
   router.get("/leads/export.csv", requireAdmin, (_req, res) => {
-    const csv = adminService.exportLeadsCsv();
+    const { csv } = adminService.exportLeadsCsv();
     res.setHeader("Content-Type", "text/csv; charset=utf-8");
     res.setHeader("Content-Disposition", 'attachment; filename="leads.csv"');
     return res.send(csv);
@@ -143,7 +166,7 @@ function createApiRouter({ repos, isProduction = false }) {
   });
 
   router.post("/products", requireAdmin, (req, res) => {
-    const { code, title, description, price_text, image_url, sort_order } = req.body || {};
+    const { code, title, description, price_text, price_per_unit, image_url, sort_order } = req.body || {};
 
     if (!code || !title) {
       return res
@@ -156,6 +179,7 @@ function createApiRouter({ repos, isProduction = false }) {
       title: String(title).trim(),
       description: description ? String(description) : "",
       price_text: price_text ? String(price_text) : "",
+      price_per_unit: price_per_unit != null ? Number(price_per_unit) || null : null,
       image_url: image_url ? String(image_url).trim() : null,
       sort_order: Number(sort_order) || 0,
     });
@@ -179,6 +203,7 @@ function createApiRouter({ repos, isProduction = false }) {
       title: payload.title,
       description: payload.description,
       price_text: payload.price_text,
+      price_per_unit: payload.price_per_unit !== undefined ? (Number(payload.price_per_unit) || null) : undefined,
       image_url: payload.image_url !== undefined ? (payload.image_url || null) : undefined,
       sort_order:
         payload.sort_order !== undefined
