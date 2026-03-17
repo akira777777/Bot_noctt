@@ -2,14 +2,14 @@ const { formatSourceLabel } = require("../utils/formatters");
 const { getLeadStatusLabel } = require("../domain/lead-status");
 
 function welcomeMessage(entry) {
+  const tagline =
+    "Просто напишите, что вас интересует — мы найдём и сообщим цену.";
+
   if (entry?.source === "channel") {
-    return (
-      `${entry.title}.\n\n` +
-      "Здесь можно быстро открыть каталог, оставить заявку или сразу написать менеджеру."
-    );
+    return `${entry.title}.\n\n${tagline}`;
   }
 
-  return "Здравствуйте. Это бот для заявок, каталога и связи с менеджером.";
+  return `Здравствуйте! Мы можем найти для вас всё что угодно.\n\n${tagline}`;
 }
 
 function helpMessage() {
@@ -88,8 +88,8 @@ function leadCreatedMessage() {
 
 function contactManagerMessage() {
   return (
-    "Вы в режиме связи с менеджером.\n" +
-    "Напишите сообщение, и администратор получит его в рабочем чате."
+    "Напишите, что вас интересует — любой товар или услуга.\n\n" +
+    "Мы подберём вариант и сообщим цену в ответном сообщении."
   );
 }
 

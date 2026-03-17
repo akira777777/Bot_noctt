@@ -32,10 +32,7 @@ const {
 } = require("../utils/source-payload");
 
 const HOME_ACTION_LABELS = {
-  "Оставить заявку": "lead:start",
-  Каталог: "catalog:root",
-  "Связаться с менеджером": "contact:manager",
-  "Как оформить заказ": "info:how_to_order",
+  "💬 Что вас интересует?": "contact:manager",
 };
 
 function getCurrentSourcePayload(repos, clientId, fallbackSource = null) {
