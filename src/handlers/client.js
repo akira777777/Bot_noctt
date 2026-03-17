@@ -26,6 +26,7 @@ const {
 } = require("../ui/messages");
 const { buildCatalogIntro, buildProductCard } = require("../ui/catalog-view");
 const { safeAnswerCbQuery } = require("../utils/telegram");
+const { parseActionId } = require("../utils/actions");
 const {
   parseSourcePayload,
   resolveStartAction,
@@ -47,10 +48,6 @@ function setHomeSession(repos, clientId, sourcePayload) {
   repos.sessions.set(clientId, "home", "menu", {
     sourcePayload: sourcePayload || null,
   });
-}
-
-function parseActionId(action) {
-  return Number(action.split(":")[2]);
 }
 
 async function showHomeScreen(ctx, deps, entry) {
