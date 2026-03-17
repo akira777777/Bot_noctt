@@ -16,6 +16,10 @@ function createRepositories(db) {
     listUsers: db.prepare(`
       SELECT * FROM users ORDER BY datetime(updated_at) DESC LIMIT ?
     `),
+    listUsersPaginated: db.prepare(`
+      SELECT * FROM users ORDER BY datetime(updated_at) DESC LIMIT ? OFFSET ?
+    `),
+    countUsers: db.prepare(`SELECT COUNT(*) AS cnt FROM users`),
     ensureConversation: db.prepare(`
       INSERT INTO conversations (client_telegram_id, assigned_admin_id, status, source_payload, last_message_at)
       VALUES (?, ?, 'open', ?, CURRENT_TIMESTAMP)
@@ -101,6 +105,25 @@ function createRepositories(db) {
       LEFT JOIN users u ON u.telegram_id = l.client_telegram_id
       ORDER BY datetime(l.created_at) DESC
     `),
+    listLeadsPaginated: db.prepare(`
+      SELECT l.*, u.username, u.first_name, u.last_name
+      FROM leads l
+      LEFT JOIN users u ON u.telegram_id = l.client_telegram_id
+      ORDER BY datetime(l.created_at) DESC
+      LIMIT ? OFFSET ?
+    `),
+    listLeadsPaginatedByStatus: db.prepare(`
+      SELECT l.*, u.username, u.first_name, u.last_name
+      FROM leads l
+      LEFT JOIN users u ON u.telegram_id = l.client_telegram_id
+      WHERE l.status = ?
+      ORDER BY datetime(l.created_at) DESC
+      LIMIT ? OFFSET ?
+    `),
+    countLeads: db.prepare(`SELECT COUNT(*) AS cnt FROM leads`),
+    countLeadsByStatus: db.prepare(`SELECT COUNT(*) AS cnt FROM leads WHERE status = ?`),
+    countProducts: db.prepare(`SELECT COUNT(*) AS cnt FROM products`),
+    countActiveProducts: db.prepare(`SELECT COUNT(*) AS cnt FROM products WHERE is_active = 1`),
     updateLeadStatus: db.prepare(`
       UPDATE leads
       SET status = ?, updated_at = CURRENT_TIMESTAMP
@@ -191,6 +214,12 @@ function createRepositories(db) {
       list(limit = 100) {
         return statements.listUsers.all(limit);
       },
+      listPaginated(limit, offset) {
+        return statements.listUsersPaginated.all(limit, offset);
+      },
+      count() {
+        return statements.countUsers.get().cnt;
+      },
       block(telegramId) {
         return statements.blockUser.run(telegramId);
       },
@@ -238,6 +267,18 @@ function createRepositories(db) {
       listAll() {
         return statements.listAllLeads.all();
       },
+      listPaginated(limit, offset, status = null) {
+        if (status) {
+          return statements.listLeadsPaginatedByStatus.all(status, limit, offset);
+        }
+        return statements.listLeadsPaginated.all(limit, offset);
+      },
+      count(status = null) {
+        if (status) {
+          return statements.countLeadsByStatus.get(status).cnt;
+        }
+        return statements.countLeads.get().cnt;
+      },
       getById(id) {
         return statements.getLeadById.get(id);
       },
@@ -279,6 +320,12 @@ function createRepositories(db) {
       setActive(id, isActive) {
         statements.setProductActive.run(isActive ? 1 : 0, id);
         return statements.getProductById.get(id);
+      },
+      count() {
+        return statements.countProducts.get().cnt;
+      },
+      countActive() {
+        return statements.countActiveProducts.get().cnt;
       },
     },
     adminState: {
@@ -334,6 +381,9 @@ function createRepositories(db) {
       },
       clear(telegramId) {
         statements.clearSession.run(telegramId);
+      },
+      clearExpired() {
+        return statements.clearExpiredSessions.run().changes;
       },
     },
   };

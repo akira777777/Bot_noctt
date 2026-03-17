@@ -138,6 +138,12 @@ async function bootstrap() {
     resources.httpServer = await startHttpServer(webServer, PORT);
     logInfo(`Web server started on port ${PORT}`);
 
+    // Clean up expired sessions accumulated from previous runs
+    const expiredCount = repos.sessions.clearExpired();
+    if (expiredCount > 0) {
+      logInfo(`Cleared ${expiredCount} expired session(s)`);
+    }
+
     await bot.launch();
     resources.botLaunched = true;
     logInfo("Bot started");

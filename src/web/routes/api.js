@@ -31,15 +31,42 @@ function createApiRouter({ repos, isProduction = false }) {
     });
   });
 
+  // GET /api/leads/export.csv — must be declared before /leads/:id to avoid param conflict
+  router.get("/leads/export.csv", requireAdmin, (_req, res) => {
+    const csv = adminService.exportLeadsCsv();
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", 'attachment; filename="leads.csv"');
+    return res.send(csv);
+  });
+
   router.get("/leads", requireAdmin, (req, res) => {
-    const statusFilter = normalizeLeadStatus(req.query.status);
-    let leads = normalizeLeadRecords(repos.leads.listAll());
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(Math.max(1, Number(req.query.limit) || 50), 200);
+    const offset = (page - 1) * limit;
+    const statusFilter = normalizeLeadStatus(req.query.status) || null;
 
-    if (req.query.status && statusFilter) {
-      leads = leads.filter((lead) => lead.status === statusFilter);
+    const total = repos.leads.count(statusFilter);
+    const leads = normalizeLeadRecords(
+      repos.leads.listPaginated(limit, offset, statusFilter),
+    );
+
+    return res.json({
+      ok: true,
+      leads,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    });
+  });
+
+  router.get("/leads/:id", requireAdmin, (req, res) => {
+    const id = Number(req.params.id);
+    if (!id) {
+      return res.status(400).json({ ok: false, error: "Invalid lead id" });
     }
-
-    return res.json({ ok: true, leads });
+    const lead = repos.leads.getById(id);
+    if (!lead) {
+      return res.status(404).json({ ok: false, error: "Lead not found" });
+    }
+    return res.json({ ok: true, lead: normalizeLeadRecord(lead) });
   });
 
   router.patch("/leads/:id/status", requireAdmin, (req, res) => {
@@ -136,22 +163,16 @@ function createApiRouter({ repos, isProduction = false }) {
 
   router.get("/users", requireAdmin, (req, res) => {
     const page = Math.max(1, Number(req.query.page) || 1);
-    const limit = Math.min(Math.max(1, Number(req.query.limit) || 50), 500);
+    const limit = Math.min(Math.max(1, Number(req.query.limit) || 50), 200);
     const offset = (page - 1) * limit;
 
-    const allUsers = repos.users.list(500); // Get max for counting
-    const total = allUsers.length;
-    const paginatedUsers = allUsers.slice(offset, offset + limit);
+    const total = repos.users.count();
+    const users = repos.users.listPaginated(limit, offset);
 
     return res.json({
       ok: true,
-      users: paginatedUsers,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-      },
+      users,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
   });
 
@@ -184,7 +205,16 @@ function createApiRouter({ repos, isProduction = false }) {
   });
 
   router.get("/stats", requireAdmin, (req, res) => {
-    return res.json({ ok: true, stats: adminService.getStats() });
+    const stats = adminService.getStats();
+    return res.json({
+      ok: true,
+      stats: {
+        ...stats,
+        total_users: repos.users.count(),
+        total_products: repos.products.count(),
+        active_products: repos.products.countActive(),
+      },
+    });
   });
 
   router.use((err, _req, res, next) => {
