@@ -13,7 +13,7 @@ const {
   clientLeadFulfilledMessage,
 } = require("../ui/messages");
 const { formatConversationRow, formatLeadRow } = require("../utils/formatters");
-const { safeAnswerCbQuery, safeSendMessage } = require("../utils/telegram");
+const { safeAnswerCbQuery, safeSendMessage, safeReply, safeEditMessageReplyMarkup } = require("../utils/telegram");
 const { getLeadStatusLabel } = require("../domain/lead-status");
 
 function isAdmin(ctx, deps) {
@@ -25,16 +25,15 @@ function parseActionId(action) {
 }
 
 async function replaceWithStatusButton(ctx, text) {
-  try {
-    await ctx.editMessageReplyMarkup({
-      inline_keyboard: [[{ text, callback_data: "admin:noop" }]],
-    });
-  } catch (_) {}
+  await safeEditMessageReplyMarkup(ctx, {
+    inline_keyboard: [[{ text, callback_data: "admin:noop" }]],
+  });
 }
 
 async function selectClient(ctx, deps, clientId) {
   deps.services.admin.selectClient(ctx.from.id, clientId);
-  await ctx.reply(
+  await safeReply(
+    ctx,
     adminSelectedClientMessage(clientId),
     adminQuickReplyKeyboard(clientId),
   );
@@ -46,7 +45,8 @@ async function sendAdminReply(ctx, deps, clientId, text) {
     clientId,
     text,
   });
-  await ctx.reply(
+  await safeReply(
+    ctx,
     "Сообщение отправлено клиенту.",
     adminQuickReplyKeyboard(clientId),
   );
@@ -55,13 +55,13 @@ async function sendAdminReply(ctx, deps, clientId, text) {
 async function showInbox(ctx, deps, title = "Inbox") {
   const dialogs = deps.services.admin.listRecentDialogs(8);
   if (!dialogs.length) {
-    await ctx.reply("Inbox пока пуст. Новые обращения появятся здесь.");
+    await safeReply(ctx, "Inbox пока пуст. Новые обращения появятся здесь.");
     return;
   }
 
   const text = [title].concat(dialogs.map(formatConversationRow)).join("\n");
 
-  await ctx.reply(text, adminInboxKeyboard(dialogs));
+  await safeReply(ctx, text, adminInboxKeyboard(dialogs));
 }
 
 function registerAdminCommands(bot, deps) {
@@ -72,7 +72,7 @@ function registerAdminCommands(bot, deps) {
 
     const rows = deps.services.admin.listRecentDialogs(10);
     if (rows.length === 0) {
-      await ctx.reply("Активных клиентов пока нет.");
+      await safeReply(ctx, "Активных клиентов пока нет.");
       return;
     }
 
@@ -80,7 +80,7 @@ function registerAdminCommands(bot, deps) {
       .concat(rows.map(formatConversationRow))
       .join("\n");
 
-    await ctx.reply(text);
+    await safeReply(ctx, text);
   });
 
   bot.command("dialogs", async (ctx) => {
@@ -98,7 +98,7 @@ function registerAdminCommands(bot, deps) {
 
     const rows = deps.services.admin.listRecentLeads(10);
     if (rows.length === 0) {
-      await ctx.reply("Заявок пока нет.");
+      await safeReply(ctx, "Заявок пока нет.");
       return;
     }
 
@@ -106,7 +106,7 @@ function registerAdminCommands(bot, deps) {
       .concat(rows.map(formatLeadRow))
       .join("\n");
 
-    await ctx.reply(text);
+    await safeReply(ctx, text);
   });
 
   bot.command("setclient", async (ctx) => {
@@ -117,7 +117,7 @@ function registerAdminCommands(bot, deps) {
     const [, rawClientId] = ctx.message.text.split(" ");
     const clientId = Number(rawClientId);
     if (!clientId) {
-      await ctx.reply("Используйте команду в формате: /setclient 123456789");
+      await safeReply(ctx, "Используйте команду в формате: /setclient 123456789");
       return;
     }
 
@@ -130,7 +130,7 @@ function registerAdminCommands(bot, deps) {
     }
 
     deps.services.admin.clearSelectedClient(ctx.from.id);
-    await ctx.reply("Активный диалог сброшен.");
+    await safeReply(ctx, "Активный диалог сброшен.");
   });
 
   bot.command("products", async (ctx) => {
@@ -140,7 +140,7 @@ function registerAdminCommands(bot, deps) {
 
     const products = deps.services.admin.listAllProducts();
     if (!products.length) {
-      await ctx.reply("Товаров пока нет.");
+      await safeReply(ctx, "Товаров пока нет.");
       return;
     }
 
@@ -148,7 +148,7 @@ function registerAdminCommands(bot, deps) {
       const status = p.is_active ? "✅" : "❌";
       return `${status} #${p.id} [${p.code}] ${p.title} — ${p.price_text}`;
     });
-    await ctx.reply("Список всех товаров:\n" + lines.join("\n"));
+    await safeReply(ctx, "Список всех товаров:\n" + lines.join("\n"));
   });
 
   bot.command("addproduct", async (ctx) => {
@@ -160,7 +160,8 @@ function registerAdminCommands(bot, deps) {
     const parts = rawArgs.split("|").map((s) => s.trim());
 
     if (parts.length < 2 || !parts[0] || !parts[1]) {
-      await ctx.reply(
+      await safeReply(
+        ctx,
         "Формат: /addproduct <код> | <название> | <описание> | <цена>\n" +
           "Пример: /addproduct widget | Виджет | Описание товара | от 100 руб.",
       );
@@ -177,12 +178,13 @@ function registerAdminCommands(bot, deps) {
     });
 
     if (!result.ok) {
-      await ctx.reply(`Ошибка: ${result.error}`);
+      await safeReply(ctx, `Ошибка: ${result.error}`);
       return;
     }
 
     const p = result.product;
-    await ctx.reply(
+    await safeReply(
+      ctx,
       `Товар добавлен ✅\n\nID: ${p.id}\nКод: ${p.code}\nНазвание: ${p.title}\nОписание: ${p.description}\nЦена: ${p.price_text}`,
     );
   });
@@ -196,7 +198,8 @@ function registerAdminCommands(bot, deps) {
     const parts = rawArgs.split("|").map((s) => s.trim());
 
     if (parts.length < 2 || !parts[0]) {
-      await ctx.reply(
+      await safeReply(
+        ctx,
         "Формат: /editproduct <id> | <название> | <описание> | <цена>\n" +
           "Пример: /editproduct 3 | Новое название | Новое описание | от 200 руб.",
       );
@@ -205,7 +208,7 @@ function registerAdminCommands(bot, deps) {
 
     const id = Number(parts[0]);
     if (!id) {
-      await ctx.reply("Первым аргументом должен быть числовой ID товара.");
+      await safeReply(ctx, "Первым аргументом должен быть числовой ID товара.");
       return;
     }
 
@@ -218,12 +221,13 @@ function registerAdminCommands(bot, deps) {
     });
 
     if (!result.ok) {
-      await ctx.reply(`Ошибка: ${result.error}`);
+      await safeReply(ctx, `Ошибка: ${result.error}`);
       return;
     }
 
     const p = result.product;
-    await ctx.reply(
+    await safeReply(
+      ctx,
       `Товар обновлён ✅\n\nID: ${p.id}\nКод: ${p.code}\nНазвание: ${p.title}\nОписание: ${p.description}\nЦена: ${p.price_text}`,
     );
   });
@@ -236,19 +240,19 @@ function registerAdminCommands(bot, deps) {
     const [, rawId] = ctx.message.text.split(" ");
     const id = Number(rawId);
     if (!id) {
-      await ctx.reply("Используйте команду в формате: /toggleproduct <id>");
+      await safeReply(ctx, "Используйте команду в формате: /toggleproduct <id>");
       return;
     }
 
     const result = deps.services.admin.toggleProduct(id);
     if (!result.ok) {
-      await ctx.reply(`Ошибка: ${result.error}`);
+      await safeReply(ctx, `Ошибка: ${result.error}`);
       return;
     }
 
     const p = result.product;
     const status = p.is_active ? "активирован ✅" : "деактивирован ❌";
-    await ctx.reply(`Товар #${p.id} (${p.code}) ${status}.`);
+    await safeReply(ctx, `Товар #${p.id} (${p.code}) ${status}.`);
   });
 
   bot.command("history", async (ctx) => {
@@ -264,7 +268,8 @@ function registerAdminCommands(bot, deps) {
     }
 
     if (!clientId) {
-      await ctx.reply(
+      await safeReply(
+        ctx,
         "Укажите клиента командой /history <telegram_id> или выберите клиента через диалог.",
       );
       return;
@@ -272,12 +277,12 @@ function registerAdminCommands(bot, deps) {
 
     const result = deps.services.admin.getClientHistory(clientId);
     if (!result.ok) {
-      await ctx.reply(`Ошибка: ${result.error}`);
+      await safeReply(ctx, `Ошибка: ${result.error}`);
       return;
     }
 
     if (!result.messages.length) {
-      await ctx.reply(`Сообщений для клиента ${clientId} не найдено.`);
+      await safeReply(ctx, `Сообщений для клиента ${clientId} не найдено.`);
       return;
     }
 
@@ -289,7 +294,7 @@ function registerAdminCommands(bot, deps) {
     });
 
     const header = `📋 История диалога (клиент ${clientId}), последние ${result.messages.length} сообщений:\n\n`;
-    await ctx.reply(header + lines.join("\n\n—————\n\n"), {
+    await safeReply(ctx, header + lines.join("\n\n—————\n\n"), {
       parse_mode: undefined,
     });
   });
@@ -317,7 +322,7 @@ function registerAdminCommands(bot, deps) {
       `По статусам:\n${statusLines.join("\n") || "  Нет данных"}\n\n` +
       `Топ товаров:\n${productLines.join("\n") || "  Нет данных"}`;
 
-    await ctx.reply(text);
+    await safeReply(ctx, text);
   });
 
   bot.command("exportleads", async (ctx) => {
@@ -327,12 +332,12 @@ function registerAdminCommands(bot, deps) {
 
     const result = deps.services.admin.exportLeadsCsv();
     if (!result.ok) {
-      await ctx.reply("Ошибка при экспорте заявок.");
+      await safeReply(ctx, "Ошибка при экспорте заявок.");
       return;
     }
 
     if (result.count === 0) {
-      await ctx.reply("Заявок пока нет — экспортировать нечего.");
+      await safeReply(ctx, "Заявок пока нет — экспортировать нечего.");
       return;
     }
 
@@ -352,23 +357,23 @@ function registerAdminCommands(bot, deps) {
     const args = ctx.message.text.split(" ").slice(1);
     const telegramId = parseInt(args[0], 10);
     if (!telegramId || isNaN(telegramId)) {
-      await ctx.reply("Использование: /blockuser <telegram_id>");
+      await safeReply(ctx, "Использование: /blockuser <telegram_id>");
       return;
     }
 
     const result = deps.services.admin.blockUser(telegramId);
     if (!result.ok) {
       if (result.reason === "not_found") {
-        await ctx.reply(`Пользователь ${telegramId} не найден.`);
+        await safeReply(ctx, `Пользователь ${telegramId} не найден.`);
       } else if (result.reason === "already_blocked") {
-        await ctx.reply(`Пользователь ${telegramId} уже заблокирован.`);
+        await safeReply(ctx, `Пользователь ${telegramId} уже заблокирован.`);
       } else {
-        await ctx.reply("Ошибка при блокировке пользователя.");
+        await safeReply(ctx, "Ошибка при блокировке пользователя.");
       }
       return;
     }
 
-    await ctx.reply(`Пользователь ${telegramId} заблокирован.`);
+    await safeReply(ctx, `Пользователь ${telegramId} заблокирован.`);
   });
 
   bot.command("unblockuser", async (ctx) => {
@@ -379,23 +384,23 @@ function registerAdminCommands(bot, deps) {
     const args = ctx.message.text.split(" ").slice(1);
     const telegramId = parseInt(args[0], 10);
     if (!telegramId || isNaN(telegramId)) {
-      await ctx.reply("Использование: /unblockuser <telegram_id>");
+      await safeReply(ctx, "Использование: /unblockuser <telegram_id>");
       return;
     }
 
     const result = deps.services.admin.unblockUser(telegramId);
     if (!result.ok) {
       if (result.reason === "not_found") {
-        await ctx.reply(`Пользователь ${telegramId} не найден.`);
+        await safeReply(ctx, `Пользователь ${telegramId} не найден.`);
       } else if (result.reason === "not_blocked") {
-        await ctx.reply(`Пользователь ${telegramId} не заблокирован.`);
+        await safeReply(ctx, `Пользователь ${telegramId} не заблокирован.`);
       } else {
-        await ctx.reply("Ошибка при разблокировке пользователя.");
+        await safeReply(ctx, "Ошибка при разблокировке пользователя.");
       }
       return;
     }
 
-    await ctx.reply(`Пользователь ${telegramId} разблокирован.`);
+    await safeReply(ctx, `Пользователь ${telegramId} разблокирован.`);
   });
 }
 
@@ -423,7 +428,7 @@ async function handleAdminStart(ctx, deps) {
       ])
     : undefined;
 
-  await ctx.reply(message, webAppKeyboard);
+  await safeReply(ctx, message, webAppKeyboard);
 }
 
 async function handleAdminText(ctx, deps) {
@@ -431,7 +436,7 @@ async function handleAdminText(ctx, deps) {
 
   const clientId = deps.services.admin.getActiveClientId(ctx.from.id);
   if (!clientId) {
-    await ctx.reply(adminNoClientSelectedMessage());
+    await safeReply(ctx, adminNoClientSelectedMessage());
     return;
   }
 
@@ -481,7 +486,7 @@ async function handleAdminAction(ctx, deps) {
       lead.client_telegram_id,
       clientLeadTakenMessage(),
     );
-    await ctx.reply(`Заявка #${leadId} переведена в статус "in_progress".`);
+    await safeReply(ctx, `Заявка #${leadId} переведена в статус "in_progress".`);
     return;
   }
 
@@ -499,7 +504,7 @@ async function handleAdminAction(ctx, deps) {
       lead.client_telegram_id,
       clientLeadClosedMessage(),
     );
-    await ctx.reply(`Заявка #${leadId} переведена в статус "closed".`);
+    await safeReply(ctx, `Заявка #${leadId} переведена в статус "closed".`);
     return;
   }
 
@@ -517,7 +522,7 @@ async function handleAdminAction(ctx, deps) {
       lead.client_telegram_id,
       clientLeadCalledBackMessage(),
     );
-    await ctx.reply(`Заявка #${leadId} переведена в статус "called_back".`);
+    await safeReply(ctx, `Заявка #${leadId} переведена в статус "called_back".`);
     return;
   }
 
@@ -535,7 +540,8 @@ async function handleAdminAction(ctx, deps) {
       lead.client_telegram_id,
       clientLeadAwaitingPaymentMessage(),
     );
-    await ctx.reply(
+    await safeReply(
+      ctx,
       `Заявка #${leadId} переведена в статус "awaiting_payment".`,
     );
     return;
@@ -555,7 +561,7 @@ async function handleAdminAction(ctx, deps) {
       lead.client_telegram_id,
       clientLeadFulfilledMessage(),
     );
-    await ctx.reply(`Заявка #${leadId} переведена в статус "fulfilled".`);
+    await safeReply(ctx, `Заявка #${leadId} переведена в статус "fulfilled".`);
     return;
   }
 
@@ -577,7 +583,7 @@ async function handleAdminAction(ctx, deps) {
   if (action === "admin:clear_dialog") {
     deps.services.admin.clearSelectedClient(adminId);
     await safeAnswerCbQuery(ctx, "Диалог сброшен");
-    await ctx.reply("Активный диалог сброшен.");
+    await safeReply(ctx, "Активный диалог сброшен.");
   }
 }
 

@@ -25,7 +25,7 @@ const {
   clientLeadStatusMessage,
 } = require("../ui/messages");
 const { buildCatalogIntro, buildProductCard } = require("../ui/catalog-view");
-const { safeAnswerCbQuery } = require("../utils/telegram");
+const { safeAnswerCbQuery, safeReply } = require("../utils/telegram");
 const {
   parseSourcePayload,
   resolveStartAction,
@@ -55,17 +55,18 @@ function parseActionId(action) {
 
 async function showHomeScreen(ctx, deps, entry) {
   setHomeSession(deps.repos, ctx.from.id, entry.raw);
-  await ctx.reply(welcomeMessage(entry), clientHomeReplyKeyboard());
+  await safeReply(ctx, welcomeMessage(entry), clientHomeReplyKeyboard());
 }
 
 async function showCatalog(ctx, deps) {
   const products = deps.services.catalog.listProducts();
-  await ctx.reply(buildCatalogIntro(products), catalogKeyboard(products));
+  await safeReply(ctx, buildCatalogIntro(products), catalogKeyboard(products));
 }
 
 async function showLeadEntry(ctx, deps) {
   const products = deps.services.catalog.listProducts();
-  await ctx.reply(
+  await safeReply(
+    ctx,
     "Выберите товар, чтобы начать заявку.",
     catalogKeyboard(products),
   );
@@ -74,7 +75,7 @@ async function showLeadEntry(ctx, deps) {
 async function showSupportEntry(ctx, deps) {
   const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
   setHomeSession(deps.repos, ctx.from.id, sourcePayload);
-  await ctx.reply(contactManagerMessage(), backToMainKeyboard());
+  await safeReply(ctx, contactManagerMessage(), backToMainKeyboard());
 }
 
 async function handleHomeAction(ctx, deps, action) {
@@ -104,19 +105,19 @@ async function handleHomeAction(ctx, deps, action) {
 async function showLeadStep(ctx, step, payload = {}) {
   switch (step) {
     case "quantity":
-      await ctx.reply(askQuantityMessage(payload.product), quantityKeyboard());
+      await safeReply(ctx, askQuantityMessage(payload.product), quantityKeyboard());
       return;
     case "comment":
-      await ctx.reply(askCommentMessage(), commentKeyboard());
+      await safeReply(ctx, askCommentMessage(), commentKeyboard());
       return;
     case "contact":
-      await ctx.reply(askContactMessage(), contactKeyboard());
+      await safeReply(ctx, askContactMessage(), contactKeyboard());
       return;
     case "contact_custom":
-      await ctx.reply(askCustomContactMessage(), customContactKeyboard());
+      await safeReply(ctx, askCustomContactMessage(), customContactKeyboard());
       return;
     case "confirm":
-      await ctx.reply(leadSummaryMessage(payload.draft), confirmLeadKeyboard());
+      await safeReply(ctx, leadSummaryMessage(payload.draft), confirmLeadKeyboard());
       return;
   }
 }
@@ -130,7 +131,7 @@ async function handleLeadText(ctx, deps, session) {
     });
 
     if (!result.ok) {
-      await ctx.reply(result.error, quantityKeyboard());
+      await safeReply(ctx, result.error, quantityKeyboard());
       return true;
     }
 
@@ -157,7 +158,7 @@ async function handleLeadText(ctx, deps, session) {
     });
 
     if (!result.ok) {
-      await ctx.reply(result.error, customContactKeyboard());
+      await safeReply(ctx, result.error, customContactKeyboard());
       return true;
     }
 
@@ -166,12 +167,13 @@ async function handleLeadText(ctx, deps, session) {
   }
 
   if (session.step === "contact") {
-    await ctx.reply("Выберите способ связи кнопкой ниже.", contactKeyboard());
+    await safeReply(ctx, "Выберите способ связи кнопкой ниже.", contactKeyboard());
     return true;
   }
 
   if (session.step === "confirm") {
-    await ctx.reply(
+    await safeReply(
+      ctx,
       "Подтвердите заявку кнопкой ниже или вернитесь назад.",
       confirmLeadKeyboard(),
     );
@@ -186,7 +188,7 @@ function isUserBlocked(user) {
 }
 
 async function rejectBlocked(ctx) {
-  await ctx.reply("Ваш аккаунт заблокирован. Обратитесь к администратору.");
+  await safeReply(ctx, "Ваш аккаунт заблокирован. Обратитесь к администратору.");
 }
 
 async function handleClientStart(ctx, deps) {
@@ -214,7 +216,8 @@ async function handleClientStart(ctx, deps) {
     } catch (error) {
       // setChatMenuButton failed silently — non-critical
     }
-    await ctx.reply(
+    await safeReply(
+      ctx,
       "Открыть Mini App:",
       Markup.inlineKeyboard([
         [Markup.button.webApp("Открыть Mini App", deps.webappUrl)],
@@ -239,7 +242,7 @@ async function handleClientStart(ctx, deps) {
 }
 
 async function handleClientHelp(ctx) {
-  await ctx.reply(helpMessage(), backToMainKeyboard());
+  await safeReply(ctx, helpMessage(), backToMainKeyboard());
 }
 
 async function handleClientMenu(ctx, deps) {
@@ -257,7 +260,7 @@ async function handleClientStatus(ctx, deps) {
     return;
   }
   const lead = deps.repos.leads.getLatestByClient(ctx.from.id);
-  await ctx.reply(clientLeadStatusMessage(lead), backToMainKeyboard());
+  await safeReply(ctx, clientLeadStatusMessage(lead), backToMainKeyboard());
 }
 
 async function handleClientText(ctx, deps) {
@@ -291,7 +294,7 @@ async function handleClientText(ctx, deps) {
     text: ctx.message.text,
     sourcePayload,
   });
-  await ctx.reply(clientMessageDelivered(), backToMainKeyboard());
+  await safeReply(ctx, clientMessageDelivered(), backToMainKeyboard());
 }
 
 async function handleClientAction(ctx, deps) {
@@ -327,7 +330,7 @@ async function handleClientAction(ctx, deps) {
     }
 
     await safeAnswerCbQuery(ctx);
-    await ctx.reply(buildProductCard(product), productCardKeyboard(product.id));
+    await safeReply(ctx, buildProductCard(product), productCardKeyboard(product.id));
     return;
   }
 
@@ -417,7 +420,8 @@ async function handleClientAction(ctx, deps) {
     });
 
     if (!lead) {
-      await ctx.reply(
+      await safeReply(
+        ctx,
         "Не удалось подтвердить заявку. Попробуйте начать заново.",
         backToMainKeyboard(),
       );
@@ -427,7 +431,8 @@ async function handleClientAction(ctx, deps) {
     if (lead.duplicate) {
       deps.repos.sessions.clear(ctx.from.id);
       setHomeSession(deps.repos, ctx.from.id, sourcePayload);
-      await ctx.reply(
+      await safeReply(
+        ctx,
         `⚠️ У вас уже есть активная заявка на этот товар (#${lead.existingLead.id}). Дождитесь её обработки или свяжитесь с менеджером.`,
         backToMainKeyboard(),
       );
@@ -435,7 +440,7 @@ async function handleClientAction(ctx, deps) {
     }
 
     setHomeSession(deps.repos, ctx.from.id, sourcePayload);
-    await ctx.reply(leadCreatedMessage(), backToMainKeyboard());
+    await safeReply(ctx, leadCreatedMessage(), backToMainKeyboard());
     return;
   }
 
@@ -473,7 +478,7 @@ async function handleClientAction(ctx, deps) {
     deps.services.lead.clearSession(ctx.from.id);
     setHomeSession(deps.repos, ctx.from.id, sourcePayload);
     await safeAnswerCbQuery(ctx, "Заявка отменена");
-    await ctx.reply("Оформление заявки отменено.", backToMainKeyboard());
+    await safeReply(ctx, "Оформление заявки отменено.", backToMainKeyboard());
   }
 }
 

@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Bot server",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start"],
+      "port": 3081
+    },
+    {
+      "name": "Vite webapp (dev:web)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev:web"],
+      "port": 5173
+    }
+  ]
+}

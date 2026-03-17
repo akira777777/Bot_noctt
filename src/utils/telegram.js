@@ -9,6 +9,23 @@ async function safeSendMessage(bot, chatId, text, extra = {}) {
   }
 }
 
+async function safeReply(ctx, text, extra = {}) {
+  try {
+    return await ctx.reply(text, extra);
+  } catch (error) {
+    logError(`Failed to reply to user ${ctx.from?.id}`, error);
+    return null;
+  }
+}
+
+async function safeEditMessageReplyMarkup(ctx, keyboard) {
+  try {
+    return await ctx.editMessageReplyMarkup(keyboard);
+  } catch (_) {
+    // Silent fail - message might not be editable
+  }
+}
+
 async function safeAnswerCbQuery(ctx, text) {
   try {
     await ctx.answerCbQuery(text);
@@ -19,6 +36,8 @@ async function safeAnswerCbQuery(ctx, text) {
 
 module.exports = {
   safeSendMessage,
+  safeReply,
+  safeEditMessageReplyMarkup,
   safeAnswerCbQuery,
 };
 
