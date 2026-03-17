@@ -11,6 +11,13 @@ function createConversationsRepo(db) {
   const getByClientId = db.prepare(
     `SELECT * FROM conversations WHERE client_telegram_id = ?`,
   );
+  const close = db.prepare(`
+    UPDATE conversations SET status = 'closed' WHERE client_telegram_id = ? RETURNING *
+  `);
+  const reopen = db.prepare(`
+    UPDATE conversations SET status = 'open', last_message_at = CURRENT_TIMESTAMP
+    WHERE client_telegram_id = ? RETURNING *
+  `);
   const listRecent = db.prepare(`
     SELECT
       c.*,
@@ -36,6 +43,12 @@ function createConversationsRepo(db) {
     },
     getByClientId(clientTelegramId) {
       return getByClientId.get(clientTelegramId);
+    },
+    close(clientTelegramId) {
+      return close.get(clientTelegramId);
+    },
+    reopen(clientTelegramId) {
+      return reopen.get(clientTelegramId);
     },
     listRecent(limit = 10) {
       return listRecent.all(limit);

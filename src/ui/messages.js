@@ -111,12 +111,14 @@ function adminNoClientSelectedMessage() {
   );
 }
 
-function adminClientCard(clientLabel, text, sourcePayload) {
+function adminClientCard(clientLabel, text, sourcePayload, msgCount = null) {
   const source = formatSourceLabel(sourcePayload);
+  const countLine = msgCount !== null ? `Сообщений в диалоге: ${msgCount}\n` : "";
   return (
-    "Новое сообщение от клиента:\n" +
+    "💬 Новое сообщение от клиента:\n" +
     `${clientLabel}\n` +
-    `${source}\n\n` +
+    `${source}\n` +
+    `${countLine}\n` +
     `Текст:\n${text}`
   );
 }
@@ -163,6 +165,14 @@ function clientLeadFulfilledMessage() {
   return "Ваша заявка выполнена. Спасибо за покупку! Будем рады снова помочь 🎉";
 }
 
+function conversationResolvedMessage() {
+  return "Ваш запрос обработан и закрыт. Если появятся новые вопросы — просто напишите, и мы снова на связи!";
+}
+
+function rateLimitMessage() {
+  return "Вы отправляете сообщения слишком часто. Пожалуйста, подождите немного.";
+}
+
 function clientLeadStatusMessage(lead) {
   if (!lead) {
     return "У вас пока нет ни одной заявки. Оформить можно через главное меню.";
@@ -193,6 +203,8 @@ function clientLeadStatusMessage(lead) {
 }
 
 module.exports = {
+  conversationResolvedMessage,
+  rateLimitMessage,
   welcomeMessage,
   helpMessage,
   howToOrderMessage,

@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /c/Users/fear7/Desktop/Bot_noct/.claude/worktrees/interesting-noyce push)"
+    ]
+  }
+}

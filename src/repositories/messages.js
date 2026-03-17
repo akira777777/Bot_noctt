@@ -9,6 +9,9 @@ function createMessagesRepo(db) {
     ORDER BY created_at DESC
     LIMIT ?
   `);
+  const countByConversation = db.prepare(
+    `SELECT COUNT(*) AS cnt FROM messages WHERE conversation_id = ?`,
+  );
 
   return {
     create(conversationId, senderRole, senderTelegramId, text) {
@@ -16,6 +19,9 @@ function createMessagesRepo(db) {
     },
     listByConversation(conversationId, limit = 10) {
       return listByConversation.all(conversationId, limit);
+    },
+    countByConversation(conversationId) {
+      return countByConversation.get(conversationId).cnt;
     },
   };
 }

@@ -27,11 +27,12 @@ function createConversationService({ repos, bot, adminId }) {
     const conversation = ensureConversation(client.id, sourcePayload);
     repos.messages.create(conversation.id, "client", client.id, text);
 
+    const msgCount = repos.messages.countByConversation(conversation.id);
     const clientLabel = formatClientLabel(client, chatId);
     await safeSendMessage(
       bot,
       adminId,
-      adminClientCard(clientLabel, text, sourcePayload),
+      adminClientCard(clientLabel, text, sourcePayload, msgCount),
       adminClientMessageKeyboard(client.id),
     );
 
