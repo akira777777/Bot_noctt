@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Backend (Node)",
+      "runtimeExecutable": "D:/Nodejs/node.exe",
+      "runtimeArgs": ["index.js"],
+      "port": 10000
+    },
+    {
+      "name": "Frontend (Vite)",
+      "runtimeExecutable": "D:/Nodejs/node.exe",
+      "runtimeArgs": ["D:/Nodejs/node_modules/npm/bin/npx-cli.js", "vite", "--config", "webapp/vite.config.js"],
+      "port": 5173
+    }
+  ]
+}
