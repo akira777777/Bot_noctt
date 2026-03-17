@@ -4,6 +4,7 @@ const isBlockedMigration = require("./003_is_blocked");
 const normalizeLeadStatusNewMigration = require("./004_normalize_lead_status_new");
 const addIndexesMigration = require("./005_add_indexes");
 const performanceMigration = require("./006_performance");
+const productImageMigration = require("./007_product_image");
 
 const migrations = [
   initialMigration,
@@ -12,6 +13,7 @@ const migrations = [
   normalizeLeadStatusNewMigration,
   addIndexesMigration,
   performanceMigration,
+  productImageMigration,
 ];
 
 function ensureMigrationTable(db) {

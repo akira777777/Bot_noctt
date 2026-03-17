@@ -19,6 +19,50 @@ function createApiRouter({ repos, isProduction = false }) {
     return next();
   }
 
+  function requireAuth(req, res, next) {
+    if (!req.auth?.telegram_id) {
+      return res.status(401).json({ ok: false, error: "Unauthorized" });
+    }
+
+    return next();
+  }
+
+  // POST /api/leads — any authenticated Telegram user submits an order
+  router.post("/leads", requireAuth, (req, res) => {
+    const { product_id, quantity, comment, contact_label } = req.body || {};
+
+    const product = repos.products.getById(Number(product_id));
+    if (!product || !product.is_active) {
+      return res.status(404).json({ ok: false, error: "Product not found" });
+    }
+
+    const qty = Number(quantity);
+    if (!qty || qty < 1 || qty > 9999) {
+      return res.status(400).json({ ok: false, error: "Quantity must be 1–9999" });
+    }
+
+    repos.users.upsert({
+      telegram_id: req.auth.telegram_id,
+      username: req.auth.username || null,
+      first_name: req.auth.first_name || null,
+      last_name: null,
+      role: "client",
+    });
+
+    const lead = repos.leads.create({
+      client_telegram_id: req.auth.telegram_id,
+      product_code: product.code,
+      product_name: product.title,
+      quantity: qty,
+      comment: comment ? String(comment).slice(0, 500) : "",
+      contact_label: contact_label ? String(contact_label).slice(0, 100) : "",
+      source_payload: "webapp",
+      status: "new",
+    });
+
+    return res.status(201).json({ ok: true, lead });
+  });
+
   router.get("/admin/me", requireAdmin, (req, res) => {
     const user = repos.users.getById(req.auth.telegram_id);
     return res.json({
@@ -99,7 +143,7 @@ function createApiRouter({ repos, isProduction = false }) {
   });
 
   router.post("/products", requireAdmin, (req, res) => {
-    const { code, title, description, price_text, sort_order } = req.body || {};
+    const { code, title, description, price_text, image_url, sort_order } = req.body || {};
 
     if (!code || !title) {
       return res
@@ -112,6 +156,7 @@ function createApiRouter({ repos, isProduction = false }) {
       title: String(title).trim(),
       description: description ? String(description) : "",
       price_text: price_text ? String(price_text) : "",
+      image_url: image_url ? String(image_url).trim() : null,
       sort_order: Number(sort_order) || 0,
     });
 
@@ -134,6 +179,7 @@ function createApiRouter({ repos, isProduction = false }) {
       title: payload.title,
       description: payload.description,
       price_text: payload.price_text,
+      image_url: payload.image_url !== undefined ? (payload.image_url || null) : undefined,
       sort_order:
         payload.sort_order !== undefined
           ? Number(payload.sort_order)

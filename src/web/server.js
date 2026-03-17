@@ -56,6 +56,11 @@ function createWebServer({
     res.json({ ok: true, service: "bot_noct_web" });
   });
 
+  // Public catalog endpoint — no auth required
+  app.get("/api/catalog", (_req, res) => {
+    return res.json({ ok: true, products: repos.products.list() });
+  });
+
   const verifyTelegramInitData = createVerifyTelegramInitData({
     botToken,
     adminId,

@@ -142,12 +142,13 @@ function createRepositories(db) {
       SELECT * FROM products WHERE code = ?
     `),
     insertProduct: db.prepare(`
-      INSERT INTO products (code, title, description, price_text, is_active, sort_order)
-      VALUES (@code, @title, @description, @price_text, 1, @sort_order)
+      INSERT INTO products (code, title, description, price_text, image_url, is_active, sort_order)
+      VALUES (@code, @title, @description, @price_text, @image_url, 1, @sort_order)
     `),
     updateProduct: db.prepare(`
       UPDATE products
-      SET title = @title, description = @description, price_text = @price_text, sort_order = @sort_order
+      SET title = @title, description = @description, price_text = @price_text,
+          image_url = @image_url, sort_order = @sort_order
       WHERE id = @id
     `),
     setProductActive: db.prepare(`
