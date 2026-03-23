@@ -1,0 +1,37 @@
+[dotenv@17.3.1] injecting env (4) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.3.1] injecting env (29) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+{"level":"INFO","time":"2026-03-23T21:48:45.697Z","service":"telegram-bot","env":"development","msg":"Starting application bootstrap","environment":"development","nodeVersion":"v24.14.0"}
+{"level":"INFO","time":"2026-03-23T21:48:45.711Z","service":"telegram-bot","env":"development","msg":"Database initialized"}
+{"level":"INFO","time":"2026-03-23T21:48:45.730Z","service":"telegram-bot","env":"development","msg":"Redis client connecting"}
+{"level":"INFO","time":"2026-03-23T21:48:45.732Z","service":"telegram-bot","env":"development","msg":"Redis client ready"}
+{"level":"INFO","time":"2026-03-23T21:48:45.732Z","service":"telegram-bot","env":"development","msg":"Redis cache connected successfully"}
+{"level":"INFO","time":"2026-03-23T21:48:45.732Z","service":"telegram-bot","env":"development","msg":"Cache service initialized","mode":"redis"}
+{"level":"INFO","time":"2026-03-23T21:48:45.732Z","service":"telegram-bot","env":"development","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
+{"level":"INFO","time":"2026-03-23T21:48:45.739Z","service":"telegram-bot","env":"development","msg":"Recurring jobs scheduled"}
+{"level":"INFO","time":"2026-03-23T21:48:45.739Z","service":"telegram-bot","env":"development","msg":"Queue service initialized successfully"}
+{"level":"INFO","time":"2026-03-23T21:48:45.739Z","service":"telegram-bot","env":"development","msg":"Queue service initialized"}
+{"level":"INFO","time":"2026-03-23T21:48:45.741Z","service":"telegram-bot","env":"development","msg":"Telegram delivery mode resolved","requestedMode":"polling","effectiveMode":"polling"}
+{"level":"INFO","time":"2026-03-23T21:48:45.766Z","service":"telegram-bot","env":"development","msg":"HTTP server started on port 3001"}
+{"level":"INFO","time":"2026-03-23T21:48:45.902Z","service":"telegram-bot","env":"development","msg":"Bot started in polling mode","username":"noct1_bot"}
+{"level":"INFO","time":"2026-03-23T21:48:45.902Z","service":"telegram-bot","env":"development","msg":"Memory monitor started","checkInterval":30000}
+{"level":"INFO","time":"2026-03-23T21:48:45.902Z","service":"telegram-bot","env":"development","msg":"Shutdown handlers registered"}
+{"level":"INFO","time":"2026-03-23T21:48:45.902Z","service":"telegram-bot","env":"development","msg":"Application bootstrap completed successfully","uptime":1.0326456}
+{"level":"INFO","time":"2026-03-23T21:48:45.902Z","service":"telegram-bot","env":"development","msg":"Application is ready","uptime":1.032729,"pid":11712}
+[ERROR] Failed to answer callback query {
+  error: {
+    name: 'Error',
+    message: '400: Bad Request: query is too old and response timeout expired or query ID is invalid',
+    stack: 'Error: 400: Bad Request: query is too old and response timeout expired or query ID is invalid\n' +
+      '    at Telegram.callApi (C:\\Users\\fear7\\Desktop\\Bot_noct\\node_modules\\telegraf\\lib\\core\\network\\client.js:315:19)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n' +
+      '    at async safeAnswerCbQuery (C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\utils\\telegram.js:14:5)\n' +
+      '    at async handleClientAction (C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\handlers\\client.js:463:5)\n' +
+      '    at async execute (C:\\Users\\fear7\\Desktop\\Bot_noct\\node_modules\\telegraf\\lib\\composer.js:518:17)\n' +
+      '    at async C:\\Users\\fear7\\Desktop\\Bot_noct\\node_modules\\telegraf\\lib\\composer.js:519:21\n' +
+      '    at async execute (C:\\Users\\fear7\\Desktop\\Bot_noct\\node_modules\\telegraf\\lib\\composer.js:518:17)\n' +
+      '    at async C:\\Users\\fear7\\Desktop\\Bot_noct\\node_modules\\telegraf\\lib\\composer.js:519:21\n' +
+      '    at async execute (C:\\Users\\fear7\\Desktop\\Bot_noct\\node_modules\\telegraf\\lib\\composer.js:518:17)\n' +
+      '    at async C:\\Users\\fear7\\Desktop\\Bot_noct\\node_modules\\telegraf\\lib\\composer.js:519:21'
+  }
+}
+{"level":"INFO","time":"2026-03-23T21:49:06.282Z","service":"telegram-bot","env":"development","msg":"HTTP Request","method":"GET","path":"/healthz","statusCode":200,"responseTime":2,"ip":"::ffff:127.0.0.1"}
