@@ -1,8 +1,3 @@
-function parseActionId(action) {
-  return Number(action.split(":")[2]);
-}
-
-module.exports = {
 const ACTIONS = Object.freeze({
   MENU_MAIN: "menu:main",
   CATALOG_ROOT: "catalog:root",
@@ -37,19 +32,11 @@ function buildAction(prefix, id) {
   return `${prefix}${id}`;
 }
 
-function parseActionId(action, prefix) {
-  if (typeof action !== "string" || typeof prefix !== "string") {
-    return { ok: false, error: "INVALID_ARGUMENTS" };
+function parseActionId(action) {
+  if (typeof action !== "string") {
+    return NaN;
   }
-  if (!action.startsWith(prefix)) {
-    return { ok: false, error: "INVALID_PREFIX" };
-  }
-  const rawId = action.slice(prefix.length);
-  const id = Number.parseInt(rawId, 10);
-  if (!Number.isInteger(id) || id <= 0) {
-    return { ok: false, error: "INVALID_ID" };
-  }
-  return { ok: true, id };
+  return Number(action.split(":")[2]);
 }
 
 module.exports = {
