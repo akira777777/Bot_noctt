@@ -423,6 +423,12 @@ async function bootstrap() {
         resources.botLaunched = true;
         log.info("Bot started in webhook mode", { webhookUrl });
       } else {
+        // Ensure polling mode is not blocked by an old webhook configuration.
+        await withTimeout(
+          bot.telegram.deleteWebhook({ drop_pending_updates: false }),
+          telegramStartupTimeoutMs,
+          "deleteWebhook",
+        );
         await withTimeout(bot.launch(), telegramStartupTimeoutMs, "bot.launch");
         resources.botLaunched = true;
         log.info("Bot started in polling mode");

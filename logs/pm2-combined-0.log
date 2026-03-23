@@ -2613,3 +2613,31 @@
 2026-03-23T16:42:01: {"level":"INFO","time":"2026-03-23T15:42:01.179Z","service":"telegram-bot","env":"production","msg":"Application bootstrap completed successfully","uptime":16.3542378}
 2026-03-23T16:42:01: {"level":"INFO","time":"2026-03-23T15:42:01.179Z","service":"telegram-bot","env":"production","msg":"Application is ready","uptime":16.354621,"pid":18380}
 2026-03-23T16:42:04: {"level":"INFO","time":"2026-03-23T15:42:04.281Z","service":"telegram-bot","env":"production","msg":"HTTP Request","method":"GET","path":"/healthz","statusCode":200,"responseTime":4,"ip":"::ffff:127.0.0.1"}
+2026-03-23T16:52:12: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: ⚙️  suppress all logs with { quiet: true }
+2026-03-23T16:52:12: [dotenv@17.3.1] injecting env (17) from .env -- tip: ⚙️  override existing env vars with { override: true }
+2026-03-23T16:52:13: {"level":"INFO","time":"2026-03-23T15:52:13.314Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T16:52:13: {"level":"INFO","time":"2026-03-23T15:52:13.328Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T16:52:13: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T16:52:13: {"level":"INFO","time":"2026-03-23T15:52:13.346Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T16:52:13: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T16:52:13: {"level":"INFO","time":"2026-03-23T15:52:13.349Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T16:52:13: {"level":"INFO","time":"2026-03-23T15:52:13.350Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T16:52:13: {"level":"INFO","time":"2026-03-23T15:52:13.350Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T16:52:13: {"level":"INFO","time":"2026-03-23T15:52:13.350Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":true}}
+2026-03-23T16:52:13: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T16:52:13: {"level":"INFO","time":"2026-03-23T15:52:13.357Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T16:52:13: {"level":"INFO","time":"2026-03-23T15:52:13.357Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T16:52:13: {"level":"INFO","time":"2026-03-23T15:52:13.357Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T16:52:13: {"level":"INFO","time":"2026-03-23T15:52:13.358Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"polling","effectiveMode":"polling"}
+2026-03-23T16:52:13: {"level":"INFO","time":"2026-03-23T15:52:13.379Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3060"}
+2026-03-23T16:52:13: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T16:52:13: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T16:52:13: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T16:52:13: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T16:52:13: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T16:52:13: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T16:52:13: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T16:52:13: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T16:52:13: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T16:52:13: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T16:52:13: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
