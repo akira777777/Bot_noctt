@@ -39,12 +39,18 @@ function optionalInteger(key, defaultValue) {
 const NODE_ENV = optionalString("NODE_ENV") || "development";
 const BOT_TOKEN = requiredString("BOT_TOKEN", ["TELEGRAM_BOT_TOKEN"]);
 const ADMIN_ID = optionalInteger("ADMIN_ID", null);
-const DB_PATH = optionalString("DB_PATH") || path.join(process.cwd(), "data", "bot.sqlite");
+const DB_PATH =
+  optionalString("DB_PATH") || path.join(process.cwd(), "data", "bot.sqlite");
 const PORT = optionalInteger("PORT", 3000);
 const API_SECRET = optionalString("API_SECRET");
-const WEBHOOK_DOMAIN = optionalString("WEBHOOK_DOMAIN", ["RENDER_EXTERNAL_URL"]);
+const WEBHOOK_DOMAIN = optionalString("WEBHOOK_DOMAIN", [
+  "RENDER_EXTERNAL_URL",
+]);
 const CORS_ORIGIN = optionalString("CORS_ORIGIN");
-const WEB_APP_URL = optionalString("WEB_APP_URL");
+// Backward compatible:
+// - primary: WEB_APP_URL
+// - legacy/alt: WEBAPP_URL (no underscore)
+const WEB_APP_URL = optionalString("WEB_APP_URL", ["WEBAPP_URL"]);
 
 if (!ADMIN_ID || Number.isNaN(ADMIN_ID) || ADMIN_ID <= 0) {
   throw new Error("ADMIN_ID must be a positive integer");
@@ -53,7 +59,9 @@ if (!ADMIN_ID || Number.isNaN(ADMIN_ID) || ADMIN_ID <= 0) {
 const isProduction = NODE_ENV === "production";
 
 if (isProduction && !API_SECRET) {
-  logWarn("API_SECRET is not set in production; admin API endpoints are unprotected");
+  logWarn(
+    "API_SECRET is not set in production; admin API endpoints are unprotected",
+  );
 }
 if (isProduction && !CORS_ORIGIN) {
   logWarn("CORS_ORIGIN is not set in production; all origins are allowed");

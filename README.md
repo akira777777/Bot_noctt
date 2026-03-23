@@ -109,7 +109,7 @@ Client mini app command:
 
 - `/app`
 
-If `WEB_APP_URL` is configured, the bot also shows the `📱 Открыть мини-приложение` button in the home keyboard.
+If `WEB_APP_URL` (or legacy `WEBAPP_URL`) is configured, the bot also shows the `📱 Открыть мини-приложение` button in the home keyboard.
 
 ## Deploy web (Mini App)
 
@@ -120,7 +120,7 @@ The Telegram mini app route is `web/app/mini-app/page.tsx`, exposed as `/mini-ap
    - `API_URL` -> your public bot/API URL (for example Render)
    - `BOT_TOKEN`, `ADMIN_ID`, `JWT_SECRET` -> for Telegram admin auth in Next.js routes
 3. Set bot environment variable:
-   - `WEB_APP_URL=https://<your-web-domain>/mini-app`
+   - `WEB_APP_URL=https://<your-web-domain>/mini-app` (legacy: `WEBAPP_URL`)
 4. Restart bot service. `/app` and the menu button will open the mini app in Telegram.
 
 ## Database & migrations
