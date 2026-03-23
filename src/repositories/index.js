@@ -6,6 +6,7 @@ const { createProductsRepo } = require("./products");
 const { createAdminStateRepo } = require("./admin-state");
 const { createSessionsRepo } = require("./sessions");
 const { createStatsRepo } = require("./stats");
+const { createLeadEventsRepo } = require("./lead-events");
 
 function createRepositories(db) {
   return {
@@ -16,6 +17,7 @@ function createRepositories(db) {
     products: createProductsRepo(db),
     adminState: createAdminStateRepo(db),
     sessions: createSessionsRepo(db),
+    leadEvents: createLeadEventsRepo(db),
     stats: createStatsRepo(db),
   };
 }
