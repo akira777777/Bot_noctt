@@ -81,5 +81,6 @@ Operational steps for safe deploy, quick incident triage, rollback, and data rec
 - **P3**: non-blocking UI or formatting issues.
 
 For P1/P2:
+
 - rollback first, investigate second.
 - include failing `requestId` and timestamp in escalation message.

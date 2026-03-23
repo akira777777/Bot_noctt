@@ -1,4 +1,11 @@
 const { createSessionsRepository } = require("./sessions-repo");
+const { createUsersRepository } = require("./users-repo");
+const { createConversationsRepository } = require("./conversations-repo");
+const { createMessagesRepository } = require("./messages-repo");
+const { createLeadsRepository } = require("./leads-repo");
+const { createProductsRepository } = require("./products-repo");
+const { createAdminStateRepository } = require("./admin-state-repo");
+const { createStatsRepository } = require("./stats-repo");
 
 function createRepositories(db) {
   const statements = {
@@ -184,131 +191,13 @@ function createRepositories(db) {
   };
 
   return {
-    users: {
-      upsert(user) {
-        statements.upsertUser.run(user);
-      },
-      getById(telegramId) {
-        return statements.getUser.get(telegramId);
-      },
-      list(limit = 100, offset = 0) {
-        return statements.listUsers.all(limit, offset);
-      },
-      count() {
-        return statements.countUsers.get().cnt;
-      },
-      block(telegramId) {
-        return statements.blockUser.run(telegramId);
-      },
-      unblock(telegramId) {
-        return statements.unblockUser.run(telegramId);
-      },
-    },
-    conversations: {
-      ensure(clientTelegramId, adminId, sourcePayload = null) {
-        statements.ensureConversation.run(
-          clientTelegramId,
-          adminId,
-          sourcePayload,
-        );
-        return statements.getConversationByClient.get(clientTelegramId);
-      },
-      getByClientId(clientTelegramId) {
-        return statements.getConversationByClient.get(clientTelegramId);
-      },
-      listRecent(limit = 10) {
-        return statements.listRecentConversations.all(limit);
-      },
-    },
-    messages: {
-      create(conversationId, senderRole, senderTelegramId, text) {
-        statements.insertMessage.run(
-          conversationId,
-          senderRole,
-          senderTelegramId,
-          text,
-        );
-      },
-      listByConversation(conversationId, limit = 10) {
-        return statements.listMessagesByConversation.all(conversationId, limit);
-      },
-    },
-    leads: {
-      create(payload) {
-        const result = statements.createLead.run(payload);
-        return statements.getLeadById.get(result.lastInsertRowid);
-      },
-      list(limit = 10) {
-        return statements.listLeads.all(limit);
-      },
-      listAll() {
-        return statements.listAllLeads.all();
-      },
-      getById(id) {
-        return statements.getLeadById.get(id);
-      },
-      getLatestByClient(telegramId) {
-        return statements.getLatestLeadByClient.get(telegramId);
-      },
-      getOpenByClientAndProduct(telegramId, productCode) {
-        return statements.getOpenLeadByClientAndProduct.get(
-          telegramId,
-          productCode,
-        );
-      },
-      updateStatus(id, status) {
-        statements.updateLeadStatus.run(status, id);
-        return statements.getLeadById.get(id);
-      },
-    },
-    products: {
-      list() {
-        return statements.listProducts.all();
-      },
-      listAll() {
-        return statements.listAllProducts.all();
-      },
-      getById(id) {
-        return statements.getProductById.get(id);
-      },
-      getByCode(code) {
-        return statements.getProductByCode.get(code);
-      },
-      create(payload) {
-        const result = statements.insertProduct.run(payload);
-        return statements.getProductById.get(result.lastInsertRowid);
-      },
-      update(payload) {
-        statements.updateProduct.run(payload);
-        return statements.getProductById.get(payload.id);
-      },
-      setActive(id, isActive) {
-        statements.setProductActive.run(isActive ? 1 : 0, id);
-        return statements.getProductById.get(id);
-      },
-    },
-    adminState: {
-      setActiveClient(adminTelegramId, clientTelegramId) {
-        statements.setAdminState.run(adminTelegramId, clientTelegramId);
-      },
-      get(adminTelegramId) {
-        return statements.getAdminState.get(adminTelegramId);
-      },
-      clear(adminTelegramId) {
-        statements.clearAdminState.run(adminTelegramId);
-      },
-    },
-    stats: {
-      leadCountsByStatus() {
-        return statements.leadCountsByStatus.all();
-      },
-      topProductsByLeads(limit = 5) {
-        return statements.topProductsByLeads.all(limit);
-      },
-      totalLeads() {
-        return statements.totalLeads.get().cnt;
-      },
-    },
+    users: createUsersRepository({ statements }),
+    conversations: createConversationsRepository({ statements }),
+    messages: createMessagesRepository({ statements }),
+    leads: createLeadsRepository({ statements }),
+    products: createProductsRepository({ statements }),
+    adminState: createAdminStateRepository({ statements }),
+    stats: createStatsRepository({ statements }),
     sessions: createSessionsRepository({ statements }),
   };
 }
