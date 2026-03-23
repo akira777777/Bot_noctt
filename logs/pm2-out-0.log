@@ -2897,3 +2897,18 @@
 2026-03-23T18:30:36: {"level":"INFO","time":"2026-03-23T17:30:36.613Z","service":"telegram-bot","env":"production","msg":"Database closed"}
 2026-03-23T18:30:36: {"level":"INFO","time":"2026-03-23T17:30:36.613Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
 2026-03-23T18:30:36: {"level":"ERROR","time":"2026-03-23T17:30:36.613Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T18:30:40: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+2026-03-23T18:30:40: [dotenv@17.3.1] injecting env (10) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+2026-03-23T18:30:41: {"level":"INFO","time":"2026-03-23T17:30:41.343Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T18:30:41: {"level":"INFO","time":"2026-03-23T17:30:41.350Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T18:30:41: {"level":"INFO","time":"2026-03-23T17:30:41.368Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T18:30:41: {"level":"INFO","time":"2026-03-23T17:30:41.370Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T18:30:41: {"level":"INFO","time":"2026-03-23T17:30:41.371Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T18:30:41: {"level":"INFO","time":"2026-03-23T17:30:41.371Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T18:30:41: {"level":"INFO","time":"2026-03-23T17:30:41.371Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":true}}
+2026-03-23T18:30:41: {"level":"INFO","time":"2026-03-23T17:30:41.378Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T18:30:41: {"level":"INFO","time":"2026-03-23T17:30:41.378Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T18:30:41: {"level":"INFO","time":"2026-03-23T17:30:41.378Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T18:30:41: {"level":"WARN","time":"2026-03-23T17:30:41.379Z","service":"telegram-bot","env":"production","msg":"Webhook mode requested but domain is not usable; using polling","webhookDomain":null}
+2026-03-23T18:30:41: {"level":"INFO","time":"2026-03-23T17:30:41.379Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"webhook","effectiveMode":"polling"}
+2026-03-23T18:30:41: {"level":"INFO","time":"2026-03-23T17:30:41.400Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3060"}
