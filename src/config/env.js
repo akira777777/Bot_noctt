@@ -99,6 +99,13 @@ const ALLOW_BOT_LAUNCH_FAILURE = optionalBoolean(
   false,
 );
 const APP_VERSION = optionalString("APP_VERSION", ["npm_package_version"]) || "1.0.0";
+// AI via Vercel AI Gateway. Auth options:
+//   • OIDC (recommended): run `vercel link` then `vercel env pull`
+//   • Manual key: set AI_GATEWAY_API_KEY from the Vercel dashboard
+// Model uses "provider/model" format with dot-separated version: "anthropic/claude-haiku-4.5"
+const AI_GATEWAY_API_KEY = optionalString("AI_GATEWAY_API_KEY");
+const AI_MODEL = optionalString("AI_MODEL") || "anthropic/claude-haiku-4.5";
+const AI_ENABLED = optionalBoolean("AI_ENABLED", true);
 const REDIS_URL = optionalString("REDIS_URL");
 const REDIS_HOST = optionalString("REDIS_HOST") || "localhost";
 const REDIS_PORT = optionalInteger("REDIS_PORT", 6379);
@@ -155,6 +162,9 @@ module.exports = {
   isProduction,
   BOT_TOKEN,
   ADMIN_ID,
+  AI_GATEWAY_API_KEY,
+  AI_MODEL,
+  AI_ENABLED,
   DB_PATH,
   PORT,
   API_SECRET,
