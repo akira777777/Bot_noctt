@@ -40,13 +40,14 @@ const NODE_ENV = optionalString("NODE_ENV") || "development";
 const BOT_TOKEN = requiredString("BOT_TOKEN", ["TELEGRAM_BOT_TOKEN"]);
 const ADMIN_ID = optionalInteger("ADMIN_ID", null);
 const DB_PATH =
-  optionalString("DB_PATH") || path.join(process.cwd(), "data", "bot.sqlite");
+  optionalString("DB_PATH", ["DATABASE_PATH"]) ||
+  path.join(process.cwd(), "data", "bot.sqlite");
 const PORT = optionalInteger("PORT", 3000);
 const API_SECRET = optionalString("API_SECRET");
 const WEBHOOK_DOMAIN = optionalString("WEBHOOK_DOMAIN", [
   "RENDER_EXTERNAL_URL",
 ]);
-const CORS_ORIGIN = optionalString("CORS_ORIGIN");
+const CORS_ORIGIN = optionalString("CORS_ORIGIN", ["ALLOWED_ORIGINS"]);
 const TELEGRAM_DELIVERY_MODE_RAW = optionalString("TELEGRAM_DELIVERY_MODE");
 const TELEGRAM_DELIVERY_MODE = TELEGRAM_DELIVERY_MODE_RAW
   ? TELEGRAM_DELIVERY_MODE_RAW.toLowerCase()

@@ -34,6 +34,7 @@ const {
   createShutdownHandler,
   createMemoryMonitor,
 } = require("./src/utils/graceful-shutdown");
+const { inspect } = require("node:util");
 // Import logger with fallback to console if module fails
 let log;
 try {
@@ -74,6 +75,22 @@ function formatError(error) {
   }
 
   return String(error);
+}
+
+function serializeErrorDetails(error) {
+  if (error instanceof Error) {
+    return {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+    };
+  }
+
+  if (typeof error === "object" && error !== null) {
+    return { inspected: inspect(error, { depth: 4, breakLength: 120 }) };
+  }
+
+  return { value: String(error) };
 }
 
 function startHttpServer(app, port) {
@@ -247,6 +264,8 @@ async function bootstrap() {
     environment: process.env.NODE_ENV || "development",
     nodeVersion: process.version,
   });
+  const allowBotLaunchFailureInProduction =
+    process.env.ALLOW_BOT_LAUNCH_FAILURE === "true";
 
   // Initialize database
   const db = createDatabase();
@@ -409,11 +428,13 @@ async function bootstrap() {
         log.info("Bot started in polling mode");
       }
     } catch (error) {
-      if (isProduction) {
+      if (isProduction && !allowBotLaunchFailureInProduction) {
         throw error;
       }
       log.warn("Bot launch failed; continuing in API-only mode", {
         error: formatError(error),
+        details: serializeErrorDetails(error),
+        productionFallbackEnabled: allowBotLaunchFailureInProduction,
       });
     }
 

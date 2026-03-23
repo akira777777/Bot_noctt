@@ -10,30 +10,30 @@ services:
     container_name: bot-noct
     restart: unless-stopped
     ports:
-      - "${PORT:-3052}:${PORT:-3052}"
+      - "${PORT:-3000}:${PORT:-3000}"
     environment:
       - NODE_ENV=production
-      - PORT=${PORT:-3052}
+      - PORT=${PORT:-3000}
       - HOST=0.0.0.0
       # Bot Configuration
       - BOT_TOKEN=${BOT_TOKEN}
       - ADMIN_ID=${ADMIN_ID}
       # API Configuration
       - API_SECRET=${API_SECRET}
-      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3000}
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:3000}
       # Redis (if using Bull queues)
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=${REDIS_PASSWORD:-}
       # Database
-      - DATABASE_PATH=/app/data/bot.db
+      - DB_PATH=/app/data/bot.sqlite
     volumes:
       - bot-data:/app/data
       - ./logs:/app/logs
     depends_on:
       - redis
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${PORT:-3052}/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:${PORT:-3000}/healthz"]
       interval: 30s
       timeout: 10s
       retries: 3

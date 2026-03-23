@@ -8,11 +8,12 @@ module.exports = {
       max_memory_restart: "768M",
       env: {
         NODE_ENV: "development",
-        PORT: 3052,
+        PORT: 3060,
       },
       env_production: {
         NODE_ENV: "production",
-        PORT: 3052,
+        PORT: 3060,
+        ALLOW_BOT_LAUNCH_FAILURE: "true",
       },
       error_file: "./logs/pm2-error.log",
       out_file: "./logs/pm2-out.log",

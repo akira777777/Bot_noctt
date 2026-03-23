@@ -41,26 +41,24 @@ function seedProducts(db) {
 
   const defaults = [
     {
-      code: "basic",
-      title: "Базовый пакет",
-      description: "Подходит для быстрого старта и базовой консультации.",
-      price_text: "Цена уточняется",
+      code: "methamphetamine",
+      title: "METH",
+      description: "EPHEDRINE 95%, Netherlands",
+      price_text: "35USDT per 1g",
       sort_order: 1,
     },
     {
-      code: "standard",
-      title: "Стандартный пакет",
-      description:
-        "Оптимальный вариант с расширенной поддержкой и доработками.",
-      price_text: "Цена уточняется",
+      code: "cocaine",
+      title: "COKE",
+      description: "COCAINE 99%, Holland",
+      price_text: "95USDT per 1g",
       sort_order: 2,
     },
     {
-      code: "premium",
-      title: "Премиум пакет",
-      description:
-        "Для клиентов, которым нужен приоритет и индивидуальные условия.",
-      price_text: "Цена уточняется",
+      code: "xanax",
+      title: "XANY",
+      description: "XANAX 2mg, Germany",
+      price_text: "25USDT per 1pc",
       sort_order: 3,
     },
   ];
