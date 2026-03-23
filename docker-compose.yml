@@ -43,6 +43,7 @@ services:
       target: production
     container_name: bot_noct
     restart: unless-stopped
+    profiles: ["prod"]
     ports:
       - "${PORT:-3000}:3000"
     environment:
@@ -51,7 +52,7 @@ services:
       - ADMIN_ID=${ADMIN_ID}
       - PORT=3000
       - DB_PATH=/app/data/bot.sqlite
-      - WEBAPP_URL=${WEBAPP_URL:-http://localhost:3000}
+      - WEB_APP_URL=${WEB_APP_URL:-http://localhost:3000}
       - CORS_ORIGIN=${CORS_ORIGIN:-*}
       - RENDER_EXTERNAL_URL=${RENDER_EXTERNAL_URL:-}
       # Redis Configuration
@@ -108,8 +109,9 @@ services:
       dockerfile: Dockerfile
     container_name: bot_noct_dev
     restart: no
+    profiles: ["dev"]
     ports:
-      - "${PORT:-3000}:3000"
+      - "${DEV_PORT:-3001}:3000"
       - "9229:9229" # Node.js debugger
     environment:
       - NODE_ENV=development
@@ -117,7 +119,7 @@ services:
       - ADMIN_ID=${ADMIN_ID}
       - PORT=3000
       - DB_PATH=/app/data/bot.sqlite
-      - WEBAPP_URL=http://localhost:5173
+      - WEB_APP_URL=http://localhost:5173
       - CORS_ORIGIN=http://localhost:5173
       # Redis Configuration
       - REDIS_HOST=redis
@@ -144,12 +146,13 @@ services:
     image: node:20-alpine
     container_name: bot_noct_web
     restart: no
+    profiles: ["dev"]
     ports:
       - "5173:3000"
     environment:
       - NODE_ENV=development
       - PORT=3000
-      - API_URL=http://bot:3000
+      - API_URL=http://bot-dev:3000
       - API_SECRET=${API_SECRET:-}
     volumes:
       - ./web:/app/web:ro
@@ -159,7 +162,7 @@ services:
     networks:
       - bot_network
     depends_on:
-      - bot
+      - bot-dev
 
   # ---------------------------------------------------------------------------
   # Render MCP Server (Go)

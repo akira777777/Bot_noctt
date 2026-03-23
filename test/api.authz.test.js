@@ -70,3 +70,129 @@ test("unauthenticated request gets 401 on admin endpoints", async (t) => {
   });
   assert.equal(response3.status, 200);
 });
+
+test("admin endpoints fail closed when API secret is not configured", async (t) => {
+  const adminId = 9001;
+  const { db, cleanup } = createTempDb();
+  const repos = createRepositories(db);
+
+  const app = createWebServer({
+    repos,
+    conversationService: {},
+    bot: {},
+    adminId,
+    apiSecret: null,
+    corsOrigin: null,
+    isProduction: true,
+  });
+  const server = await startServer(app);
+
+  t.after(() => {
+    server.close();
+    cleanup();
+  });
+
+  const baseUrl = `http://127.0.0.1:${server.address().port}`;
+
+  const response = await fetch(`${baseUrl}/api/admin/leads`);
+  assert.equal(response.status, 503);
+
+  const payload = await response.json();
+  assert.equal(payload.ok, false);
+  assert.match(payload.error, /disabled/i);
+});
+
+test("public lead status endpoint is disabled in production", async (t) => {
+  const adminId = 9001;
+  const { db, cleanup } = createTempDb();
+  const repos = createRepositories(db);
+
+  repos.users.upsert({
+    telegram_id: 1001,
+    username: "client_1001",
+    first_name: "Client",
+    last_name: null,
+    role: "client",
+  });
+
+  const lead = repos.leads.create({
+    client_telegram_id: 1001,
+    product_code: "basic",
+    product_name: "Базовый пакет",
+    quantity: 1,
+    comment: "",
+    contact_label: "Telegram",
+    source_payload: "web_form",
+    status: "new",
+  });
+
+  const app = createWebServer({
+    repos,
+    conversationService: {},
+    bot: {},
+    adminId,
+    apiSecret: "test-secret-key",
+    corsOrigin: null,
+    isProduction: true,
+  });
+  const server = await startServer(app);
+
+  t.after(() => {
+    server.close();
+    cleanup();
+  });
+
+  const baseUrl = `http://127.0.0.1:${server.address().port}`;
+  const response = await fetch(`${baseUrl}/api/lead/${lead.id}/status`);
+  assert.equal(response.status, 404);
+});
+
+test("public lead status endpoint remains available in non-production", async (t) => {
+  const adminId = 9001;
+  const { db, cleanup } = createTempDb();
+  const repos = createRepositories(db);
+
+  repos.users.upsert({
+    telegram_id: 1001,
+    username: "client_1001",
+    first_name: "Client",
+    last_name: null,
+    role: "client",
+  });
+
+  const lead = repos.leads.create({
+    client_telegram_id: 1001,
+    product_code: "basic",
+    product_name: "Базовый пакет",
+    quantity: 3,
+    comment: "",
+    contact_label: "Telegram",
+    source_payload: "web_form",
+    status: "in_progress",
+  });
+
+  const app = createWebServer({
+    repos,
+    conversationService: {},
+    bot: {},
+    adminId,
+    apiSecret: "test-secret-key",
+    corsOrigin: null,
+    isProduction: false,
+  });
+  const server = await startServer(app);
+
+  t.after(() => {
+    server.close();
+    cleanup();
+  });
+
+  const baseUrl = `http://127.0.0.1:${server.address().port}`;
+  const response = await fetch(`${baseUrl}/api/lead/${lead.id}/status`);
+  assert.equal(response.status, 200);
+
+  const payload = await response.json();
+  assert.equal(payload.ok, true);
+  assert.equal(payload.lead.id, lead.id);
+  assert.equal(payload.lead.status, "in_progress");
+});

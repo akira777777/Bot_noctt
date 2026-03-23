@@ -40,8 +40,9 @@ function parseActionId(action) {
     return NaN;
   }
   const parts = action.split(":");
-  const parsed = Number(parts[2]);
-  return parsed;
+  const idPart = parts[parts.length - 1];
+  const parsed = Number(idPart);
+  return Number.isFinite(parsed) ? parsed : NaN;
 }
 
 module.exports = {

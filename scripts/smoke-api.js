@@ -30,10 +30,19 @@ async function waitForHealthz({ baseUrl, attempts = 20, delayMs = 500 }) {
       const { status, body } = await fetchJson(`${baseUrl}/healthz`, {
         timeoutMs: 1500,
       });
-      if (status === 200 && body && body.ok === true) {
+      const healthOk =
+        status === 200 &&
+        body &&
+        (body.ok === true ||
+          body.status === "ok" ||
+          body.status === "healthy" ||
+          body.alive === true);
+      if (healthOk) {
         return;
       }
-      lastError = new Error(`Unexpected /healthz response: ${status}`);
+      lastError = new Error(
+        `Unexpected /healthz response: ${status} ${JSON.stringify(body)}`,
+      );
     } catch (err) {
       lastError = err;
     }
@@ -41,13 +50,19 @@ async function waitForHealthz({ baseUrl, attempts = 20, delayMs = 500 }) {
     await sleep(delayMs);
   }
 
-  throw new Error(`Smoke failed: /healthz never became healthy (${String(lastError)})`);
+  throw new Error(
+    `Smoke failed: /healthz never became healthy (${String(lastError)})`,
+  );
 }
 
 async function runSmokeChecks({ baseUrl }) {
-  const catalog = await fetchJson(`${baseUrl}/api/catalog`, { timeoutMs: 3000 });
+  const catalog = await fetchJson(`${baseUrl}/api/catalog`, {
+    timeoutMs: 3000,
+  });
   if (catalog.status !== 200 || !catalog.body || catalog.body.ok !== true) {
-    throw new Error(`Smoke failed: /api/catalog not ok (status=${catalog.status})`);
+    throw new Error(
+      `Smoke failed: /api/catalog not ok (status=${catalog.status})`,
+    );
   }
 }
 
@@ -102,4 +117,3 @@ main().catch((err) => {
   console.error(err);
   process.exitCode = 1;
 });
-

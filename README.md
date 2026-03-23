@@ -61,17 +61,20 @@ docker compose up -d
 npm start
 ```
 
-### Docker Compose
+### Docker Compose (примеры)
 
 ```bash
-# Запуск всех сервисов
-docker compose up -d
+# Development profile (bot-dev + web + redis + mcp)
+docker compose --profile dev up -d
 
 # Просмотр логов
 docker compose logs -f
 
 # Остановка
 docker compose down
+
+# Production profile (bot + redis + mcp)
+docker compose --profile prod up -d
 ```
 
 ## ⚙️ Конфигурация
@@ -83,15 +86,30 @@ docker compose down
 BOT_TOKEN=your_bot_token
 ADMIN_ID=your_telegram_id
 
-# База данных
+# App
+NODE_ENV=development
+PORT=3000
+DEV_PORT=3001
 DB_PATH=./data/bot.sqlite
 
-# Redis (кэш и очереди)
+# Режим доставки Telegram
+# local: polling
+# production: webhook + WEBHOOK_DOMAIN
+TELEGRAM_DELIVERY_MODE=polling
+WEBHOOK_DOMAIN=
+
+# Web / Mini App
+WEB_APP_URL=https://your-miniapp-domain.example/mini-app
+CORS_ORIGIN=
+
+# API
+API_SECRET=replace_with_strong_secret
+
+# Redis (кэш и очереди; опционально)
 REDIS_HOST=localhost
 REDIS_PORT=6379
 
-# Опционально
-NODE_ENV=production
+# Logging
 LOG_LEVEL=info
 ```
 
@@ -118,7 +136,7 @@ LOG_LEVEL=info
 | `/api/admin/broadcast`     | POST  | Рассылка     |
 | `/api/admin/users`         | GET   | Пользователи |
 
-### Health Checks
+### Проверка состояния
 
 | Endpoint   | Описание         |
 | ---------- | ---------------- |
@@ -129,7 +147,7 @@ LOG_LEVEL=info
 
 ## 🏗 Архитектура
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │                      Telegram API                         │
 └────────────────────────┬────────────────────────────────┘
@@ -155,7 +173,7 @@ LOG_LEVEL=info
 
 ## 📁 Структура проекта
 
-```
+```text
 Bot_noct/
 ├── src/
 │   ├── bot.js              # Telegram bot initialization
@@ -254,16 +272,17 @@ docker run -d \
 ### Docker Compose
 
 ```bash
-# Запуск с Redis
-docker compose up -d bot redis
+# Запуск production bot
+docker compose --profile prod up -d bot redis
 
-# Масштабирование
-docker compose up -d --scale bot=3
+# Запуск development bot + web
+docker compose --profile dev up -d bot-dev web redis
 ```
 
 ## 🔒 Безопасность
 
 - [ ] Используйте сильный `API_SECRET`
+- [ ] Без `API_SECRET` admin HTTP API работает в fail-closed режиме и возвращает `503`
 - [ ] Настройте `CORS_ORIGIN` для продакшена
 - [ ] Включите `LOG_FORMAT=json` в продакшене
 - [ ] Настройте firewall для Redis порта

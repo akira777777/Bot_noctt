@@ -11,6 +11,7 @@ const {
   PORT,
   API_SECRET,
   WEBHOOK_DOMAIN,
+  TELEGRAM_DELIVERY_MODE,
   CORS_ORIGIN,
   isProduction,
 } = require("./src/config/env");
@@ -80,6 +81,18 @@ function startHttpServer(app, port) {
     const server = app.listen(port, () => resolve(server));
     server.once("error", reject);
   });
+}
+
+function withTimeout(promise, timeoutMs, label) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      setTimeout(
+        () => reject(new Error(`${label} timed out after ${timeoutMs}ms`)),
+        timeoutMs,
+      );
+    }),
+  ]);
 }
 
 function shouldUseWebhookMode(webhookDomain) {
@@ -318,12 +331,22 @@ async function bootstrap() {
     cacheService,
   });
 
-  const webhookEnabled = shouldUseWebhookMode(WEBHOOK_DOMAIN);
-  if (WEBHOOK_DOMAIN && !webhookEnabled) {
-    log.warn("WEBHOOK_DOMAIN looks like placeholder; falling back to polling", {
-      webhookDomain: WEBHOOK_DOMAIN,
-    });
+  let webhookEnabled = false;
+  if (TELEGRAM_DELIVERY_MODE === "webhook") {
+    webhookEnabled = shouldUseWebhookMode(WEBHOOK_DOMAIN);
+    if (!webhookEnabled) {
+      log.warn(
+        "Webhook mode requested but domain is not usable; using polling",
+        {
+          webhookDomain: WEBHOOK_DOMAIN || null,
+        },
+      );
+    }
   }
+  log.info("Telegram delivery mode resolved", {
+    requestedMode: TELEGRAM_DELIVERY_MODE,
+    effectiveMode: webhookEnabled ? "webhook" : "polling",
+  });
 
   // Create web server
   const webServer = createWebServer({
@@ -367,17 +390,135 @@ async function bootstrap() {
 
     // Launch bot
     try {
+      const telegramStartupTimeoutMs = Number.parseInt(
+        process.env.TELEGRAM_STARTUP_TIMEOUT_MS || "15000",
+        10,
+      );
       if (webhookEnabled) {
+        // #region agent log
+        fetch(
+          "http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Debug-Session-Id": "7f4ee9",
+            },
+            body: JSON.stringify({
+              sessionId: "7f4ee9",
+              runId: "initial",
+              hypothesisId: "H1",
+              location: "index.js:365",
+              message: "about to start bot in webhook mode",
+              data: { webhookEnabled, webhookDomain: WEBHOOK_DOMAIN || null },
+              timestamp: Date.now(),
+            }),
+          },
+        ).catch(() => {});
+        // #endregion
         const webhookUrl = `${WEBHOOK_DOMAIN}/webhook/${BOT_TOKEN}`;
-        await bot.telegram.setWebhook(webhookUrl);
+        await withTimeout(
+          bot.telegram.setWebhook(webhookUrl),
+          telegramStartupTimeoutMs,
+          "setWebhook",
+        );
+        // #region agent log
+        fetch(
+          "http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Debug-Session-Id": "7f4ee9",
+            },
+            body: JSON.stringify({
+              sessionId: "7f4ee9",
+              runId: "initial",
+              hypothesisId: "H1",
+              location: "index.js:369",
+              message: "setWebhook completed",
+              data: { webhookUrl },
+              timestamp: Date.now(),
+            }),
+          },
+        ).catch(() => {});
+        // #endregion
         resources.botLaunched = true;
         log.info("Bot started in webhook mode", { webhookUrl });
       } else {
-        await bot.launch();
+        // #region agent log
+        fetch(
+          "http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Debug-Session-Id": "7f4ee9",
+            },
+            body: JSON.stringify({
+              sessionId: "7f4ee9",
+              runId: "initial",
+              hypothesisId: "H2",
+              location: "index.js:373",
+              message: "about to launch bot in polling mode",
+              data: { webhookEnabled, port: PORT },
+              timestamp: Date.now(),
+            }),
+          },
+        ).catch(() => {});
+        // #endregion
+        await withTimeout(bot.launch(), telegramStartupTimeoutMs, "bot.launch");
+        // #region agent log
+        fetch(
+          "http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Debug-Session-Id": "7f4ee9",
+            },
+            body: JSON.stringify({
+              sessionId: "7f4ee9",
+              runId: "initial",
+              hypothesisId: "H2",
+              location: "index.js:375",
+              message: "bot.launch completed in polling mode",
+              data: { webhookEnabled },
+              timestamp: Date.now(),
+            }),
+          },
+        ).catch(() => {});
+        // #endregion
         resources.botLaunched = true;
         log.info("Bot started in polling mode");
       }
     } catch (error) {
+      // #region agent log
+      fetch(
+        "http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Debug-Session-Id": "7f4ee9",
+          },
+          body: JSON.stringify({
+            sessionId: "7f4ee9",
+            runId: "initial",
+            hypothesisId: "H3",
+            location: "index.js:381",
+            message: "bot launch/setWebhook failed",
+            data: {
+              name: error?.name || null,
+              message: error?.message || null,
+              code: error?.code || null,
+              isProduction,
+            },
+            timestamp: Date.now(),
+          }),
+        },
+      ).catch(() => {});
+      // #endregion
       if (isProduction) {
         throw error;
       }

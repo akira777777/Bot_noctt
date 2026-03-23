@@ -130,4 +130,42 @@ test("admin API manages leads with status filters", async (t) => {
     },
   );
   assert.equal(patchInvalidResponse.status, 400);
+
+  const exportResponse = await fetch(`${baseUrl}/api/admin/export/leads`, {
+    headers,
+  });
+  assert.equal(exportResponse.status, 200);
+  assert.match(exportResponse.headers.get("content-type") || "", /text\/csv/i);
+});
+
+test("admin CSV export stays protected by API key auth", async (t) => {
+  const adminId = 9001;
+  const apiSecret = "test-api-secret";
+  const { db, cleanup } = createTempDb();
+  const repos = createRepositories(db);
+
+  const app = createWebServer({
+    repos,
+    conversationService: {},
+    bot: {},
+    adminId,
+    apiSecret,
+    corsOrigin: null,
+    isProduction: false,
+  });
+  const server = await startServer(app);
+  t.after(async () => {
+    await stopServer(server);
+    cleanup();
+  });
+
+  const baseUrl = `http://127.0.0.1:${server.address().port}`;
+
+  const unauthorized = await fetch(`${baseUrl}/api/admin/export/leads`);
+  assert.equal(unauthorized.status, 401);
+
+  const authorized = await fetch(`${baseUrl}/api/admin/export/leads`, {
+    headers: { "X-Api-Key": apiSecret },
+  });
+  assert.equal(authorized.status, 200);
 });

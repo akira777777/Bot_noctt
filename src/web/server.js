@@ -137,7 +137,14 @@ function createWebServer({
   app.use(
     "/api",
     publicLimiter,
-    createPublicRoutes({ repos, bot, adminId, cacheService, queueService }),
+    createPublicRoutes({
+      repos,
+      bot,
+      adminId,
+      cacheService,
+      queueService,
+      isProduction,
+    }),
   );
 
   // Admin API (API key auth + rate limited)

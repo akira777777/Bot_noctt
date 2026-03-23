@@ -3,7 +3,7 @@ const { validateWebLead } = require("../validators/lead");
 const { createRateLimiter } = require("../middleware/rate-limit");
 const { getLeadStatusLabel } = require("../../domain/lead-status");
 
-function createPublicRoutes({ repos, bot, adminId }) {
+function createPublicRoutes({ repos, bot, adminId, isProduction }) {
   const router = express.Router();
 
   const leadFormLimiter = createRateLimiter({
@@ -20,6 +20,10 @@ function createPublicRoutes({ repos, bot, adminId }) {
 
   // GET /api/lead/:id/status — public lead status (no PII)
   router.get("/lead/:id/status", (req, res) => {
+    if (isProduction) {
+      return res.status(404).json({ ok: false, error: "Not found" });
+    }
+
     const id = Number(req.params.id);
     if (!id) {
       return res.status(400).json({ ok: false, error: "Invalid lead ID" });
@@ -53,7 +57,9 @@ function createPublicRoutes({ repos, bot, adminId }) {
 
     const product = repos.products.getByCode(req.body.product_code);
     if (!product || !product.is_active) {
-      return res.status(400).json({ ok: false, error: "Product not found or inactive" });
+      return res
+        .status(400)
+        .json({ ok: false, error: "Product not found or inactive" });
     }
 
     const lead = repos.leads.create({

@@ -47,6 +47,12 @@ const WEBHOOK_DOMAIN = optionalString("WEBHOOK_DOMAIN", [
   "RENDER_EXTERNAL_URL",
 ]);
 const CORS_ORIGIN = optionalString("CORS_ORIGIN");
+const TELEGRAM_DELIVERY_MODE_RAW = optionalString("TELEGRAM_DELIVERY_MODE");
+const TELEGRAM_DELIVERY_MODE = TELEGRAM_DELIVERY_MODE_RAW
+  ? TELEGRAM_DELIVERY_MODE_RAW.toLowerCase()
+  : NODE_ENV === "production"
+    ? "webhook"
+    : "polling";
 // Backward compatible:
 // - primary: WEB_APP_URL
 // - legacy/alt: WEBAPP_URL (no underscore)
@@ -60,11 +66,24 @@ const isProduction = NODE_ENV === "production";
 
 if (isProduction && !API_SECRET) {
   logWarn(
-    "API_SECRET is not set in production; admin API endpoints are unprotected",
+    "API_SECRET is not set in production; admin API endpoints are disabled",
   );
 }
 if (isProduction && !CORS_ORIGIN) {
   logWarn("CORS_ORIGIN is not set in production; all origins are allowed");
+}
+if (
+  TELEGRAM_DELIVERY_MODE !== "polling" &&
+  TELEGRAM_DELIVERY_MODE !== "webhook"
+) {
+  throw new Error(
+    "TELEGRAM_DELIVERY_MODE must be either 'polling' or 'webhook'",
+  );
+}
+if (TELEGRAM_DELIVERY_MODE === "webhook" && !WEBHOOK_DOMAIN) {
+  logWarn(
+    "TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling",
+  );
 }
 
 module.exports = {
@@ -76,6 +95,7 @@ module.exports = {
   PORT,
   API_SECRET,
   WEBHOOK_DOMAIN,
+  TELEGRAM_DELIVERY_MODE,
   CORS_ORIGIN,
   WEB_APP_URL,
 };

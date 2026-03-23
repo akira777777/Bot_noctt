@@ -59,6 +59,13 @@ function setHomeSession(repos, clientId, sourcePayload) {
   });
 }
 
+function normalizeText(value) {
+  if (typeof value !== "string") {
+    return "";
+  }
+  return value.trim();
+}
+
 async function showHomeScreen(ctx, deps, entry) {
   setHomeSession(deps.repos, ctx.from.id, entry.raw);
   await ctx.reply(
@@ -163,13 +170,8 @@ async function showPreviousLeadStep(ctx, deps, session) {
     return true;
   }
 
-  if (previousStep === "comment") {
-    await showLeadStep(ctx, "comment");
-    return true;
-  }
-
-  if (previousStep === "contact") {
-    await showLeadStep(ctx, "contact");
+  if (previousStep === "comment" || previousStep === "contact") {
+    await showLeadStep(ctx, previousStep);
     return true;
   }
 
@@ -185,7 +187,7 @@ async function cancelLeadFlow(ctx, deps) {
 
 async function handleLeadText(ctx, deps, session) {
   const normalizedCommand =
-    LEAD_TEXT_COMMANDS[ctx.message.text.trim().toLowerCase()];
+    LEAD_TEXT_COMMANDS[normalizeText(ctx.message.text).toLowerCase()];
   if (normalizedCommand === "cancel") {
     await cancelLeadFlow(ctx, deps);
     return true;
@@ -265,12 +267,44 @@ async function handleLeadText(ctx, deps, session) {
   return false;
 }
 
+async function getLeadSessionOrReply(ctx, deps) {
+  const session = deps.services.lead.getSession(ctx.from.id);
+  if (!session) {
+    await safeAnswerCbQuery(ctx, "Сессия не найдена");
+    return null;
+  }
+  return session;
+}
+
+async function showConfirmOrContactStep(ctx, result) {
+  const nextStep = result.nextStep === "confirm" ? "confirm" : "contact";
+  await showLeadStep(ctx, nextStep, result);
+}
+
 function isUserBlocked(user) {
   return user && user.is_blocked;
 }
 
 async function rejectBlocked(ctx) {
   await ctx.reply("Ваш аккаунт заблокирован. Обратитесь к администратору.");
+}
+
+async function ensureClientAllowed(ctx, deps, { checkRateLimit = false } = {}) {
+  if (checkRateLimit && !messageLimiter.isAllowed(ctx.from.id)) {
+    await ctx.reply(rateLimitMessage());
+    return false;
+  }
+
+  const user = deps.services.conversation.upsertTelegramUser(
+    ctx.from,
+    "client",
+  );
+  if (isUserBlocked(user)) {
+    await rejectBlocked(ctx);
+    return false;
+  }
+
+  return true;
 }
 
 async function handleClientStart(ctx, deps) {
@@ -315,12 +349,7 @@ async function handleClientMiniApp(ctx, deps) {
 }
 
 async function handleClientStatus(ctx, deps) {
-  const user = deps.services.conversation.upsertTelegramUser(
-    ctx.from,
-    "client",
-  );
-  if (isUserBlocked(user)) {
-    await rejectBlocked(ctx);
+  if (!(await ensureClientAllowed(ctx, deps))) {
     return;
   }
   const lead = deps.repos.leads.getLatestByClient(ctx.from.id);
@@ -328,17 +357,7 @@ async function handleClientStatus(ctx, deps) {
 }
 
 async function handleClientText(ctx, deps) {
-  if (!messageLimiter.isAllowed(ctx.from.id)) {
-    await ctx.reply(rateLimitMessage());
-    return;
-  }
-
-  const user = deps.services.conversation.upsertTelegramUser(
-    ctx.from,
-    "client",
-  );
-  if (isUserBlocked(user)) {
-    await rejectBlocked(ctx);
+  if (!(await ensureClientAllowed(ctx, deps, { checkRateLimit: true }))) {
     return;
   }
 
@@ -430,11 +449,8 @@ async function handleClientAction(ctx, deps) {
   }
 
   if (action === ACTIONS.LEAD_SKIP_COMMENT) {
-    const session = deps.services.lead.getSession(ctx.from.id);
-    if (!session) {
-      await safeAnswerCbQuery(ctx, "Сессия не найдена");
-      return;
-    }
+    const session = await getLeadSessionOrReply(ctx, deps);
+    if (!session) return;
 
     const result = deps.services.lead.skipComment({
       clientId: ctx.from.id,
@@ -442,20 +458,13 @@ async function handleClientAction(ctx, deps) {
     });
 
     await safeAnswerCbQuery(ctx);
-    if (result.nextStep === "confirm") {
-      await showLeadStep(ctx, "confirm", result);
-      return;
-    }
-    await showLeadStep(ctx, "contact", result);
+    await showConfirmOrContactStep(ctx, result);
     return;
   }
 
   if (action === ACTIONS.LEAD_CONTACT_TELEGRAM) {
-    const session = deps.services.lead.getSession(ctx.from.id);
-    if (!session) {
-      await safeAnswerCbQuery(ctx, "Сессия не найдена");
-      return;
-    }
+    const session = await getLeadSessionOrReply(ctx, deps);
+    if (!session) return;
 
     const result = deps.services.lead.useTelegramContact({
       client: ctx.from,
@@ -468,11 +477,8 @@ async function handleClientAction(ctx, deps) {
   }
 
   if (action === ACTIONS.LEAD_CONTACT_CUSTOM) {
-    const session = deps.services.lead.getSession(ctx.from.id);
-    if (!session) {
-      await safeAnswerCbQuery(ctx, "Сессия не найдена");
-      return;
-    }
+    const session = await getLeadSessionOrReply(ctx, deps);
+    if (!session) return;
 
     deps.services.lead.requestCustomContact({
       clientId: ctx.from.id,
@@ -489,11 +495,8 @@ async function handleClientAction(ctx, deps) {
     action === ACTIONS.LEAD_EDIT_COMMENT ||
     action === ACTIONS.LEAD_EDIT_CONTACT
   ) {
-    const session = deps.services.lead.getSession(ctx.from.id);
-    if (!session) {
-      await safeAnswerCbQuery(ctx, "Сессия не найдена");
-      return;
-    }
+    const session = await getLeadSessionOrReply(ctx, deps);
+    if (!session) return;
 
     const field =
       action === ACTIONS.LEAD_EDIT_QUANTITY
@@ -572,17 +575,7 @@ async function handleClientAction(ctx, deps) {
 }
 
 async function handleClientMedia(ctx, deps, mediaType) {
-  if (!messageLimiter.isAllowed(ctx.from.id)) {
-    await ctx.reply(rateLimitMessage());
-    return;
-  }
-
-  const user = deps.services.conversation.upsertTelegramUser(
-    ctx.from,
-    "client",
-  );
-  if (isUserBlocked(user)) {
-    await rejectBlocked(ctx);
+  if (!(await ensureClientAllowed(ctx, deps, { checkRateLimit: true }))) {
     return;
   }
 
