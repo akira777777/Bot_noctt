@@ -1,4 +1,5 @@
 const { adminQuickReplyKeyboard, adminInboxKeyboard } = require("../ui/keyboards");
+const { removeReplyKeyboard } = require("../ui/reply-keyboards");
 const {
   adminSelectedClientMessage,
   adminNoClientSelectedMessage,
@@ -688,7 +689,7 @@ async function handleAdminStart(ctx, deps) {
     "/suggest — предложить ответ для активного клиента\n" +
     "/summarize [id] — резюме диалога с клиентом\n" +
     "/ai <запрос> — AI-ассистент (статистика, заявки, история)";
-  await ctx.reply(message);
+  await ctx.reply(message, removeReplyKeyboard());
 }
 
 async function handleAdminText(ctx, deps) {

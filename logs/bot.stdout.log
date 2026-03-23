@@ -1,37 +1,76 @@
-[dotenv@17.3.1] injecting env (4) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
-[dotenv@17.3.1] injecting env (29) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
-{"level":"INFO","time":"2026-03-23T21:48:45.697Z","service":"telegram-bot","env":"development","msg":"Starting application bootstrap","environment":"development","nodeVersion":"v24.14.0"}
-{"level":"INFO","time":"2026-03-23T21:48:45.711Z","service":"telegram-bot","env":"development","msg":"Database initialized"}
-{"level":"INFO","time":"2026-03-23T21:48:45.730Z","service":"telegram-bot","env":"development","msg":"Redis client connecting"}
-{"level":"INFO","time":"2026-03-23T21:48:45.732Z","service":"telegram-bot","env":"development","msg":"Redis client ready"}
-{"level":"INFO","time":"2026-03-23T21:48:45.732Z","service":"telegram-bot","env":"development","msg":"Redis cache connected successfully"}
-{"level":"INFO","time":"2026-03-23T21:48:45.732Z","service":"telegram-bot","env":"development","msg":"Cache service initialized","mode":"redis"}
-{"level":"INFO","time":"2026-03-23T21:48:45.732Z","service":"telegram-bot","env":"development","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
-{"level":"INFO","time":"2026-03-23T21:48:45.739Z","service":"telegram-bot","env":"development","msg":"Recurring jobs scheduled"}
-{"level":"INFO","time":"2026-03-23T21:48:45.739Z","service":"telegram-bot","env":"development","msg":"Queue service initialized successfully"}
-{"level":"INFO","time":"2026-03-23T21:48:45.739Z","service":"telegram-bot","env":"development","msg":"Queue service initialized"}
-{"level":"INFO","time":"2026-03-23T21:48:45.741Z","service":"telegram-bot","env":"development","msg":"Telegram delivery mode resolved","requestedMode":"polling","effectiveMode":"polling"}
-{"level":"INFO","time":"2026-03-23T21:48:45.766Z","service":"telegram-bot","env":"development","msg":"HTTP server started on port 3001"}
-{"level":"INFO","time":"2026-03-23T21:48:45.902Z","service":"telegram-bot","env":"development","msg":"Bot started in polling mode","username":"noct1_bot"}
-{"level":"INFO","time":"2026-03-23T21:48:45.902Z","service":"telegram-bot","env":"development","msg":"Memory monitor started","checkInterval":30000}
-{"level":"INFO","time":"2026-03-23T21:48:45.902Z","service":"telegram-bot","env":"development","msg":"Shutdown handlers registered"}
-{"level":"INFO","time":"2026-03-23T21:48:45.902Z","service":"telegram-bot","env":"development","msg":"Application bootstrap completed successfully","uptime":1.0326456}
-{"level":"INFO","time":"2026-03-23T21:48:45.902Z","service":"telegram-bot","env":"development","msg":"Application is ready","uptime":1.032729,"pid":11712}
-[ERROR] Failed to answer callback query {
-  error: {
-    name: 'Error',
-    message: '400: Bad Request: query is too old and response timeout expired or query ID is invalid',
-    stack: 'Error: 400: Bad Request: query is too old and response timeout expired or query ID is invalid\n' +
-      '    at Telegram.callApi (C:\\Users\\fear7\\Desktop\\Bot_noct\\node_modules\\telegraf\\lib\\core\\network\\client.js:315:19)\n' +
-      '    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n' +
-      '    at async safeAnswerCbQuery (C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\utils\\telegram.js:14:5)\n' +
-      '    at async handleClientAction (C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\handlers\\client.js:463:5)\n' +
-      '    at async execute (C:\\Users\\fear7\\Desktop\\Bot_noct\\node_modules\\telegraf\\lib\\composer.js:518:17)\n' +
-      '    at async C:\\Users\\fear7\\Desktop\\Bot_noct\\node_modules\\telegraf\\lib\\composer.js:519:21\n' +
-      '    at async execute (C:\\Users\\fear7\\Desktop\\Bot_noct\\node_modules\\telegraf\\lib\\composer.js:518:17)\n' +
-      '    at async C:\\Users\\fear7\\Desktop\\Bot_noct\\node_modules\\telegraf\\lib\\composer.js:519:21\n' +
-      '    at async execute (C:\\Users\\fear7\\Desktop\\Bot_noct\\node_modules\\telegraf\\lib\\composer.js:518:17)\n' +
-      '    at async C:\\Users\\fear7\\Desktop\\Bot_noct\\node_modules\\telegraf\\lib\\composer.js:519:21'
-  }
-}
-{"level":"INFO","time":"2026-03-23T21:49:06.282Z","service":"telegram-bot","env":"development","msg":"HTTP Request","method":"GET","path":"/healthz","statusCode":200,"responseTime":2,"ip":"::ffff:127.0.0.1"}
+[dotenv@17.3.1] injecting env (5) from .env.local -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.3.1] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[2026-03-23 23:00:20.550 +0100] [32mINFO[39m: [36mStarting application bootstrap[39m
+    [35mservice[39m: "telegram-bot"
+    [35menv[39m: "development"
+    [35menvironment[39m: "development"
+    [35mnodeVersion[39m: "v24.14.0"
+[2026-03-23 23:00:20.565 +0100] [32mINFO[39m: [36mDatabase initialized[39m
+    [35mservice[39m: "telegram-bot"
+    [35menv[39m: "development"
+[2026-03-23 23:00:20.582 +0100] [32mINFO[39m: [36mRedis client connecting[39m
+    [35mservice[39m: "telegram-bot"
+    [35menv[39m: "development"
+[2026-03-23 23:00:20.585 +0100] [32mINFO[39m: [36mRedis client ready[39m
+    [35mservice[39m: "telegram-bot"
+    [35menv[39m: "development"
+[2026-03-23 23:00:20.585 +0100] [32mINFO[39m: [36mRedis cache connected successfully[39m
+    [35mservice[39m: "telegram-bot"
+    [35menv[39m: "development"
+[2026-03-23 23:00:20.585 +0100] [32mINFO[39m: [36mCache service initialized[39m
+    [35mservice[39m: "telegram-bot"
+    [35menv[39m: "development"
+    [35mmode[39m: "redis"
+[2026-03-23 23:00:20.585 +0100] [32mINFO[39m: [36mInitializing queue service[39m
+    [35mservice[39m: "telegram-bot"
+    [35menv[39m: "development"
+    [35mredisConfig[39m: {
+      "host": "localhost",
+      "port": 6379,
+      "db": 0,
+      "hasPassword": false
+    }
+[2026-03-23 23:00:20.593 +0100] [32mINFO[39m: [36mRecurring jobs scheduled[39m
+    [35mservice[39m: "telegram-bot"
+    [35menv[39m: "development"
+[2026-03-23 23:00:20.593 +0100] [32mINFO[39m: [36mQueue service initialized successfully[39m
+    [35mservice[39m: "telegram-bot"
+    [35menv[39m: "development"
+[2026-03-23 23:00:20.593 +0100] [32mINFO[39m: [36mQueue service initialized[39m
+    [35mservice[39m: "telegram-bot"
+    [35menv[39m: "development"
+[2026-03-23 23:00:20.595 +0100] [32mINFO[39m: [36mTelegram delivery mode resolved[39m
+    [35mservice[39m: "telegram-bot"
+    [35menv[39m: "development"
+    [35mrequestedMode[39m: "polling"
+    [35meffectiveMode[39m: "polling"
+[2026-03-23 23:00:20.622 +0100] [32mINFO[39m: [36mHTTP server started on port 3001[39m
+    [35mservice[39m: "telegram-bot"
+    [35menv[39m: "development"
+[2026-03-23 23:00:20.754 +0100] [32mINFO[39m: [36mBot started in polling mode[39m
+    [35mservice[39m: "telegram-bot"
+    [35menv[39m: "development"
+    [35musername[39m: "noct1_bot"
+[2026-03-23 23:00:20.754 +0100] [32mINFO[39m: [36mMemory monitor started[39m
+    [35mservice[39m: "telegram-bot"
+    [35menv[39m: "development"
+    [35mcheckInterval[39m: 30000
+[2026-03-23 23:00:20.755 +0100] [32mINFO[39m: [36mShutdown handlers registered[39m
+    [35mservice[39m: "telegram-bot"
+    [35menv[39m: "development"
+[2026-03-23 23:00:20.755 +0100] [32mINFO[39m: [36mApplication bootstrap completed successfully[39m
+    [35mservice[39m: "telegram-bot"
+    [35menv[39m: "development"
+    [35muptime[39m: 0.9233438
+[2026-03-23 23:00:20.755 +0100] [32mINFO[39m: [36mApplication is ready[39m
+    [35mservice[39m: "telegram-bot"
+    [35menv[39m: "development"
+    [35muptime[39m: 0.9233906
+[2026-03-23 23:00:45.987 +0100] [32mINFO[39m: [36mHTTP Request[39m
+    [35mservice[39m: "telegram-bot"
+    [35menv[39m: "development"
+    [35mmethod[39m: "GET"
+    [35mpath[39m: "/healthz"
+    [35mstatusCode[39m: 200
+    [35mresponseTime[39m: 2
+    [35mip[39m: "::ffff:127.0.0.1"

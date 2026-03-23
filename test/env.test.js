@@ -40,3 +40,13 @@ test("env loader fails on invalid ADMIN_ID", () => {
   assert.equal(error instanceof Error, true);
   assert.match(error.message, /ADMIN_ID/);
 });
+
+test("env loader ignores placeholder WEB_APP_URL values", () => {
+  const { result, error } = loadEnvModule({
+    BOT_TOKEN: "bot:test",
+    ADMIN_ID: "123",
+    WEB_APP_URL: "https://your-miniapp-domain.example/mini-app",
+  });
+  assert.equal(error, undefined);
+  assert.equal(result.WEB_APP_URL, null);
+});

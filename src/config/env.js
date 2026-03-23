@@ -61,6 +61,34 @@ function emitConfigWarning(message) {
   console.warn(`[WARN] ${message}`);
 }
 
+function optionalUrlString(key, fallbackKeys = []) {
+  const value = optionalString(key, fallbackKeys);
+  if (!value) {
+    return null;
+  }
+
+  let parsed;
+  try {
+    parsed = new URL(value);
+  } catch {
+    emitConfigWarning(`${key} is not a valid URL; treating it as unset`);
+    return null;
+  }
+
+  if (!["http:", "https:"].includes(parsed.protocol)) {
+    emitConfigWarning(`${key} must use http or https; treating it as unset`);
+    return null;
+  }
+
+  const hostname = parsed.hostname.toLowerCase();
+  if (hostname === "example.com" || hostname.endsWith(".example")) {
+    emitConfigWarning(`${key} still uses a placeholder domain; treating it as unset`);
+    return null;
+  }
+
+  return value;
+}
+
 const NODE_ENV = optionalString("NODE_ENV") || "development";
 const BOT_TOKEN = requiredString("BOT_TOKEN", ["TELEGRAM_BOT_TOKEN"]);
 const ADMIN_ID = optionalInteger("ADMIN_ID", null);
@@ -82,7 +110,7 @@ const TELEGRAM_DELIVERY_MODE = TELEGRAM_DELIVERY_MODE_RAW
 // Backward compatible:
 // - primary: WEB_APP_URL
 // - legacy/alt: WEBAPP_URL (no underscore)
-const WEB_APP_URL = optionalString("WEB_APP_URL", ["WEBAPP_URL"]);
+const WEB_APP_URL = optionalUrlString("WEB_APP_URL", ["WEBAPP_URL"]);
 const API_COMPRESSION = optionalBoolean("API_COMPRESSION", true);
 const LOG_LEVEL =
   optionalString("LOG_LEVEL") || (NODE_ENV === "production" ? "info" : "debug");
