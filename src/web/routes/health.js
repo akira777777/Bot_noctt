@@ -4,6 +4,12 @@
  */
 const express = require("express");
 const os = require("os");
+const {
+  APP_VERSION,
+  NODE_ENV,
+  MEMORY_LIMIT_WARN,
+  MEMORY_LIMIT_CRITICAL,
+} = require("../../config/env");
 
 const router = express.Router();
 
@@ -94,9 +100,9 @@ router.get("/health", async (req, res) => {
   const response = {
     status,
     timestamp: new Date().toISOString(),
-    version: process.env.npm_package_version || "1.0.0",
+    version: APP_VERSION,
     uptime: process.uptime(),
-    environment: process.env.NODE_ENV || "development",
+    environment: NODE_ENV,
     checks,
     system: {
       totalMemory: os.totalmem(),
@@ -160,11 +166,8 @@ function performMemoryCheck() {
   const free = os.freemem();
   const usedPercent = ((total - free) / total) * 100;
   const processRssMb = Math.round(used.rss / 1024 / 1024);
-  const warnThresholdMb = parseInt(process.env.MEMORY_LIMIT_WARN || "512", 10);
-  const criticalThresholdMb = parseInt(
-    process.env.MEMORY_LIMIT_CRITICAL || "768",
-    10,
-  );
+  const warnThresholdMb = MEMORY_LIMIT_WARN;
+  const criticalThresholdMb = MEMORY_LIMIT_CRITICAL;
 
   let status = "ok";
   if (processRssMb > criticalThresholdMb) status = "critical";

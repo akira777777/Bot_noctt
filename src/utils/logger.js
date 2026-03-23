@@ -1,3 +1,5 @@
+const { NODE_ENV } = require("../config/env");
+
 function normalizeError(error) {
   if (error instanceof Error) {
     return {
@@ -10,7 +12,7 @@ function normalizeError(error) {
 }
 
 function write(level, message, fields = {}) {
-  const isProduction = process.env.NODE_ENV === "production";
+  const isProduction = NODE_ENV === "production";
   const payload = {
     ts: new Date().toISOString(),
     level,

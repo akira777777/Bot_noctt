@@ -2,11 +2,13 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 
 const MODULE_PATH = "../src/services/cache-service";
+const ENV_MODULE_PATH = "../src/config/env";
 
 function loadCacheModule(overrides) {
   const backup = { ...process.env };
   Object.assign(process.env, overrides);
   delete require.cache[require.resolve(MODULE_PATH)];
+  delete require.cache[require.resolve(ENV_MODULE_PATH)];
 
   let result;
   let error;
@@ -18,6 +20,7 @@ function loadCacheModule(overrides) {
   } finally {
     process.env = backup;
     delete require.cache[require.resolve(MODULE_PATH)];
+    delete require.cache[require.resolve(ENV_MODULE_PATH)];
   }
 
   return { result, error };

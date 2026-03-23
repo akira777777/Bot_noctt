@@ -4,22 +4,17 @@
  */
 const Redis = require("ioredis");
 const log = require("../utils/logger-enhanced");
-
-function readTtl(name, fallbackSeconds) {
-  const alias = process.env[`CACHE_TTL_${name}`];
-  const legacy = process.env[`REDIS_TTL_${name}`];
-  return parseInt(alias || legacy || String(fallbackSeconds), 10);
-}
+const { REDIS_URL, CACHE_TTL } = require("../config/env");
 
 // Cache TTL configurations (in seconds)
-const CACHE_TTL = {
-  SESSION: readTtl("SESSION", 3600), // 1 hour
-  CATALOG: readTtl("CATALOG", 300), // 5 minutes
-  PRODUCT: readTtl("PRODUCT", 600), // 10 minutes
-  STATS: readTtl("STATS", 60), // 1 minute
-  USER: readTtl("USER", 1800), // 30 minutes
-  LEAD: readTtl("LEAD", 300), // 5 minutes
-  CONVERSATION: readTtl("CONVERSATION", 900), // 15 minutes
+const CACHE_TTL_CONFIG = {
+  SESSION: CACHE_TTL.SESSION,
+  CATALOG: CACHE_TTL.CATALOG,
+  PRODUCT: CACHE_TTL.PRODUCT,
+  STATS: CACHE_TTL.STATS,
+  USER: CACHE_TTL.USER,
+  LEAD: CACHE_TTL.LEAD,
+  CONVERSATION: CACHE_TTL.CONVERSATION,
 };
 
 // Cache key prefixes for namespacing
@@ -118,7 +113,7 @@ class CacheService {
       }
 
       const serialized = JSON.stringify(value);
-      const ttl = ttlSeconds || CACHE_TTL.SESSION;
+      const ttl = ttlSeconds || CACHE_TTL_CONFIG.SESSION;
 
       await this.redis.setex(key, ttl, serialized);
 
@@ -185,7 +180,7 @@ class CacheService {
     return this.set(
       `${CACHE_KEYS.SESSION}${sessionId}`,
       data,
-      CACHE_TTL.SESSION,
+      CACHE_TTL_CONFIG.SESSION,
     );
   }
 
@@ -201,7 +196,7 @@ class CacheService {
    * Cache catalog products
    */
   async setCatalog(products) {
-    return this.set(`${CACHE_KEYS.CATALOG}all`, products, CACHE_TTL.CATALOG);
+    return this.set(`${CACHE_KEYS.CATALOG}all`, products, CACHE_TTL_CONFIG.CATALOG);
   }
 
   async getCatalog() {
@@ -219,7 +214,7 @@ class CacheService {
     return this.set(
       `${CACHE_KEYS.PRODUCT}${productId}`,
       product,
-      CACHE_TTL.PRODUCT,
+      CACHE_TTL_CONFIG.PRODUCT,
     );
   }
 
@@ -235,7 +230,7 @@ class CacheService {
    * Cache statistics
    */
   async setStats(stats) {
-    return this.set(`${CACHE_KEYS.STATS}dashboard`, stats, CACHE_TTL.STATS);
+    return this.set(`${CACHE_KEYS.STATS}dashboard`, stats, CACHE_TTL_CONFIG.STATS);
   }
 
   async getDashboardStats() {
@@ -250,7 +245,7 @@ class CacheService {
    * Cache user data
    */
   async setUser(userId, userData) {
-    return this.set(`${CACHE_KEYS.USER}${userId}`, userData, CACHE_TTL.USER);
+    return this.set(`${CACHE_KEYS.USER}${userId}`, userData, CACHE_TTL_CONFIG.USER);
   }
 
   async getUser(userId) {
@@ -429,14 +424,12 @@ class CacheService {
  * Create Redis client with configuration
  */
 function createRedisClient() {
-  const redisUrl = process.env.REDIS_URL;
-
-  if (!redisUrl) {
+  if (!REDIS_URL) {
     log.warn("REDIS_URL not configured, using in-memory cache fallback");
     return null;
   }
 
-  const client = new Redis(redisUrl, {
+  const client = new Redis(REDIS_URL, {
     maxRetriesPerRequest: 3,
     retryStrategy: (times) => {
       if (times > 3) {
@@ -578,6 +571,6 @@ module.exports = {
   initCacheService,
   getCacheService,
   createRedisClient,
-  CACHE_TTL,
+  CACHE_TTL: CACHE_TTL_CONFIG,
   CACHE_KEYS,
 };

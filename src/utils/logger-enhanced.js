@@ -5,6 +5,7 @@
 const pino = require("pino");
 const path = require("path");
 const fs = require("fs");
+const { NODE_ENV, LOG_LEVEL, LOG_FORMAT } = require("../config/env");
 
 // Ensure logs directory exists
 const logsDir = path.join(process.cwd(), "logs");
@@ -13,10 +14,10 @@ if (!fs.existsSync(logsDir)) {
 }
 
 // Determine if we're in development
-const isDevelopment = process.env.NODE_ENV !== "production";
+const isDevelopment = NODE_ENV !== "production";
 
 // Base transport configuration
-const transport = isDevelopment
+const transport = isDevelopment && LOG_FORMAT !== "json"
   ? {
       target: "pino-pretty",
       options: {
@@ -30,10 +31,10 @@ const transport = isDevelopment
 
 // Create the main logger instance
 const logger = pino({
-  level: process.env.LOG_LEVEL || (isDevelopment ? "debug" : "info"),
+  level: LOG_LEVEL,
   base: {
     service: "telegram-bot",
-    env: process.env.NODE_ENV || "development",
+    env: NODE_ENV,
   },
   timestamp: pino.stdTimeFunctions.isoTime,
   formatters: {

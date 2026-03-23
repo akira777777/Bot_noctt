@@ -14,6 +14,13 @@ const {
   TELEGRAM_DELIVERY_MODE,
   CORS_ORIGIN,
   isProduction,
+  NODE_ENV,
+  API_COMPRESSION,
+  ALLOW_BOT_LAUNCH_FAILURE,
+  TELEGRAM_STARTUP_TIMEOUT_MS,
+  MEMORY_LIMIT_WARN,
+  MEMORY_LIMIT_CRITICAL,
+  REDIS_CONFIG,
 } = require("./src/config/env");
 const { createWebServer } = require("./src/web/server");
 const {
@@ -261,11 +268,10 @@ function startScheduledTasks(scheduler) {
 
 async function bootstrap() {
   log.info("Starting application bootstrap", {
-    environment: process.env.NODE_ENV || "development",
+    environment: NODE_ENV,
     nodeVersion: process.version,
   });
-  const allowBotLaunchFailureInProduction =
-    process.env.ALLOW_BOT_LAUNCH_FAILURE === "true";
+  const allowBotLaunchFailureInProduction = ALLOW_BOT_LAUNCH_FAILURE;
 
   // Initialize database
   const db = createDatabase();
@@ -277,12 +283,7 @@ async function bootstrap() {
   // Initialize cache service (Redis with in-memory fallback)
   let cacheService = null;
   try {
-    cacheService = await initCacheService({
-      host: process.env.REDIS_HOST || "localhost",
-      port: parseInt(process.env.REDIS_PORT || "6379"),
-      password: process.env.REDIS_PASSWORD || undefined,
-      db: parseInt(process.env.REDIS_DB || "0"),
-    });
+    cacheService = await initCacheService(REDIS_CONFIG);
     log.info("Cache service initialized", {
       mode: cacheService.getMode(),
     });
@@ -295,12 +296,7 @@ async function bootstrap() {
   // Initialize queue service (Bull)
   let queueService = null;
   try {
-    await initQueueService({
-      host: process.env.REDIS_HOST || "localhost",
-      port: parseInt(process.env.REDIS_PORT || "6379"),
-      password: process.env.REDIS_PASSWORD || undefined,
-      db: parseInt(process.env.REDIS_DB || "0"),
-    });
+    await initQueueService(REDIS_CONFIG);
     queueService = require("./src/services/queue-service");
     log.info("Queue service initialized");
 
@@ -376,7 +372,7 @@ async function bootstrap() {
     apiSecret: API_SECRET,
     corsOrigin: CORS_ORIGIN,
     isProduction,
-    compressionEnabled: process.env.API_COMPRESSION !== "false",
+    compressionEnabled: API_COMPRESSION,
     cacheService,
     queueService,
   });
@@ -409,10 +405,7 @@ async function bootstrap() {
 
     // Launch bot
     try {
-      const telegramStartupTimeoutMs = Number.parseInt(
-        process.env.TELEGRAM_STARTUP_TIMEOUT_MS || "15000",
-        10,
-      );
+      const telegramStartupTimeoutMs = TELEGRAM_STARTUP_TIMEOUT_MS;
       if (webhookEnabled) {
         const webhookUrl = `${WEBHOOK_DOMAIN}/webhook/${BOT_TOKEN}`;
         await withTimeout(
@@ -452,10 +445,8 @@ async function bootstrap() {
     resources.schedulerTimers = startScheduledTasks(scheduler);
 
     // Start memory monitor
-    const memoryLimitWarn =
-      parseInt(process.env.MEMORY_LIMIT_WARN || "512") * 1024 * 1024;
-    const memoryLimitCritical =
-      parseInt(process.env.MEMORY_LIMIT_CRITICAL || "768") * 1024 * 1024;
+    const memoryLimitWarn = MEMORY_LIMIT_WARN * 1024 * 1024;
+    const memoryLimitCritical = MEMORY_LIMIT_CRITICAL * 1024 * 1024;
 
     resources.memoryMonitor = createMemoryMonitor({
       warnThreshold: memoryLimitWarn,

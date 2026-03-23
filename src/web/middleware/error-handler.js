@@ -4,6 +4,7 @@
  */
 const { v4: uuidv4 } = require("uuid");
 const log = require("../../utils/logger-enhanced");
+const { NODE_ENV } = require("../../config/env");
 
 // Error codes mapping
 const ERROR_CODES = {
@@ -125,7 +126,7 @@ function errorHandler(err, req, res, next) {
       id: errorId,
       code: errorCode,
       message:
-        process.env.NODE_ENV === "production" && statusCode >= 500
+        NODE_ENV === "production" && statusCode >= 500
           ? "An internal error occurred"
           : message,
       ...(details && { details }),
@@ -208,7 +209,7 @@ function requestLogger(req, res, next) {
  */
 function trustProxy(req) {
   // In production, trust common proxy headers
-  if (process.env.NODE_ENV === "production") {
+  if (NODE_ENV === "production") {
     return true;
   }
   return false;
