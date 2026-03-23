@@ -128,7 +128,10 @@ function createShutdownHandler(services = {}) {
       await Promise.race([
         Promise.all(shutdownOrder),
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("Shutdown timeout")), SHUTDOWN_TIMEOUT),
+          setTimeout(
+            () => reject(new Error("Shutdown timeout")),
+            SHUTDOWN_TIMEOUT,
+          ),
         ),
       ]);
     } catch (err) {
@@ -320,3 +323,39 @@ function createHealthMonitor(options = {}) {
       log.warn("Health check found issues", results);
     }
 
+    return results;
+  }
+
+  function start() {
+    if (!intervalId) {
+      intervalId = setInterval(async () => {
+        try {
+          await performCheck();
+        } catch (err) {
+          log.error("Health check error", err);
+        }
+      }, checkInterval);
+      log.info("Health monitor started", { checkInterval });
+    }
+  }
+
+  function stop() {
+    if (intervalId) {
+      clearInterval(intervalId);
+      intervalId = null;
+      log.info("Health monitor stopped");
+    }
+  }
+
+  return {
+    start,
+    stop,
+    performCheck,
+  };
+}
+
+module.exports = {
+  createShutdownHandler,
+  createMemoryMonitor,
+  createHealthMonitor,
+};
