@@ -395,130 +395,20 @@ async function bootstrap() {
         10,
       );
       if (webhookEnabled) {
-        // #region agent log
-        fetch(
-          "http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Debug-Session-Id": "7f4ee9",
-            },
-            body: JSON.stringify({
-              sessionId: "7f4ee9",
-              runId: "initial",
-              hypothesisId: "H1",
-              location: "index.js:365",
-              message: "about to start bot in webhook mode",
-              data: { webhookEnabled, webhookDomain: WEBHOOK_DOMAIN || null },
-              timestamp: Date.now(),
-            }),
-          },
-        ).catch(() => {});
-        // #endregion
         const webhookUrl = `${WEBHOOK_DOMAIN}/webhook/${BOT_TOKEN}`;
         await withTimeout(
           bot.telegram.setWebhook(webhookUrl),
           telegramStartupTimeoutMs,
           "setWebhook",
         );
-        // #region agent log
-        fetch(
-          "http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Debug-Session-Id": "7f4ee9",
-            },
-            body: JSON.stringify({
-              sessionId: "7f4ee9",
-              runId: "initial",
-              hypothesisId: "H1",
-              location: "index.js:369",
-              message: "setWebhook completed",
-              data: { webhookUrl },
-              timestamp: Date.now(),
-            }),
-          },
-        ).catch(() => {});
-        // #endregion
         resources.botLaunched = true;
         log.info("Bot started in webhook mode", { webhookUrl });
       } else {
-        // #region agent log
-        fetch(
-          "http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Debug-Session-Id": "7f4ee9",
-            },
-            body: JSON.stringify({
-              sessionId: "7f4ee9",
-              runId: "initial",
-              hypothesisId: "H2",
-              location: "index.js:373",
-              message: "about to launch bot in polling mode",
-              data: { webhookEnabled, port: PORT },
-              timestamp: Date.now(),
-            }),
-          },
-        ).catch(() => {});
-        // #endregion
         await withTimeout(bot.launch(), telegramStartupTimeoutMs, "bot.launch");
-        // #region agent log
-        fetch(
-          "http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Debug-Session-Id": "7f4ee9",
-            },
-            body: JSON.stringify({
-              sessionId: "7f4ee9",
-              runId: "initial",
-              hypothesisId: "H2",
-              location: "index.js:375",
-              message: "bot.launch completed in polling mode",
-              data: { webhookEnabled },
-              timestamp: Date.now(),
-            }),
-          },
-        ).catch(() => {});
-        // #endregion
         resources.botLaunched = true;
         log.info("Bot started in polling mode");
       }
     } catch (error) {
-      // #region agent log
-      fetch(
-        "http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Debug-Session-Id": "7f4ee9",
-          },
-          body: JSON.stringify({
-            sessionId: "7f4ee9",
-            runId: "initial",
-            hypothesisId: "H3",
-            location: "index.js:381",
-            message: "bot launch/setWebhook failed",
-            data: {
-              name: error?.name || null,
-              message: error?.message || null,
-              code: error?.code || null,
-              isProduction,
-            },
-            timestamp: Date.now(),
-          }),
-        },
-      ).catch(() => {});
-      // #endregion
       if (isProduction) {
         throw error;
       }
