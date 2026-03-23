@@ -16,15 +16,32 @@ type TelegramWebAppWindow = Window & {
 
 export default function MiniAppPage() {
   useEffect(() => {
-    const w = window as TelegramWebAppWindow;
-    if (!w.Telegram?.WebApp) {
+    const scriptId = "telegram-webapp-script";
+
+    const initTelegramWebApp = () => {
+      const w = window as TelegramWebAppWindow;
+      if (!w.Telegram?.WebApp) {
+        return;
+      }
+
+      w.Telegram.WebApp.ready?.();
+      w.Telegram.WebApp.expand?.();
+      w.Telegram.WebApp.setHeaderColor?.("#0f172a");
+      w.Telegram.WebApp.setBackgroundColor?.("#020617");
+    };
+
+    const existingScript = document.getElementById(scriptId) as HTMLScriptElement | null;
+    if (existingScript) {
+      initTelegramWebApp();
       return;
     }
 
-    w.Telegram.WebApp.ready?.();
-    w.Telegram.WebApp.expand?.();
-    w.Telegram.WebApp.setHeaderColor?.("#0f172a");
-    w.Telegram.WebApp.setBackgroundColor?.("#020617");
+    const script = document.createElement("script");
+    script.id = scriptId;
+    script.src = "https://telegram.org/js/telegram-web-app.js";
+    script.async = true;
+    script.onload = initTelegramWebApp;
+    document.head.appendChild(script);
   }, []);
 
   return (

@@ -4,13 +4,27 @@ import { fetchCatalog } from "@/lib/api";
 export const dynamic = "force-dynamic";
 
 export default async function CatalogPage() {
-  const { products } = await fetchCatalog();
+  let products: Awaited<ReturnType<typeof fetchCatalog>>["products"] = [];
+  let fetchError = "";
+
+  try {
+    const data = await fetchCatalog();
+    products = data.products;
+  } catch {
+    fetchError =
+      "Не удалось загрузить каталог. Проверьте, что API-сервер запущен на API_URL.";
+  }
 
   return (
     <main className="min-h-screen p-6 lg:p-12 max-w-5xl mx-auto">
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Каталог</h1>
         <p className="text-muted-foreground mt-2">Выберите товар и оставьте заявку</p>
+        {fetchError && (
+          <p className="mt-3 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {fetchError}
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
