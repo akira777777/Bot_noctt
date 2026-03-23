@@ -1,0 +1,66 @@
+# Multi-stage production Dockerfile for Bot_noct
+# Optimized for production deployment
+
+# ============================================
+# Stage 1: Dependencies
+# ============================================
+FROM node:20-alpine AS deps
+
+RUN apk add --no-cache \
+    dumb-init \
+    tini \
+    curl
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production
+
+# ============================================
+# Stage 2: Production image
+# ============================================
+FROM node:20-alpine AS production
+
+# Security: Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
+# Install production dependencies
+RUN apk add --no-cache \
+    dumb-init \
+    tini \
+    curl \
+    sqlite \
+    tzdata
+
+WORKDIR /app
+
+# Copy dependencies from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /usr/bin/tini /usr/bin/tini
+
+# Copy application
+COPY --chown=nodejs:nodejs . .
+
+# Create directories for logs and data
+RUN mkdir -p logs data && \
+    chown -R nodejs:nodejs logs data
+
+# Switch to non-root user
+USER nodejs
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-3052}/health || exit 1
+
+# Expose port
+EXPOSE ${PORT:-3052}
+
+# Use tini as init system
+ENTRYPOINT ["/usr/bin/tini", "--"]
+
+# Run the application
+CMD ["node", "index.js"]

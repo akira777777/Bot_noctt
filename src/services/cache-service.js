@@ -220,7 +220,7 @@ class CacheService {
     return this.set(`${CACHE_KEYS.STATS}dashboard`, stats, CACHE_TTL.STATS);
   }
 
-  async getStats() {
+  async getDashboardStats() {
     return this.get(`${CACHE_KEYS.STATS}dashboard`);
   }
 
@@ -302,10 +302,14 @@ class CacheService {
     log.info("All caches invalidated");
   }
 
+  getMode() {
+    return this.fallbackToMemory ? "memory" : "redis";
+  }
+
   /**
    * Get cache statistics
    */
-  async getStats() {
+  async getCacheStats() {
     if (this.fallbackToMemory) {
       return {
         isConnected: false,
@@ -358,6 +362,10 @@ class CacheService {
       log.info("Redis connection closed");
     }
     this.isConnected = false;
+  }
+
+  async disconnect() {
+    return this.close();
   }
 
   // ============ In-Memory Fallback Methods ============
@@ -463,8 +471,61 @@ function getCacheService() {
   return cacheService;
 }
 
+async function initCacheService(redisConfig = null) {
+  if (cacheService) {
+    return cacheService;
+  }
+
+  let redisClient = null;
+
+  if (redisConfig) {
+    const { host = "localhost", port = 6379, password, db = 0 } = redisConfig;
+
+    redisClient = new Redis({
+      host,
+      port,
+      password,
+      db,
+      maxRetriesPerRequest: 3,
+      retryStrategy: (times) => {
+        if (times > 3) {
+          log.error(`Redis connection failed after ${times} attempts`);
+          return null;
+        }
+        return Math.min(times * 100, 3000);
+      },
+      reconnectOnError: (err) => err.message.includes("READONLY"),
+      enableReadyCheck: true,
+      lazyConnect: false,
+    });
+
+    redisClient.on("connect", () => {
+      log.info("Redis client connecting");
+    });
+
+    redisClient.on("ready", () => {
+      log.info("Redis client ready");
+    });
+
+    redisClient.on("error", (error) => {
+      log.error("Redis client error", error);
+    });
+
+    redisClient.on("close", () => {
+      log.warn("Redis connection closed");
+    });
+  } else {
+    redisClient = createRedisClient();
+  }
+
+  cacheService = new CacheService(redisClient);
+  await cacheService.connect();
+  return cacheService;
+}
+
 module.exports = {
   CacheService,
+  initCacheService,
   getCacheService,
   createRedisClient,
   CACHE_TTL,
