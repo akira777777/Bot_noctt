@@ -27,7 +27,7 @@ const {
 } = require("../ui/messages");
 const { buildCatalogIntro, buildProductCard } = require("../ui/catalog-view");
 const { safeAnswerCbQuery } = require("../utils/telegram");
-const { parseActionId } = require("../utils/actions");
+const { ACTIONS, parseActionId } = require("../utils/actions");
 const {
   parseSourcePayload,
   resolveStartAction,
@@ -42,6 +42,11 @@ const HOME_ACTION_LABELS = {
   "💬 Что вас интересует?": "contact:manager",
   "📱 Открыть мини-приложение": "miniapp:open",
 };
+const LEAD_TEXT_COMMANDS = Object.freeze({
+  назад: "back",
+  отмена: "cancel",
+  отменить: "cancel",
+});
 
 function getCurrentSourcePayload(repos, clientId, fallbackSource = null) {
   const session = repos.sessions.get(clientId);
@@ -56,7 +61,10 @@ function setHomeSession(repos, clientId, sourcePayload) {
 
 async function showHomeScreen(ctx, deps, entry) {
   setHomeSession(deps.repos, ctx.from.id, entry.raw);
-  await ctx.reply(welcomeMessage(entry), clientHomeReplyKeyboard(deps.webAppUrl));
+  await ctx.reply(
+    welcomeMessage(entry),
+    clientHomeReplyKeyboard(deps.webAppUrl),
+  );
 }
 
 async function openMiniApp(ctx, deps) {
@@ -140,7 +148,54 @@ async function showLeadStep(ctx, step, payload = {}) {
   }
 }
 
+async function showPreviousLeadStep(ctx, deps, session) {
+  const previousStep = deps.services.lead.goBack(ctx.from.id, session);
+  if (!previousStep) {
+    await showLeadEntry(ctx, deps);
+    return true;
+  }
+
+  if (previousStep === "quantity") {
+    const product = deps.services.lead.hydrateProductForLead(
+      session.draft.productId,
+    );
+    await showLeadStep(ctx, "quantity", { product });
+    return true;
+  }
+
+  if (previousStep === "comment") {
+    await showLeadStep(ctx, "comment");
+    return true;
+  }
+
+  if (previousStep === "contact") {
+    await showLeadStep(ctx, "contact");
+    return true;
+  }
+
+  return false;
+}
+
+async function cancelLeadFlow(ctx, deps) {
+  const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
+  deps.services.lead.clearSession(ctx.from.id);
+  setHomeSession(deps.repos, ctx.from.id, sourcePayload);
+  await ctx.reply("Оформление заявки отменено.", backToMainKeyboard());
+}
+
 async function handleLeadText(ctx, deps, session) {
+  const normalizedCommand =
+    LEAD_TEXT_COMMANDS[ctx.message.text.trim().toLowerCase()];
+  if (normalizedCommand === "cancel") {
+    await cancelLeadFlow(ctx, deps);
+    return true;
+  }
+
+  if (normalizedCommand === "back") {
+    await showPreviousLeadStep(ctx, deps, session);
+    return true;
+  }
+
   if (session.step === "quantity") {
     const result = deps.services.lead.saveQuantity({
       clientId: ctx.from.id,
@@ -163,6 +218,16 @@ async function handleLeadText(ctx, deps, session) {
       session,
       comment: ctx.message.text,
     });
+
+    if (!result.ok) {
+      await ctx.reply(result.error, commentKeyboard());
+      return true;
+    }
+
+    if (result.nextStep === "confirm") {
+      await showLeadStep(ctx, "confirm", result);
+      return true;
+    }
 
     await showLeadStep(ctx, "contact", result);
     return true;
@@ -191,7 +256,7 @@ async function handleLeadText(ctx, deps, session) {
 
   if (session.step === "confirm") {
     await ctx.reply(
-      "Подтвердите заявку кнопкой ниже или вернитесь назад.",
+      "Подтвердите заявку кнопкой ниже. Чтобы поправить данные, используйте кнопки «Изменить ...».",
       confirmLeadKeyboard(),
     );
     return true;
@@ -364,7 +429,7 @@ async function handleClientAction(ctx, deps) {
     return;
   }
 
-  if (action === "lead:skip_comment") {
+  if (action === ACTIONS.LEAD_SKIP_COMMENT) {
     const session = deps.services.lead.getSession(ctx.from.id);
     if (!session) {
       await safeAnswerCbQuery(ctx, "Сессия не найдена");
@@ -377,11 +442,15 @@ async function handleClientAction(ctx, deps) {
     });
 
     await safeAnswerCbQuery(ctx);
+    if (result.nextStep === "confirm") {
+      await showLeadStep(ctx, "confirm", result);
+      return;
+    }
     await showLeadStep(ctx, "contact", result);
     return;
   }
 
-  if (action === "lead:contact_telegram") {
+  if (action === ACTIONS.LEAD_CONTACT_TELEGRAM) {
     const session = deps.services.lead.getSession(ctx.from.id);
     if (!session) {
       await safeAnswerCbQuery(ctx, "Сессия не найдена");
@@ -398,7 +467,7 @@ async function handleClientAction(ctx, deps) {
     return;
   }
 
-  if (action === "lead:contact_custom") {
+  if (action === ACTIONS.LEAD_CONTACT_CUSTOM) {
     const session = deps.services.lead.getSession(ctx.from.id);
     if (!session) {
       await safeAnswerCbQuery(ctx, "Сессия не найдена");
@@ -415,7 +484,50 @@ async function handleClientAction(ctx, deps) {
     return;
   }
 
-  if (action === "lead:confirm") {
+  if (
+    action === ACTIONS.LEAD_EDIT_QUANTITY ||
+    action === ACTIONS.LEAD_EDIT_COMMENT ||
+    action === ACTIONS.LEAD_EDIT_CONTACT
+  ) {
+    const session = deps.services.lead.getSession(ctx.from.id);
+    if (!session) {
+      await safeAnswerCbQuery(ctx, "Сессия не найдена");
+      return;
+    }
+
+    const field =
+      action === ACTIONS.LEAD_EDIT_QUANTITY
+        ? "quantity"
+        : action === ACTIONS.LEAD_EDIT_COMMENT
+          ? "comment"
+          : "contact";
+    const result = deps.services.lead.startConfirmEdit({
+      clientId: ctx.from.id,
+      session,
+      field,
+    });
+    if (!result.ok) {
+      await safeAnswerCbQuery(ctx, "Не удалось изменить шаг");
+      return;
+    }
+
+    await safeAnswerCbQuery(ctx);
+    if (result.nextStep === "quantity") {
+      const product = deps.services.lead.hydrateProductForLead(
+        session.draft.productId,
+      );
+      await showLeadStep(ctx, "quantity", { product });
+      return;
+    }
+    if (result.nextStep === "comment") {
+      await showLeadStep(ctx, "comment");
+      return;
+    }
+    await showLeadStep(ctx, "contact");
+    return;
+  }
+
+  if (action === ACTIONS.LEAD_CONFIRM) {
     const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
     await safeAnswerCbQuery(ctx);
     const lead = await deps.services.lead.confirmLead({
@@ -446,41 +558,16 @@ async function handleClientAction(ctx, deps) {
     return;
   }
 
-  if (action === "lead:back") {
+  if (action === ACTIONS.LEAD_BACK) {
     const session = deps.services.lead.getSession(ctx.from.id);
-    const previousStep = deps.services.lead.goBack(ctx.from.id, session);
     await safeAnswerCbQuery(ctx);
-
-    if (!previousStep) {
-      await showLeadEntry(ctx, deps);
-      return;
-    }
-
-    if (previousStep === "quantity") {
-      const product = deps.services.lead.hydrateProductForLead(
-        session.draft.productId,
-      );
-      await showLeadStep(ctx, "quantity", { product });
-      return;
-    }
-
-    if (previousStep === "comment") {
-      await showLeadStep(ctx, "comment");
-      return;
-    }
-
-    if (previousStep === "contact") {
-      await showLeadStep(ctx, "contact");
-      return;
-    }
+    await showPreviousLeadStep(ctx, deps, session);
+    return;
   }
 
-  if (action === "lead:cancel") {
-    const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
-    deps.services.lead.clearSession(ctx.from.id);
-    setHomeSession(deps.repos, ctx.from.id, sourcePayload);
+  if (action === ACTIONS.LEAD_CANCEL) {
     await safeAnswerCbQuery(ctx, "Заявка отменена");
-    await ctx.reply("Оформление заявки отменено.", backToMainKeyboard());
+    await cancelLeadFlow(ctx, deps);
   }
 }
 

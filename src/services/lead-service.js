@@ -12,6 +12,27 @@ function createLeadService({
   catalogService,
   conversationService,
 }) {
+  const EDITABLE_CONFIRM_STEPS = Object.freeze({
+    quantity: "quantity",
+    comment: "comment",
+    contact: "contact",
+  });
+
+  const BACK_TRANSITIONS = Object.freeze({
+    comment: "quantity",
+    contact: "comment",
+    contact_custom: "contact",
+    confirm: "contact",
+  });
+
+  function isConfirmEditing(session) {
+    return Boolean(session?.draft?.isConfirmEditing);
+  }
+
+  function getNextStep(session, regularStep) {
+    return isConfirmEditing(session) ? "confirm" : regularStep;
+  }
+
   function getSession(clientId) {
     return repos.sessions.get(clientId);
   }
@@ -25,6 +46,13 @@ function createLeadService({
       ...(session?.draft || {}),
       ...patch,
     };
+  }
+
+  function normalizeText(value) {
+    if (typeof value !== "string") {
+      return "";
+    }
+    return value.trim();
   }
 
   function moveToStep(clientId, nextStep, session, patch = {}) {
@@ -53,20 +81,43 @@ function createLeadService({
     return draft;
   }
 
+  function getOpenLeadByClientAndProduct(clientId, productCode) {
+    return repos.leads.getOpenByClientAndProduct(clientId, productCode);
+  }
+
+  function isOpenLeadUniqueViolation(error) {
+    return (
+      typeof error?.message === "string" &&
+      error.message.includes("idx_leads_unique_open_client_product")
+    );
+  }
+
   function saveQuantity({ clientId, session, rawQuantity }) {
-    const quantity = Number(rawQuantity.trim());
+    const quantityText = normalizeText(rawQuantity);
+    const quantity = Number(quantityText);
     if (!Number.isInteger(quantity) || quantity <= 0) {
       return {
         ok: false,
-        error: "Количество должно быть положительным числом.",
+        error:
+          "Количество должно быть целым положительным числом. Пример: 1, 5, 12.",
+      };
+    }
+    if (quantity > 10000) {
+      return {
+        ok: false,
+        error: "Слишком большое количество. Укажите значение до 10000.",
       };
     }
 
-    return moveToStep(clientId, "comment", session, { quantity });
+    const nextStep = getNextStep(session, "comment");
+    return moveToStep(clientId, nextStep, session, {
+      quantity,
+      isConfirmEditing: false,
+    });
   }
 
   function saveComment({ clientId, session, comment }) {
-    const trimmed = comment.trim();
+    const trimmed = normalizeText(comment);
     // Validate: non-empty after trim, max 500 chars
     if (trimmed.length === 0) {
       return {
@@ -80,64 +131,83 @@ function createLeadService({
         error: "Комментарий не должен превышать 500 символов.",
       };
     }
-    return moveToStep(clientId, "contact", session, {
+    const nextStep = getNextStep(session, "contact");
+    return moveToStep(clientId, nextStep, session, {
       comment: trimmed,
+      isConfirmEditing: false,
     });
   }
 
   function skipComment({ clientId, session }) {
-    return moveToStep(clientId, "contact", session, { comment: "" });
+    const nextStep = getNextStep(session, "contact");
+    return moveToStep(clientId, nextStep, session, {
+      comment: "",
+      isConfirmEditing: false,
+    });
   }
 
   function useTelegramContact({ client, session }) {
     const contactLabel = client.username
       ? `Telegram: @${client.username}`
       : `Telegram: id ${client.id}`;
-    return moveToStep(client.id, "confirm", session, { contactLabel });
+    return moveToStep(client.id, "confirm", session, {
+      contactLabel,
+      isConfirmEditing: false,
+    });
   }
 
   function requestCustomContact({ clientId, session }) {
-    const draft = session?.draft || {};
-    repos.sessions.set(clientId, "lead", "contact_custom", draft);
-
-    return {
-      ok: true,
-      nextStep: "contact_custom",
-      draft,
-    };
+    return moveToStep(clientId, "contact_custom", session);
   }
 
   function saveCustomContact({ clientId, session, contactText }) {
-    const value = contactText.trim();
+    const value = normalizeText(contactText);
     if (!value) {
-      return { ok: false, error: "Укажите контакт одним сообщением." };
+      return {
+        ok: false,
+        error:
+          "Укажите контакт одним сообщением: @username, телефон или любой удобный способ связи.",
+      };
     }
     if (value.length > 500) {
       return { ok: false, error: "Контакт не должен превышать 500 символов." };
     }
 
-    return moveToStep(clientId, "confirm", session, { contactLabel: value });
+    return moveToStep(clientId, "confirm", session, {
+      contactLabel: value,
+      isConfirmEditing: false,
+    });
+  }
+
+  function startConfirmEdit({ clientId, session, field }) {
+    if (!session || session.flow !== "lead" || session.step !== "confirm") {
+      return { ok: false };
+    }
+
+    const targetStep = EDITABLE_CONFIRM_STEPS[field] || null;
+
+    if (!targetStep) {
+      return { ok: false };
+    }
+
+    repos.sessions.set(clientId, "lead", targetStep, {
+      ...session.draft,
+      isConfirmEditing: true,
+    });
+
+    return { ok: true, nextStep: targetStep };
   }
 
   function goBack(clientId, session) {
     if (!session) {
       return null;
     }
-
-    switch (session.step) {
-      case "comment":
-        repos.sessions.set(clientId, "lead", "quantity", session.draft);
-        return "quantity";
-      case "contact":
-        repos.sessions.set(clientId, "lead", "comment", session.draft);
-        return "comment";
-      case "contact_custom":
-      case "confirm":
-        repos.sessions.set(clientId, "lead", "contact", session.draft);
-        return "contact";
-      default:
-        return null;
+    const previousStep = BACK_TRANSITIONS[session.step];
+    if (!previousStep) {
+      return null;
     }
+    repos.sessions.set(clientId, "lead", previousStep, session.draft);
+    return previousStep;
   }
 
   async function notifyAdminAboutLead(lead, client, chatId) {
@@ -156,7 +226,7 @@ function createLeadService({
       return null;
     }
 
-    const existingLead = repos.leads.getOpenByClientAndProduct(
+    const existingLead = getOpenLeadByClientAndProduct(
       client.id,
       session.draft.productCode,
     );
@@ -195,11 +265,8 @@ function createLeadService({
     try {
       lead = transaction();
     } catch (error) {
-      const isUniqueViolation =
-        typeof error?.message === "string" &&
-        error.message.includes("idx_leads_unique_open_client_product");
-      if (isUniqueViolation) {
-        const duplicate = repos.leads.getOpenByClientAndProduct(
+      if (isOpenLeadUniqueViolation(error)) {
+        const duplicate = getOpenLeadByClientAndProduct(
           client.id,
           session.draft.productCode,
         );
@@ -230,6 +297,7 @@ function createLeadService({
     useTelegramContact,
     requestCustomContact,
     saveCustomContact,
+    startConfirmEdit,
     goBack,
     confirmLead,
     hydrateProductForLead,

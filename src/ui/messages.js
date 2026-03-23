@@ -1,6 +1,10 @@
 const { formatSourceLabel } = require("../utils/formatters");
 const { getLeadStatusLabel } = require("../domain/lead-status");
 
+function withFallback(value, fallback) {
+  return value ? value : fallback;
+}
+
 function welcomeMessage(entry) {
   const tagline =
     "Просто напишите, что вас интересует — мы найдём и сообщим цену.";
@@ -35,11 +39,19 @@ function howToOrderMessage() {
 }
 
 function askQuantityMessage(product) {
-  return `Шаг 1 из 4.\n\nВы выбрали "${product.title}".\nУкажите количество одним сообщением цифрой.`;
+  return (
+    `Шаг 1 из 4.\n\nВы выбрали "${product.title}".\n` +
+    "Укажите количество одним сообщением (целое число).\n" +
+    "Например: 1, 5, 12."
+  );
 }
 
 function askCommentMessage() {
-  return "Шаг 2 из 4.\n\nДобавьте комментарий к заявке одним сообщением или пропустите этот шаг.";
+  return (
+    "Шаг 2 из 4.\n\n" +
+    "Добавьте комментарий к заявке одним сообщением или пропустите этот шаг.\n" +
+    "Если комментарий не нужен, нажмите «Пропустить комментарий»."
+  );
 }
 
 function askContactMessage() {
@@ -47,14 +59,15 @@ function askContactMessage() {
 }
 
 function askCustomContactMessage() {
-  return "Шаг 3 из 4.\n\nНапишите контакт для связи: @username, телефон или другой удобный способ.";
+  return (
+    "Шаг 3 из 4.\n\n" +
+    "Напишите контакт для связи одним сообщением: @username, телефон или другой удобный способ."
+  );
 }
 
 function leadSummaryMessage(draft) {
-  const comment = draft.comment ? draft.comment : "Без комментария";
-  const contact = draft.contactLabel
-    ? draft.contactLabel
-    : "Ответить в этом чате";
+  const comment = withFallback(draft.comment, "Без комментария");
+  const contact = withFallback(draft.contactLabel, "Ответить в этом чате");
   const source = formatSourceLabel(draft.sourcePayload);
   return (
     "Шаг 4 из 4.\n\nПроверьте заявку:\n\n" +
@@ -63,7 +76,8 @@ function leadSummaryMessage(draft) {
     `Комментарий: ${comment}\n` +
     `Контакт: ${contact}\n` +
     `Источник: ${source}\n\n` +
-    "Если всё верно, подтвердите заявку."
+    "Если всё верно, подтвердите заявку.\n" +
+    "Нужно что-то поправить? Используйте кнопки «Изменить ...» ниже."
   );
 }
 
@@ -101,7 +115,8 @@ function adminNoClientSelectedMessage() {
 
 function adminClientCard(clientLabel, text, sourcePayload, msgCount = null) {
   const source = formatSourceLabel(sourcePayload);
-  const countLine = msgCount !== null ? `Сообщений в диалоге: ${msgCount}\n` : "";
+  const countLine =
+    msgCount !== null ? `Сообщений в диалоге: ${msgCount}\n` : "";
   return (
     "💬 Новое сообщение от клиента:\n" +
     `${clientLabel}\n` +
@@ -112,10 +127,8 @@ function adminClientCard(clientLabel, text, sourcePayload, msgCount = null) {
 }
 
 function adminLeadCard(lead, clientLabel) {
-  const comment = lead.comment ? lead.comment : "Без комментария";
-  const contact = lead.contact_label
-    ? lead.contact_label
-    : "Ответить в Telegram";
+  const comment = withFallback(lead.comment, "Без комментария");
+  const contact = withFallback(lead.contact_label, "Ответить в Telegram");
   const source = formatSourceLabel(lead.source_payload);
   return (
     "Новая заявка:\n" +
@@ -167,10 +180,8 @@ function clientLeadStatusMessage(lead) {
   }
 
   const statusLabel = getLeadStatusLabel(lead.status);
-  const comment = lead.comment ? lead.comment : "Без комментария";
-  const contact = lead.contact_label
-    ? lead.contact_label
-    : "Ответить в Telegram";
+  const comment = withFallback(lead.comment, "Без комментария");
+  const contact = withFallback(lead.contact_label, "Ответить в Telegram");
   const date = new Date(lead.created_at + "Z").toLocaleString("ru-RU", {
     day: "2-digit",
     month: "2-digit",

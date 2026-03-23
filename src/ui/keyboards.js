@@ -51,7 +51,12 @@ function quantityKeyboard() {
 
 function commentKeyboard() {
   return Markup.inlineKeyboard([
-    [Markup.button.callback("Пропустить комментарий", ACTIONS.LEAD_SKIP_COMMENT)],
+    [
+      Markup.button.callback(
+        "Пропустить комментарий",
+        ACTIONS.LEAD_SKIP_COMMENT,
+      ),
+    ],
     [
       Markup.button.callback("Назад", ACTIONS.LEAD_BACK),
       Markup.button.callback("Отмена", ACTIONS.LEAD_CANCEL),
@@ -61,8 +66,18 @@ function commentKeyboard() {
 
 function contactKeyboard() {
   return Markup.inlineKeyboard([
-    [Markup.button.callback("Ответить в Telegram", ACTIONS.LEAD_CONTACT_TELEGRAM)],
-    [Markup.button.callback("Указать другой контакт", ACTIONS.LEAD_CONTACT_CUSTOM)],
+    [
+      Markup.button.callback(
+        "Ответить в Telegram",
+        ACTIONS.LEAD_CONTACT_TELEGRAM,
+      ),
+    ],
+    [
+      Markup.button.callback(
+        "Указать другой контакт",
+        ACTIONS.LEAD_CONTACT_CUSTOM,
+      ),
+    ],
     [
       Markup.button.callback("Назад", ACTIONS.LEAD_BACK),
       Markup.button.callback("Отмена", ACTIONS.LEAD_CANCEL),
@@ -82,7 +97,15 @@ function customContactKeyboard() {
 function confirmLeadKeyboard() {
   return Markup.inlineKeyboard([
     [Markup.button.callback("Подтвердить заявку", ACTIONS.LEAD_CONFIRM)],
-    [Markup.button.callback("Изменить контакт", ACTIONS.LEAD_BACK)],
+    [
+      Markup.button.callback("Изменить количество", ACTIONS.LEAD_EDIT_QUANTITY),
+      Markup.button.callback("Изменить комментарий", ACTIONS.LEAD_EDIT_COMMENT),
+    ],
+    [Markup.button.callback("Изменить контакт", ACTIONS.LEAD_EDIT_CONTACT)],
+    [
+      Markup.button.callback("Назад", ACTIONS.LEAD_BACK),
+      Markup.button.callback("Отмена", ACTIONS.LEAD_CANCEL),
+    ],
     [Markup.button.callback("Главное меню", ACTIONS.MENU_MAIN)],
   ]);
 }
