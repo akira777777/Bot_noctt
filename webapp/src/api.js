@@ -16,7 +16,9 @@ export async function apiRequest(path, initData, options = {}) {
       data?.details && typeof data.details === "object"
         ? ` | ${JSON.stringify(data.details)}`
         : "";
-    throw new Error(`${data.error || "Request failed"}${details}`);
+    const error = new Error(`${data.error || "Request failed"}${details}`);
+    error.status = response.status;
+    throw error;
   }
 
   return data;

@@ -97,14 +97,6 @@ async function configureAdminMenu(bot) {
 
   try {
     await bot.telegram.setChatMenuButton({
-      menu_button: {
-        type: "web_app",
-        text: "Mini App",
-        web_app: { url: WEBAPP_URL },
-      },
-    });
-
-    await bot.telegram.setChatMenuButton({
       chat_id: ADMIN_ID,
       menu_button: {
         type: "web_app",

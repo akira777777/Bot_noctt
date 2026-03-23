@@ -19,6 +19,7 @@ export default function ProductsTab() {
   const [togglingId, setTogglingId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
+  const [actionNotice, setActionNotice] = useState("");
 
   const loadProducts = useCallback(async () => {
     const data = await cachedRequest("/api/products");
@@ -41,7 +42,7 @@ export default function ProductsTab() {
       if (!confirmed) return;
 
       setTogglingId(product.id);
-      await withLoading(async () => {
+      const updated = await withLoading(async () => {
         await apiRequest(
           `/api/products/${product.id}/toggle`,
           telegram.initData,
@@ -49,7 +50,13 @@ export default function ProductsTab() {
         );
         clearCache("products");
         await loadProducts();
+        return true;
       });
+      if (updated) {
+        setActionNotice(
+          `Товар "${product.title}" ${product.is_active ? "деактивирован" : "активирован"}.`,
+        );
+      }
       setTogglingId(null);
     },
     [telegram.initData, withLoading, clearCache, loadProducts],
@@ -66,7 +73,7 @@ export default function ProductsTab() {
       }
 
       setSubmitting(true);
-      await withLoading(async () => {
+      const created = await withLoading(async () => {
         await apiRequest("/api/products", telegram.initData, {
           method: "POST",
           body: JSON.stringify(newProduct),
@@ -74,10 +81,21 @@ export default function ProductsTab() {
         setNewProduct(EMPTY_PRODUCT);
         clearCache("products");
         await loadProducts();
+        return true;
       });
+      if (created) {
+        setActionNotice(`Товар "${newProduct.title.trim()}" успешно добавлен.`);
+      }
       setSubmitting(false);
     },
-    [telegram.initData, newProduct, withLoading, clearCache, loadProducts, setError],
+    [
+      telegram.initData,
+      newProduct,
+      withLoading,
+      clearCache,
+      loadProducts,
+      setError,
+    ],
   );
 
   const updateField = useCallback((field, value) => {
@@ -91,6 +109,11 @@ export default function ProductsTab() {
   return (
     <section>
       <ErrorBanner message={error} onDismiss={() => setError("")} />
+      {actionNotice ? (
+        <div className="success" role="status">
+          {actionNotice}
+        </div>
+      ) : null}
 
       <form className="card" onSubmit={createProduct}>
         <h2>Новый товар</h2>
@@ -195,11 +218,15 @@ export default function ProductsTab() {
                 </div>
                 <div className="mobile-item-row">
                   <span className="mobile-item-label">Цена</span>
-                  <span className="mobile-item-value">{product.price_text || "—"}</span>
+                  <span className="mobile-item-value">
+                    {product.price_text || "—"}
+                  </span>
                 </div>
                 <div className="mobile-item-row">
                   <span className="mobile-item-label">Активен</span>
-                  <span className="mobile-item-value">{product.is_active ? "Да" : "Нет"}</span>
+                  <span className="mobile-item-value">
+                    {product.is_active ? "Да" : "Нет"}
+                  </span>
                 </div>
                 <button
                   onClick={() => toggleProduct(product)}

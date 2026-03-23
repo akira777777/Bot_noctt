@@ -1,4 +1,3 @@
-const { Markup } = require("telegraf");
 const {
   backToMainKeyboard,
   catalogKeyboard,
@@ -203,27 +202,6 @@ async function handleClientStart(ctx, deps) {
   const entry = parseSourcePayload(ctx.startPayload);
 
   await showHomeScreen(ctx, deps, entry);
-  if (deps.webappUrl) {
-    try {
-      await deps.bot.telegram.setChatMenuButton({
-        chat_id: ctx.from.id,
-        menu_button: {
-          type: "web_app",
-          text: "Mini App",
-          web_app: { url: deps.webappUrl },
-        },
-      });
-    } catch (error) {
-      // setChatMenuButton failed silently — non-critical
-    }
-    await ctx.reply(
-      "Открыть Mini App:",
-      Markup.inlineKeyboard([
-        [Markup.button.webApp("Открыть Mini App", deps.webappUrl)],
-      ]),
-    );
-  }
-
   const startAction = resolveStartAction(entry);
   if (startAction === "catalog") {
     await showCatalog(ctx, deps);

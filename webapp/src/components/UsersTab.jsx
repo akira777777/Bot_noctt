@@ -15,6 +15,7 @@ export default function UsersTab() {
   const [users, setUsers] = useState([]);
   const [blockingId, setBlockingId] = useState(null);
   const [initialLoad, setInitialLoad] = useState(true);
+  const [actionNotice, setActionNotice] = useState("");
 
   const loadUsers = useCallback(async () => {
     const data = await cachedRequest("/api/users?limit=50");
@@ -38,7 +39,7 @@ export default function UsersTab() {
       if (!confirmed) return;
 
       setBlockingId(user.telegram_id);
-      await withLoading(async () => {
+      const updated = await withLoading(async () => {
         const endpoint = shouldBlock ? "block" : "unblock";
         await apiRequest(
           `/api/users/${user.telegram_id}/${endpoint}`,
@@ -47,7 +48,13 @@ export default function UsersTab() {
         );
         clearCache("users");
         await loadUsers();
+        return true;
       });
+      if (updated) {
+        setActionNotice(
+          `Пользователь ${name} ${shouldBlock ? "заблокирован" : "разблокирован"}.`,
+        );
+      }
       setBlockingId(null);
     },
     [telegram.initData, withLoading, clearCache, loadUsers],
@@ -60,6 +67,11 @@ export default function UsersTab() {
   return (
     <section>
       <ErrorBanner message={error} onDismiss={() => setError("")} />
+      {actionNotice ? (
+        <div className="success" role="status">
+          {actionNotice}
+        </div>
+      ) : null}
 
       {users.length === 0 && !loading ? (
         <EmptyState message="Пользователи не найдены" />
@@ -108,11 +120,15 @@ export default function UsersTab() {
               <article key={user.telegram_id} className="mobile-item">
                 <div className="mobile-item-row">
                   <span className="mobile-item-label">Telegram ID</span>
-                  <strong className="mobile-item-value">{user.telegram_id}</strong>
+                  <strong className="mobile-item-value">
+                    {user.telegram_id}
+                  </strong>
                 </div>
                 <div className="mobile-item-row">
                   <span className="mobile-item-label">Юзернейм</span>
-                  <span className="mobile-item-value">{user.username || "—"}</span>
+                  <span className="mobile-item-value">
+                    {user.username || "—"}
+                  </span>
                 </div>
                 <div className="mobile-item-row">
                   <span className="mobile-item-label">Роль</span>
@@ -120,7 +136,9 @@ export default function UsersTab() {
                 </div>
                 <div className="mobile-item-row">
                   <span className="mobile-item-label">Заблокирован</span>
-                  <span className="mobile-item-value">{user.is_blocked ? "Да" : "Нет"}</span>
+                  <span className="mobile-item-value">
+                    {user.is_blocked ? "Да" : "Нет"}
+                  </span>
                 </div>
                 <button
                   onClick={() => setUserBlockState(user, !user.is_blocked)}

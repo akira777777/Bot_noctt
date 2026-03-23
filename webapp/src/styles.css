@@ -122,6 +122,15 @@ body,
   margin-bottom: var(--space-3);
 }
 
+.success {
+  border: 1px solid color-mix(in srgb, #22c55e 45%, transparent);
+  background: color-mix(in srgb, #22c55e 14%, var(--bg));
+  color: var(--text-primary);
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-3);
+}
+
 .error-dismiss {
   flex-shrink: 0;
   border: none;
@@ -205,6 +214,10 @@ th {
   padding: var(--space-3);
   display: grid;
   gap: var(--space-2);
+}
+
+.mobile-item button {
+  width: 100%;
 }
 
 .mobile-item-row {
@@ -346,8 +359,8 @@ button:focus-visible {
   }
 
   .tab {
-    min-height: 38px;
-    padding: 8px 12px;
+    min-height: 40px;
+    padding: 10px 12px;
     font-size: 14px;
   }
 

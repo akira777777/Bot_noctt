@@ -18,12 +18,16 @@ export function AdminProvider({ children }) {
     user: null,
   });
   const [admin, setAdmin] = useState(null);
+  const [initStatus, setInitStatus] = useState("idle");
   const [initError, setInitError] = useState("");
 
   // Initialize Telegram WebApp once
   useEffect(() => {
     const tg = getTelegramWebApp();
-    if (!tg) return;
+    if (!tg) {
+      setInitStatus("missing_telegram");
+      return;
+    }
     tg.ready();
     tg.expand();
     setTelegram({
@@ -31,6 +35,9 @@ export function AdminProvider({ children }) {
       initData: tg.initData || "",
       user: tg.initDataUnsafe?.user || null,
     });
+    if (!tg.initData) {
+      setInitStatus("missing_init_data");
+    }
   }, []);
 
   const canUseApi = useMemo(
@@ -44,21 +51,48 @@ export function AdminProvider({ children }) {
     let cancelled = false;
     (async () => {
       try {
+        setInitStatus("loading_profile");
         const data = await apiRequest("/api/admin/me", telegram.initData);
-        if (!cancelled) setAdmin(data.user);
+        if (!cancelled) {
+          setAdmin(data.user);
+          setInitStatus("ready");
+        }
       } catch (err) {
-        if (!cancelled) setInitError(err.message || "Не удалось загрузить профиль администратора");
+        if (cancelled) return;
+        const status = Number(err?.status);
+        if (status === 401) {
+          setInitStatus("unauthorized");
+          setInitError(
+            "Не удалось подтвердить сессию Telegram. Откройте Mini App заново из бота.",
+          );
+          return;
+        }
+        if (status === 403) {
+          setInitStatus("forbidden");
+          setInitError(
+            "Этот Mini App доступен только администратору. Используйте аккаунт администратора.",
+          );
+          return;
+        }
+        setInitStatus("error");
+        setInitError(
+          err.message || "Не удалось загрузить профиль администратора",
+        );
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [canUseApi, telegram.initData]);
 
   const value = useMemo(
-    () => ({ telegram, admin, canUseApi, initError }),
-    [telegram, admin, canUseApi, initError],
+    () => ({ telegram, admin, canUseApi, initError, initStatus }),
+    [telegram, admin, canUseApi, initError, initStatus],
   );
 
-  return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;
+  return (
+    <AdminContext.Provider value={value}>{children}</AdminContext.Provider>
+  );
 }
 
 /**

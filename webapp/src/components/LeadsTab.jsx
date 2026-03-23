@@ -20,6 +20,7 @@ export default function LeadsTab() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [updatingId, setUpdatingId] = useState(null);
   const [initialLoad, setInitialLoad] = useState(true);
+  const [actionNotice, setActionNotice] = useState("");
 
   const loadLeads = useCallback(async () => {
     const query =
@@ -44,14 +45,20 @@ export default function LeadsTab() {
       }
 
       setUpdatingId(leadId);
-      await withLoading(async () => {
+      const updated = await withLoading(async () => {
         await apiRequest(`/api/leads/${leadId}/status`, telegram.initData, {
           method: "PATCH",
           body: JSON.stringify({ status: normalizedStatus }),
         });
         clearCache("leads");
         await loadLeads();
+        return true;
       });
+      if (updated) {
+        setActionNotice(
+          `Статус заявки #${leadId} обновлён: ${getLeadStatusLabel(normalizedStatus)}.`,
+        );
+      }
       setUpdatingId(null);
     },
     [telegram.initData, withLoading, clearCache, loadLeads, setError],
@@ -64,6 +71,11 @@ export default function LeadsTab() {
   return (
     <section>
       <ErrorBanner message={error} onDismiss={() => setError("")} />
+      {actionNotice ? (
+        <div className="success" role="status">
+          {actionNotice}
+        </div>
+      ) : null}
 
       <div className="row">
         <label htmlFor="statusFilter">Фильтр статуса</label>
@@ -146,7 +158,9 @@ export default function LeadsTab() {
                 </div>
                 <div className="mobile-item-row">
                   <span className="mobile-item-label">Клиент</span>
-                  <span className="mobile-item-value">{lead.client_telegram_id}</span>
+                  <span className="mobile-item-value">
+                    {lead.client_telegram_id}
+                  </span>
                 </div>
                 <div className="mobile-item-row">
                   <span className="mobile-item-label">Товар</span>
@@ -154,11 +168,15 @@ export default function LeadsTab() {
                 </div>
                 <div className="mobile-item-row">
                   <span className="mobile-item-label">Статус</span>
-                  <span className="mobile-item-value">{getLeadStatusLabel(lead.status)}</span>
+                  <span className="mobile-item-value">
+                    {getLeadStatusLabel(lead.status)}
+                  </span>
                 </div>
                 <select
                   aria-label={`Обновить статус заявки ${lead.id}`}
-                  value={normalizeLeadStatus(lead.status) || LEAD_STATUS_OPTIONS[0]}
+                  value={
+                    normalizeLeadStatus(lead.status) || LEAD_STATUS_OPTIONS[0]
+                  }
                   onChange={(e) => updateLeadStatus(lead.id, e.target.value)}
                   disabled={updatingId === lead.id}
                 >
