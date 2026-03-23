@@ -9,6 +9,34 @@ const {
 
 loadEnvFiles();
 
+function optionalUrlString(key, fallbackKeys = []) {
+  const value = optionalString(key, fallbackKeys);
+  if (!value) {
+    return null;
+  }
+
+  let parsed;
+  try {
+    parsed = new URL(value);
+  } catch {
+    emitConfigWarning(`${key} is not a valid URL; treating it as unset`);
+    return null;
+  }
+
+  if (!["http:", "https:"].includes(parsed.protocol)) {
+    emitConfigWarning(`${key} must use http or https; treating it as unset`);
+    return null;
+  }
+
+  const hostname = parsed.hostname.toLowerCase();
+  if (hostname === "example.com" || hostname.endsWith(".example")) {
+    emitConfigWarning(`${key} still uses a placeholder domain; treating it as unset`);
+    return null;
+  }
+
+  return value;
+}
+
 const NODE_ENV = optionalString("NODE_ENV") || "development";
 const isProduction = NODE_ENV === "production";
 const BOT_ENABLED = optionalBoolean("BOT_ENABLED", true);
