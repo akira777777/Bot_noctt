@@ -37,52 +37,10 @@ function buildAction(prefix, id) {
 
 function parseActionId(action) {
   if (typeof action !== "string") {
-    // #region agent log
-    fetch("http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "7f4ee9",
-      },
-      body: JSON.stringify({
-        sessionId: "7f4ee9",
-        runId: "initial",
-        hypothesisId: "H2",
-        location: "src/utils/actions.js:40",
-        message: "parseActionId received non-string action",
-        data: { actionType: typeof action },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
     return NaN;
   }
   const parts = action.split(":");
   const parsed = Number(parts[2]);
-  // #region agent log
-  fetch("http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Debug-Session-Id": "7f4ee9",
-    },
-    body: JSON.stringify({
-      sessionId: "7f4ee9",
-      runId: "initial",
-      hypothesisId: "H1",
-      location: "src/utils/actions.js:45",
-      message: "parseActionId parsed callback payload",
-      data: {
-        action,
-        partsLength: parts.length,
-        parts,
-        parsed,
-        isNaN: Number.isNaN(parsed),
-      },
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
   return parsed;
 }
 

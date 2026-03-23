@@ -539,24 +539,6 @@ async function handleAdminText(ctx, deps) {
 async function handleAdminAction(ctx, deps) {
   const action = ctx.match[0];
   const adminId = ctx.from.id;
-  // #region agent log
-  fetch("http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Debug-Session-Id": "7f4ee9",
-    },
-    body: JSON.stringify({
-      sessionId: "7f4ee9",
-      runId: "initial",
-      hypothesisId: "H3",
-      location: "src/handlers/admin.js:541",
-      message: "handleAdminAction received callback",
-      data: { action, adminId },
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
 
   if (!isAdmin(ctx, deps)) {
     await safeAnswerCbQuery(ctx, "Доступно только администратору");
@@ -585,24 +567,6 @@ async function handleAdminAction(ctx, deps) {
 
   if (action.startsWith("admin:lead_take:")) {
     const leadId = parseActionId(action);
-    // #region agent log
-    fetch("http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "7f4ee9",
-      },
-      body: JSON.stringify({
-        sessionId: "7f4ee9",
-        runId: "initial",
-        hypothesisId: "H4",
-        location: "src/handlers/admin.js:570",
-        message: "admin lead_take parsed lead id",
-        data: { action, leadId, isNaN: Number.isNaN(leadId) },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
     const lead = deps.services.admin.takeLead(leadId);
     if (!lead) {
       await safeAnswerCbQuery(ctx, "Заявка не найдена");
@@ -621,24 +585,6 @@ async function handleAdminAction(ctx, deps) {
 
   if (action.startsWith("admin:lead_close:")) {
     const leadId = parseActionId(action);
-    // #region agent log
-    fetch("http://127.0.0.1:7379/ingest/eab98f11-ecc3-47fe-8d2e-29dd361451b3", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "7f4ee9",
-      },
-      body: JSON.stringify({
-        sessionId: "7f4ee9",
-        runId: "initial",
-        hypothesisId: "H4",
-        location: "src/handlers/admin.js:590",
-        message: "admin lead_close parsed lead id",
-        data: { action, leadId, isNaN: Number.isNaN(leadId) },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
     const lead = deps.services.admin.closeLead(leadId);
     if (!lead) {
       await safeAnswerCbQuery(ctx, "Заявка не найдена");
