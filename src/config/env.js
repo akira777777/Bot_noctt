@@ -44,6 +44,7 @@ const PORT = optionalInteger("PORT", 3000);
 const API_SECRET = optionalString("API_SECRET");
 const WEBHOOK_DOMAIN = optionalString("WEBHOOK_DOMAIN", ["RENDER_EXTERNAL_URL"]);
 const CORS_ORIGIN = optionalString("CORS_ORIGIN");
+const WEB_APP_URL = optionalString("WEB_APP_URL");
 
 if (!ADMIN_ID || Number.isNaN(ADMIN_ID) || ADMIN_ID <= 0) {
   throw new Error("ADMIN_ID must be a positive integer");
@@ -68,4 +69,5 @@ module.exports = {
   API_SECRET,
   WEBHOOK_DOMAIN,
   CORS_ORIGIN,
+  WEB_APP_URL,
 };

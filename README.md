@@ -11,7 +11,7 @@ npm install
 npm install --prefix web
 ```
 
-2. Configure environment:
+1. Configure environment:
 
 Copy `.env.example` to `.env.local` and set at least `BOT_TOKEN` and `ADMIN_ID`.
 
@@ -27,12 +27,13 @@ PORT=3081
 # API security (admin endpoints)
 API_SECRET=your_random_api_secret_key
 CORS_ORIGIN=https://your-dashboard.vercel.app
+WEB_APP_URL=https://your-dashboard.vercel.app/mini-app
 
 # Webhook mode (optional; polling is used if not set)
 WEBHOOK_DOMAIN=https://your-service.onrender.com
 ```
 
-3. Start the bot + API server:
+1. Start the bot + API server:
 
 ```bash
 npm start
@@ -103,6 +104,24 @@ Use deep links in posts, buttons, or pinned messages:
 - `/leads`
 - `/setclient <id>`
 - `/stop`
+
+Client mini app command:
+
+- `/app`
+
+If `WEB_APP_URL` is configured, the bot also shows the `📱 Открыть мини-приложение` button in the home keyboard.
+
+## Deploy web (Mini App)
+
+The Telegram mini app route is `web/app/mini-app/page.tsx`, exposed as `/mini-app`.
+
+1. Deploy `web/` to a public HTTPS host (for example, Vercel).
+2. Set web environment variables:
+   - `API_URL` -> your public bot/API URL (for example Render)
+   - `BOT_TOKEN`, `ADMIN_ID`, `JWT_SECRET` -> for Telegram admin auth in Next.js routes
+3. Set bot environment variable:
+   - `WEB_APP_URL=https://<your-web-domain>/mini-app`
+4. Restart bot service. `/app` and the menu button will open the mini app in Telegram.
 
 ## Database & migrations
 

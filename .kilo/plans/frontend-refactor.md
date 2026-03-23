@@ -1,28 +1,33 @@
-# Frontend Refactoring Plan — Bot_noct Mini App
+# Frontend Refactoring Plan — Bot_noct Admin Web (Next.js)
 
 ## Scope
+
 Full frontend improvement: component splitting, bug fixes, UX, CSS, performance, redeploy.
 
 ## Phase 1: Component Splitting
 
 ### 1.1 Extract hooks
-- `webapp/src/hooks/useApi.js` — cache logic, apiRequest, withLoading
-- `webapp/src/hooks/useAdminContext.js` — admin state + init
+
+- `web/lib/api.ts` — typed API helpers (public + admin)
+- `web/lib/auth.ts` — session/admin helpers for Next.js
 
 ### 1.2 Extract tab components
-- `webapp/src/components/LeadsTab.jsx`
-- `webapp/src/components/ProductsTab.jsx`
-- `webapp/src/components/UsersTab.jsx`
-- `webapp/src/components/StatsTab.jsx`
+
+- `web/app/admin/leads/page.tsx`
+- `web/app/admin/products/page.tsx`
+- `web/app/admin/users/page.tsx`
+- `web/app/admin/page.tsx`
 
 ### 1.3 Extract reusable UI components
-- `webapp/src/components/ErrorBanner.jsx` — role="alert", auto-dismiss
-- `webapp/src/components/EmptyState.jsx` — "no data" message
-- `webapp/src/components/ConfirmDialog.jsx` — destructive action confirm
-- `webapp/src/components/LoadingSkeleton.jsx` — skeleton placeholder
+
+- `web/components/admin/sidebar.tsx`
+- `web/components/admin/reply-form.tsx`
+- `web/components/admin/lead-status-actions.tsx`
+- `web/components/admin/stat-card.tsx`
 
 ### 1.4 Rewrite App.jsx
-- Thin shell: tab nav, context providers, error boundary
+
+- Thin shell: shared admin layout in `web/app/admin/layout.tsx`
 
 ## Phase 2: Bug Fixes (Critical)
 
@@ -60,10 +65,12 @@ Full frontend improvement: component splitting, bug fixes, UX, CSS, performance,
 - Deploy to Vercel production via CLI
 
 ## File Changes
+
 - New: ~8 files (4 tab components + 4 shared components/hooks)
 - Modified: 3 (App.jsx rewrite, styles.css, api.js)
 - Deleted: 0
 
 ## Risk
+
 - Low — frontend only, backend untouched
 - Rollback: revert to current commit

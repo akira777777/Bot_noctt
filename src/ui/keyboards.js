@@ -7,6 +7,13 @@ function backToMainKeyboard() {
   ]);
 }
 
+function clientMiniAppKeyboard(webAppUrl) {
+  return Markup.inlineKeyboard([
+    [Markup.button.webApp("📱 Открыть Mini App", webAppUrl)],
+    [Markup.button.callback("Главное меню", ACTIONS.MENU_MAIN)],
+  ]);
+}
+
 function catalogKeyboard(products) {
   const rows = products.map((product) => [
     Markup.button.callback(
@@ -173,6 +180,7 @@ function adminInboxKeyboard(dialogs) {
 }
 
 module.exports = {
+  clientMiniAppKeyboard,
   backToMainKeyboard,
   catalogKeyboard,
   productCardKeyboard,

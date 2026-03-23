@@ -2,6 +2,7 @@ const { Telegraf } = require("telegraf");
 const {
   BOT_TOKEN,
   ADMIN_ID,
+  WEB_APP_URL,
 } = require("./config/env");
 const {
   createConversationService,
@@ -20,6 +21,7 @@ const {
   handleClientStart,
   handleClientHelp,
   handleClientMenu,
+  handleClientMiniApp,
   handleClientStatus,
   handleClientText,
   handleClientAction,
@@ -59,6 +61,7 @@ function createBot({ db, repos }) {
       lead,
     },
     adminId: ADMIN_ID,
+    webAppUrl: WEB_APP_URL,
   };
 
   bot.catch((error, ctx) => {
@@ -79,6 +82,7 @@ function createBot({ db, repos }) {
   bot.help((ctx) => handleClientHelp(ctx, deps));
   bot.command("menu", (ctx) => handleClientMenu(ctx, deps));
   bot.command("status", (ctx) => handleClientStatus(ctx, deps));
+  bot.command("app", (ctx) => handleClientMiniApp(ctx, deps));
   bot.command("myid", (ctx) =>
     ctx.reply(`Ваш Telegram ID: ${ctx.from.id}`),
   );

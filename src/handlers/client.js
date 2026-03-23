@@ -7,6 +7,7 @@ const {
   contactKeyboard,
   customContactKeyboard,
   confirmLeadKeyboard,
+  clientMiniAppKeyboard,
 } = require("../ui/keyboards");
 const { clientHomeReplyKeyboard } = require("../ui/reply-keyboards");
 const {
@@ -39,6 +40,7 @@ const messageLimiter = createRateLimiter(5, 60 * 1000);
 
 const HOME_ACTION_LABELS = {
   "💬 Что вас интересует?": "contact:manager",
+  "📱 Открыть мини-приложение": "miniapp:open",
 };
 
 function getCurrentSourcePayload(repos, clientId, fallbackSource = null) {
@@ -54,7 +56,22 @@ function setHomeSession(repos, clientId, sourcePayload) {
 
 async function showHomeScreen(ctx, deps, entry) {
   setHomeSession(deps.repos, ctx.from.id, entry.raw);
-  await ctx.reply(welcomeMessage(entry), clientHomeReplyKeyboard());
+  await ctx.reply(welcomeMessage(entry), clientHomeReplyKeyboard(deps.webAppUrl));
+}
+
+async function openMiniApp(ctx, deps) {
+  if (!deps.webAppUrl) {
+    await ctx.reply(
+      "Мини-приложение пока не настроено. Добавьте WEB_APP_URL в окружение.",
+      backToMainKeyboard(),
+    );
+    return;
+  }
+
+  await ctx.reply(
+    "Откройте мини-приложение кнопкой ниже:",
+    clientMiniAppKeyboard(deps.webAppUrl),
+  );
 }
 
 async function showCatalog(ctx, deps) {
@@ -95,6 +112,9 @@ async function handleHomeAction(ctx, deps, action) {
       await showHomeScreen(ctx, deps, parseSourcePayload(sourcePayload));
       return true;
     }
+    case "miniapp:open":
+      await openMiniApp(ctx, deps);
+      return true;
     default:
       return false;
   }
@@ -223,6 +243,10 @@ async function handleClientHelp(ctx) {
 async function handleClientMenu(ctx, deps) {
   const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
   await showHomeScreen(ctx, deps, parseSourcePayload(sourcePayload));
+}
+
+async function handleClientMiniApp(ctx, deps) {
+  await openMiniApp(ctx, deps);
 }
 
 async function handleClientStatus(ctx, deps) {
@@ -529,6 +553,7 @@ module.exports = {
   handleClientStart,
   handleClientHelp,
   handleClientMenu,
+  handleClientMiniApp,
   handleClientStatus,
   handleClientText,
   handleClientAction,

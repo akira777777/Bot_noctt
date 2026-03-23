@@ -36,16 +36,18 @@ export function LeadStatusActions({ leadId, currentStatus }: Props) {
   }
 
   return (
-    <div className="flex gap-2 flex-wrap">
+    <div className="flex gap-2 flex-wrap" role="group" aria-label="Изменить статус заявки">
       {STATUSES.map((s) => (
         <button
           key={s.key}
           onClick={() => handleStatusChange(s.key)}
           disabled={loading || s.key === currentStatus}
-          className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50 ${
+          aria-label={`Установить статус: ${s.label}`}
+          aria-pressed={s.key === currentStatus}
+          className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all disabled:opacity-50 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background ${
             s.key === currentStatus
               ? "bg-primary text-primary-foreground"
-              : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+              : "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:scale-105"
           }`}
         >
           {s.label}
