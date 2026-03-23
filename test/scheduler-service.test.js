@@ -36,6 +36,14 @@ function createSchedulerHarness() {
 test("scheduler sends draft reminders at 15 minutes and 24 hours only once per draft", async () => {
   const { db, repos, scheduler, sentMessages } = createSchedulerHarness();
 
+  repos.users.upsert({
+    telegram_id: 501,
+    username: "client501",
+    first_name: "Client",
+    last_name: null,
+    role: "client",
+  });
+
   repos.sessions.set(501, "lead", "confirm", {
     productId: 1,
     productCode: "p1",

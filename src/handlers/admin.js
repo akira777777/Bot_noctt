@@ -6,7 +6,6 @@ const {
 } = require("../ui/messages");
 const { formatConversationRow, formatLeadRow } = require("../utils/formatters");
 const { safeAnswerCbQuery, safeSendMessage } = require("../utils/telegram");
-const { getLeadStatusLabel } = require("../domain/lead-status");
 const { parseActionId } = require("../utils/actions");
 
 function isAdmin(ctx, deps) {
@@ -51,7 +50,7 @@ async function sendAdminReply(ctx, deps, clientId, text) {
 }
 
 async function showInbox(ctx, deps, title = "Inbox") {
-  const dialogs = deps.services.admin.listRecentDialogs(8);
+  const dialogs = deps.services.admin.listInbox(8);
   if (!dialogs.length) {
     await ctx.reply("Inbox пока пуст. Новые обращения появятся здесь.");
     return;
@@ -70,8 +69,9 @@ async function applyLeadStatusAction({
   cbSuccessText,
   buttonText,
   adminReplyText,
+  options = {},
 }) {
-  const lead = await deps.services.leadStatus.updateStatus(leadId, status);
+  const lead = await deps.services.leadStatus.updateStatus(leadId, status, options);
   if (!lead) {
     await safeAnswerCbQuery(ctx, "Заявка не найдена");
     return false;
@@ -111,7 +111,7 @@ function registerAdminCommands(bot, deps) {
   bot.command(
     "dialogs",
     adminOnly(async (ctx) => {
-      await showInbox(ctx, deps, "Последние диалоги:");
+      await showInbox(ctx, deps, "Приоритетный inbox:");
     }),
   );
 
@@ -312,23 +312,33 @@ function registerAdminCommands(bot, deps) {
   bot.command(
     "stats",
     adminOnly(async (ctx) => {
-      const { total, byStatus, topProducts } = deps.services.admin.getStats();
+      const dashboard = deps.services.admin.getDashboardStats();
 
-      const statusLines = byStatus.map((row) => {
-        const label = getLeadStatusLabel(row.status);
-        return `  ${label}: ${row.cnt}`;
-      });
+      function formatWindow(title, stats) {
+        const topSources = stats.topSources
+          .map(
+            (row, index) =>
+              `  ${index + 1}. ${row.source_payload || "direct"}: ${row.cnt}`,
+          )
+          .join("\n");
 
-      const productLines = topProducts.map(
-        (row, i) =>
-          `  ${i + 1}. ${row.product_name} (${row.product_code}): ${row.cnt}`,
-      );
+        return (
+          `${title}\n` +
+          `  Draft started: ${stats.draftsStarted}\n` +
+          `  Confirmed: ${stats.confirmedLeads}\n` +
+          `  Conversion: ${stats.conversionRate}%\n` +
+          `  Avg response: ${stats.avgResponseSeconds ?? "—"} sec\n` +
+          `  Median response: ${stats.medianResponseSeconds ?? "—"} sec\n` +
+          `  Overdue leads: ${stats.overdueLeads}\n` +
+          `  Top sources:\n${topSources || "  Нет данных"}`
+        );
+      }
 
       const text =
-        `📊 Статистика по заявкам\n\n` +
-        `Всего заявок: ${total}\n\n` +
-        `По статусам:\n${statusLines.join("\n") || "  Нет данных"}\n\n` +
-        `Топ товаров:\n${productLines.join("\n") || "  Нет данных"}`;
+        "📊 Funnel и SLA статистика\n\n" +
+        formatWindow("За 24 часа", dashboard.last24Hours) +
+        "\n\n" +
+        formatWindow("За 7 дней", dashboard.last7Days);
 
       await ctx.reply(text);
     }),
@@ -601,6 +611,26 @@ async function handleAdminAction(ctx, deps) {
     return;
   }
 
+  if (action.startsWith("admin:lead_snooze:")) {
+    const leadId = parseActionId(action);
+    const nextFollowUpAt = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();
+    await applyLeadStatusAction({
+      ctx,
+      deps,
+      leadId,
+      status: "in_progress",
+      cbSuccessText: "Напомню через 2 часа",
+      buttonText: "⏰ Напомнить через 2ч",
+      adminReplyText: (id) =>
+        `Для заявки #${id} установлен follow-up через 2 часа.`,
+      options: {
+        nextFollowUpAt,
+        notifyClient: false,
+      },
+    });
+    return;
+  }
+
   if (action.startsWith("admin:lead_close:")) {
     const leadId = parseActionId(action);
     await applyLeadStatusAction({
@@ -611,6 +641,44 @@ async function handleAdminAction(ctx, deps) {
       cbSuccessText: "Заявка закрыта",
       buttonText: "✅ Заявка закрыта",
       adminReplyText: (id) => `Заявка #${id} переведена в статус "closed".`,
+    });
+    return;
+  }
+
+  if (action.startsWith("admin:lead_out_of_stock:")) {
+    const leadId = parseActionId(action);
+    await applyLeadStatusAction({
+      ctx,
+      deps,
+      leadId,
+      status: "closed",
+      cbSuccessText: "Закрыто: нет в наличии",
+      buttonText: "⛔ Нет в наличии",
+      adminReplyText: (id) =>
+        `Заявка #${id} закрыта с причиной "out_of_stock".`,
+      options: {
+        closedReason: "out_of_stock",
+        notifyClient: false,
+      },
+    });
+    return;
+  }
+
+  if (action.startsWith("admin:lead_not_relevant:")) {
+    const leadId = parseActionId(action);
+    await applyLeadStatusAction({
+      ctx,
+      deps,
+      leadId,
+      status: "closed",
+      cbSuccessText: "Закрыто: неактуально",
+      buttonText: "🗂 Неактуально",
+      adminReplyText: (id) =>
+        `Заявка #${id} закрыта с причиной "not_relevant".`,
+      options: {
+        closedReason: "not_relevant",
+        notifyClient: false,
+      },
     });
     return;
   }

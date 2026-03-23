@@ -1,4 +1,3 @@
-const { getLeadStatusLabel } = require("../domain/lead-status");
 const { logInfo, logError } = require("../utils/logger");
 const { leadResumeKeyboard } = require("../ui/keyboards");
 
@@ -27,6 +26,19 @@ function createSchedulerService({ repos, bot, adminId }) {
             leadResumeKeyboard(),
           );
           repos.sessions.markReminderSent(session.telegram_id, reminder.key);
+          if (reminder.key === "15m" && repos.leadEvents) {
+            try {
+              repos.leadEvents.create({
+                leadId: null,
+                clientTelegramId: session.telegram_id,
+                eventType: "lead_abandoned",
+                sourcePayload: session.draft.sourcePayload || null,
+                metadata: { reminder_key: reminder.key },
+              });
+            } catch (error) {
+              logError("Failed to persist abandonment event", error);
+            }
+          }
           logInfo("draft_reminder_sent", {
             telegramId: session.telegram_id,
             reminderKey: reminder.key,
@@ -38,58 +50,73 @@ function createSchedulerService({ repos, bot, adminId }) {
     }
   }
 
-  // Notify admin about leads stuck in "new" status for > 2 hours
-  async function checkStaleLeads() {
-    const staleLeads = repos.leads.listStale("new", 120, 10);
-    if (staleLeads.length === 0) {
-      return;
-    }
+  async function sendSlaReminders() {
+    const reminderConfigs = [
+      { key: "15m", label: "15 минут" },
+      { key: "60m", label: "60 минут" },
+    ];
 
-    const lines = staleLeads.map((l) => {
-      const name = l.first_name || l.username || `id:${l.client_telegram_id}`;
-      return `  #${l.id} — ${l.product_name} (${name})`;
-    });
+    for (const reminder of reminderConfigs) {
+      const leads = repos.leads.listPendingSlaReminder(reminder.key, 20);
+      if (leads.length === 0) {
+        continue;
+      }
 
-    const text =
-      `⏰ Необработанные заявки (${staleLeads.length}):\n\n` +
-      lines.join("\n") +
-      "\n\nЭти заявки ждут больше 2 часов.";
+      const lines = leads.map(
+        (lead) =>
+          `  #${lead.id} — ${lead.product_name} — ${lead.first_name || lead.username || `id:${lead.client_telegram_id}`}`,
+      );
 
-    try {
-      await bot.telegram.sendMessage(adminId, text);
-      logInfo("stale_leads_notification_sent", { count: staleLeads.length });
-    } catch (error) {
-      logError("Failed to send stale leads notification", error);
+      try {
+        await bot.telegram.sendMessage(
+          adminId,
+          `SLA ${reminder.label}: заявки без первого ответа\n\n${lines.join("\n")}`,
+        );
+        for (const lead of leads) {
+          repos.leads.markSlaReminderSent(lead.id, reminder.key);
+        }
+      } catch (error) {
+        logError("Failed to send SLA reminder", error);
+      }
     }
   }
 
-  // Remind admin about leads in "in_progress" with no update for > 24 hours
-  async function sendFollowUps() {
-    const staleLeads = repos.leads.listStale("in_progress", 1440, 10);
-    if (staleLeads.length === 0) {
+  async function sendDueFollowUpReminders() {
+    const leads = repos.leads.listDueFollowUps(20);
+    if (leads.length === 0) {
       return;
     }
 
-    const lines = staleLeads.map((l) => {
-      const name = l.first_name || l.username || `id:${l.client_telegram_id}`;
-      return `  #${l.id} — ${l.product_name} (${name})`;
-    });
-
-    const text =
-      `🔔 Заявки без обновлений > 24 часов (${staleLeads.length}):\n\n` +
-      lines.join("\n") +
-      "\n\nРекомендуем связаться с клиентом или обновить статус.";
+    const lines = leads.map(
+      (lead) =>
+        `  #${lead.id} — ${lead.product_name} — ${lead.first_name || lead.username || `id:${lead.client_telegram_id}`}`,
+    );
 
     try {
-      await bot.telegram.sendMessage(adminId, text);
-      logInfo("follow_up_notification_sent", { count: staleLeads.length });
+      await bot.telegram.sendMessage(
+        adminId,
+        `follow-up: пришло время вернуться к лидам\n\n${lines.join("\n")}`,
+      );
+      for (const lead of leads) {
+        repos.leads.markFollowUpReminderSent(lead.id);
+      }
     } catch (error) {
-      logError("Failed to send follow-up notification", error);
+      logError("Failed to send follow-up reminders", error);
     }
+  }
+
+  async function checkStaleLeads() {
+    await sendSlaReminders();
+  }
+
+  async function sendFollowUps() {
+    await sendDueFollowUpReminders();
   }
 
   return {
     sendDraftReminders,
+    sendSlaReminders,
+    sendDueFollowUpReminders,
     checkStaleLeads,
     sendFollowUps,
   };

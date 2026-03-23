@@ -150,6 +150,20 @@ function adminLeadKeyboard(leadId, clientId) {
     ],
     [
       Markup.button.callback(
+        "Напомнить через 2ч",
+        buildAction(ACTION_PREFIXES.ADMIN_LEAD_SNOOZE, leadId),
+      ),
+      Markup.button.callback(
+        "Нет в наличии",
+        buildAction(ACTION_PREFIXES.ADMIN_LEAD_OUT_OF_STOCK, leadId),
+      ),
+    ],
+    [
+      Markup.button.callback(
+        "Неактуально",
+        buildAction(ACTION_PREFIXES.ADMIN_LEAD_NOT_RELEVANT, leadId),
+      ),
+      Markup.button.callback(
         "📞 Перезвонили",
         buildAction(ACTION_PREFIXES.ADMIN_LEAD_CALLED_BACK, leadId),
       ),
@@ -175,12 +189,28 @@ function adminLeadKeyboard(leadId, clientId) {
 function adminQuickReplyKeyboard(clientId) {
   return Markup.inlineKeyboard([
     [
-      Markup.button.callback("Цена", `admin:template:price:${clientId}`),
+      Markup.button.callback(
+        "Подтвердить",
+        `admin:template:ack:${clientId}`,
+      ),
       Markup.button.callback("Сроки", `admin:template:terms:${clientId}`),
     ],
     [
+      Markup.button.callback(
+        "Наличие",
+        `admin:template:availability:${clientId}`,
+      ),
+      Markup.button.callback(
+        "Контакт",
+        `admin:template:contact:${clientId}`,
+      ),
+    ],
+    [
       Markup.button.callback("Оплата", `admin:template:payment:${clientId}`),
-      Markup.button.callback("Доставка", `admin:template:delivery:${clientId}`),
+      Markup.button.callback(
+        "Доставка",
+        `admin:template:delivery:${clientId}`,
+      ),
     ],
     [
       Markup.button.callback("Inbox", ACTIONS.ADMIN_INBOX),

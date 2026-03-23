@@ -225,7 +225,11 @@ async function showPreviousLeadStep(ctx, deps, session) {
 
 async function cancelLeadFlow(ctx, deps) {
   const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
-  deps.services.lead.cancelLeadDraft(ctx.from.id);
+  if (typeof deps.services.lead.cancelLeadDraft === "function") {
+    deps.services.lead.cancelLeadDraft(ctx.from.id);
+  } else {
+    deps.services.lead.clearSession(ctx.from.id);
+  }
   setHomeSession(deps.repos, ctx.from.id, sourcePayload, { force: true });
   await ctx.reply("Оформление заявки отменено.", backToMainKeyboard());
 }
@@ -650,6 +654,7 @@ async function handleClientMedia(ctx, deps, mediaType) {
     messageData,
     mediaType,
   );
+  deps.repos.leads.touchLastClientActivityByClient(ctx.from.id);
 
   const clientLabel = formatClientLabel(ctx.from, ctx.chat.id);
   const adminCaption = `${clientLabel}\n${caption || "(без подписи)"}`;

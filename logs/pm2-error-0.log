@@ -2100,3 +2100,243 @@
 2026-03-23T18:38:36:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
 2026-03-23T18:38:36:   ]
 2026-03-23T18:38:36: }
+2026-03-23T18:38:40: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:41: Error: Cannot find module './services/admin-service'
+2026-03-23T18:38:41: Require stack:
+2026-03-23T18:38:41: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:38:41: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:38:41:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:38:41:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:38:41:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:38:41:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:38:41:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:38:41:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:38:41:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:38:41:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:38:41:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:38:41:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:38:41:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:38:41:   requireStack: [
+2026-03-23T18:38:41:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:38:41:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:38:41:   ]
+2026-03-23T18:38:41: }
+2026-03-23T18:38:45: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:45: Error: Cannot find module './services/admin-service'
+2026-03-23T18:38:45: Require stack:
+2026-03-23T18:38:45: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:38:45: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:38:45:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:38:45:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:38:45:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:38:45:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:38:45:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:38:45:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:38:45:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:38:45:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:38:45:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:38:45:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:38:45:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:38:45:   requireStack: [
+2026-03-23T18:38:45:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:38:45:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:38:45:   ]
+2026-03-23T18:38:45: }
+2026-03-23T18:38:49: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:49: Error: Cannot find module './services/admin-service'
+2026-03-23T18:38:49: Require stack:
+2026-03-23T18:38:49: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:38:49: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:38:49:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:38:49:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:38:49:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:38:49:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:38:49:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:38:49:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:38:49:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:38:49:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:38:49:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:38:49:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:38:49:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:38:49:   requireStack: [
+2026-03-23T18:38:49:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:38:49:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:38:49:   ]
+2026-03-23T18:38:49: }
+2026-03-23T18:38:53: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:54: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:38:54: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:38:54: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:38:54: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:38:54: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:38:54: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:38:54: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:38:54: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:38:54: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:38:54: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:38:54: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:38:54: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:38:54: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:38:54: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:10: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:14: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:39:15: Error: Cannot find module './src/services/scheduler-service'
+2026-03-23T18:39:15: Require stack:
+2026-03-23T18:39:15: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:39:15:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:39:15:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:39:15:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:39:15:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\index.js:29:36)
+2026-03-23T18:39:15:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:39:15:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:39:15:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:39:15:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:39:15:     at Object.<anonymous> (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\lib\ProcessContainerFork.js:33:23)
+2026-03-23T18:39:15:     at Module._compile (node:internal/modules/cjs/loader:1812:14) {
+2026-03-23T18:39:15:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:39:15:   requireStack: [ 'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js' ]
+2026-03-23T18:39:15: }
+2026-03-23T18:39:19: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:39:19: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:20: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:20: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:20: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:20: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:20: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:20: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:20: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:20: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:20: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:20: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:20: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:20: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:20: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:35: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:39: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:39:40: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:40: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:40: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:40: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:40: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:40: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:40: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:40: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:40: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:40: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:40: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:40: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:40: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:40: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:39:55: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:00: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:40:00: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:00: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:00: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:00: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:00: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:00: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:00: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:00: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:00: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:00: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:00: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:00: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:00: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:00: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:16: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:20: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:40:21: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:21: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:21: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:21: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:21: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:21: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:21: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:21: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:21: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:21: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:21: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:21: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:21: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:21: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:36: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:40: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:40:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:40:57: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:01: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:41:01: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:01: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:01: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:01: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:01: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:01: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:01: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:01: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:01: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:01: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:01: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:01: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:01: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:01: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:21: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:41:22: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:22: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:22: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:22: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:22: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:22: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:22: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:22: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:22: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:22: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:22: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:22: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:22: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:22: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:42: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:41:42: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:42: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:42: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:42: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:42: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:42: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:42: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:42: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:42: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:42: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:42: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:42: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:42: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:42: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:41:58: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:02: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:42:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:18: [WARN] This Redis server's `default` user does not require a password, but a password was supplied

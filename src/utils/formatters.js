@@ -46,7 +46,12 @@ function formatConversationRow(conversation) {
     ? conversation.last_message_text.slice(0, 60)
     : "Без сообщений";
   const source = formatSourceLabel(conversation.source_payload);
-  return `• ${name} — id ${conversation.client_telegram_id} — ${conversation.status} — ${source} — ${lastText}`;
+  const status = conversation.lead_status || conversation.status;
+  const statusLabel = status ? getLeadStatusLabel(status) : "Без активной заявки";
+  const productLabel = conversation.product_name
+    ? ` — ${conversation.product_name}`
+    : "";
+  return `• ${name} — id ${conversation.client_telegram_id} — ${statusLabel}${productLabel} — ${source} — ${lastText}`;
 }
 
 function formatLeadRow(lead) {
