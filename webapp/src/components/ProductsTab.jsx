@@ -89,41 +89,63 @@ export default function ProductsTab() {
   }
 
   return (
-    <section>
+    <section className="section-stack">
       <ErrorBanner message={error} onDismiss={() => setError("")} />
 
       <form className="card" onSubmit={createProduct}>
         <h2>Новый товар</h2>
-        <input
-          placeholder="Код товара"
-          value={newProduct.code}
-          onChange={(e) => updateField("code", e.target.value)}
-          required
-          disabled={submitting}
-        />
-        <input
-          placeholder="Название"
-          value={newProduct.title}
-          onChange={(e) => updateField("title", e.target.value)}
-          required
-          disabled={submitting}
-        />
-        <textarea
-          placeholder="Описание"
-          value={newProduct.description}
-          onChange={(e) => updateField("description", e.target.value)}
-          disabled={submitting}
-        />
-        <input
-          placeholder="Текст цены"
-          value={newProduct.price_text}
-          onChange={(e) => updateField("price_text", e.target.value)}
-          disabled={submitting}
-        />
-        <button type="submit" disabled={submitting}>
+        <div className="form-grid">
+          <div className="form-field">
+            <label className="field-label" htmlFor="product-code">Код товара</label>
+            <input
+              id="product-code"
+              placeholder="Например: bot-noct-1"
+              value={newProduct.code}
+              onChange={(e) => updateField("code", e.target.value)}
+              required
+              disabled={submitting}
+            />
+          </div>
+          <div className="form-field">
+            <label className="field-label" htmlFor="product-title">Название</label>
+            <input
+              id="product-title"
+              placeholder="Название товара"
+              value={newProduct.title}
+              onChange={(e) => updateField("title", e.target.value)}
+              required
+              disabled={submitting}
+            />
+          </div>
+          <div className="form-field">
+            <label className="field-label" htmlFor="product-description">Описание</label>
+            <textarea
+              id="product-description"
+              placeholder="Краткое описание"
+              value={newProduct.description}
+              onChange={(e) => updateField("description", e.target.value)}
+              disabled={submitting}
+            />
+          </div>
+          <div className="form-field">
+            <label className="field-label" htmlFor="product-price-text">Текст цены</label>
+            <input
+              id="product-price-text"
+              placeholder="Например: от 5 000 ₽"
+              value={newProduct.price_text}
+              onChange={(e) => updateField("price_text", e.target.value)}
+              disabled={submitting}
+            />
+          </div>
+        </div>
+        <button className="btn-primary" type="submit" disabled={submitting}>
           {submitting ? "Добавление..." : "Добавить товар"}
         </button>
       </form>
+
+      <div className="section-header">
+        <div className="subtle">Всего товаров: {products.length}</div>
+      </div>
 
       {products.length === 0 && !loading ? (
         <EmptyState message="Товары не найдены" />
@@ -145,11 +167,16 @@ export default function ProductsTab() {
                 <tr key={product.id}>
                   <td>{product.id}</td>
                   <td>{product.code}</td>
-                  <td>{product.title}</td>
-                  <td>{product.price_text}</td>
-                  <td>{product.is_active ? "Да" : "Нет"}</td>
+                  <td className="cell-wrap">{product.title}</td>
+                  <td className="cell-wrap">{product.price_text || "—"}</td>
+                  <td>
+                    <span className={`status-chip ${product.is_active ? "success" : "warning"}`}>
+                      {product.is_active ? "Да" : "Нет"}
+                    </span>
+                  </td>
                   <td>
                     <button
+                      className={product.is_active ? "btn-danger" : "btn-primary"}
                       onClick={() => toggleProduct(product)}
                       disabled={togglingId === product.id}
                     >
@@ -168,7 +195,7 @@ export default function ProductsTab() {
       )}
 
       {loading && !initialLoad ? (
-        <div className="subtle">Обновление данных...</div>
+        <div className="subtle">Обновляем каталог товаров...</div>
       ) : null}
     </section>
   );

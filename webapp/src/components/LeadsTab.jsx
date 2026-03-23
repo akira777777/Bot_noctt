@@ -62,29 +62,36 @@ export default function LeadsTab() {
   }
 
   return (
-    <section>
+    <section className="section-stack">
       <ErrorBanner message={error} onDismiss={() => setError("")} />
 
-      <div className="row">
-        <label htmlFor="statusFilter">Фильтр статуса</label>
-        <select
-          id="statusFilter"
-          value={statusFilter}
-          onChange={(e) => {
-            const nextValue =
-              e.target.value === "all"
-                ? "all"
-                : normalizeLeadStatus(e.target.value) || "all";
-            setStatusFilter(nextValue);
-          }}
-        >
-          <option value="all">Все статусы</option>
-          {LEAD_STATUS_OPTIONS.map((status) => (
-            <option key={status} value={status}>
-              {getLeadStatusLabel(status)}
-            </option>
-          ))}
-        </select>
+      <div className="card">
+        <div className="row-wrap">
+          <div className="form-field">
+            <label className="field-label" htmlFor="statusFilter">
+              Фильтр по статусу
+            </label>
+            <select
+              id="statusFilter"
+              value={statusFilter}
+              onChange={(e) => {
+                const nextValue =
+                  e.target.value === "all"
+                    ? "all"
+                    : normalizeLeadStatus(e.target.value) || "all";
+                setStatusFilter(nextValue);
+              }}
+            >
+              <option value="all">Все статусы</option>
+              {LEAD_STATUS_OPTIONS.map((status) => (
+                <option key={status} value={status}>
+                  {getLeadStatusLabel(status)}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="subtle">Найдено заявок: {leads.length}</div>
+        </div>
       </div>
 
       {leads.length === 0 && !loading ? (
@@ -106,8 +113,10 @@ export default function LeadsTab() {
                 <tr key={lead.id}>
                   <td>{lead.id}</td>
                   <td>{lead.client_telegram_id}</td>
-                  <td>{lead.product_name}</td>
-                  <td>{getLeadStatusLabel(lead.status)}</td>
+                  <td className="cell-wrap">{lead.product_name}</td>
+                  <td>
+                    <span className="status-chip">{getLeadStatusLabel(lead.status)}</span>
+                  </td>
                   <td>
                     <select
                       value={
@@ -134,7 +143,7 @@ export default function LeadsTab() {
       )}
 
       {loading && !initialLoad ? (
-        <div className="subtle">Обновление данных...</div>
+        <div className="subtle">Обновляем список заявок...</div>
       ) : null}
     </section>
   );

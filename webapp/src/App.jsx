@@ -22,6 +22,7 @@ const TAB_COMPONENTS = {
 function AdminPanel() {
   const { telegram, admin, canUseApi, initError } = useAdmin();
   const [activeTab, setActiveTab] = useState(null);
+  const activeTabLabel = TABS.find(([id]) => id === activeTab)?.[1];
 
   if (!telegram.ready) {
     return (
@@ -45,12 +46,23 @@ function AdminPanel() {
 
   return (
     <div className="container">
-      <header className="header">
-        <h1>Bot Noct Admin</h1>
+      <header className="header panel">
+        <div className="header-title">
+          <h1>Bot Noct Admin</h1>
+          <p className="subtle">
+            Управление заявками, товарами, пользователями и аналитикой.
+          </p>
+        </div>
         <div className="subtle">
-          {admin
-            ? `@${admin.username || "admin"} (${admin.telegram_id})`
-            : "Загрузка профиля..."}
+          {admin ? (
+            <>
+              <strong>@{admin.username || "admin"}</strong>
+              <br />
+              ID: {admin.telegram_id}
+            </>
+          ) : (
+            "Загрузка профиля..."
+          )}
         </div>
       </header>
 
@@ -67,7 +79,9 @@ function AdminPanel() {
       ) : (
         <>
           <nav className="tabs">
-            <button className="tab-back" onClick={() => setActiveTab(null)}>← Назад</button>
+            <button className="tab-back" onClick={() => setActiveTab(null)}>
+              ← К разделам
+            </button>
             {TABS.map(([id, label]) => (
               <button
                 key={id}
@@ -78,6 +92,10 @@ function AdminPanel() {
               </button>
             ))}
           </nav>
+          <div className="section-header">
+            <h2>{activeTabLabel}</h2>
+            <span className="subtle">Операционный раздел</span>
+          </div>
           <ActiveTabComponent />
         </>
       )}

@@ -58,8 +58,12 @@ export default function UsersTab() {
   }
 
   return (
-    <section>
+    <section className="section-stack">
       <ErrorBanner message={error} onDismiss={() => setError("")} />
+
+      <div className="section-header">
+        <div className="subtle">Всего пользователей: {users.length}</div>
+      </div>
 
       {users.length === 0 && !loading ? (
         <EmptyState message="Пользователи не найдены" />
@@ -80,10 +84,17 @@ export default function UsersTab() {
                 <tr key={user.telegram_id}>
                   <td>{user.telegram_id}</td>
                   <td>{user.username || "—"}</td>
-                  <td>{user.role}</td>
-                  <td>{user.is_blocked ? "Да" : "Нет"}</td>
+                  <td>
+                    <span className="status-chip">{user.role}</span>
+                  </td>
+                  <td>
+                    <span className={`status-chip ${user.is_blocked ? "warning" : "success"}`}>
+                      {user.is_blocked ? "Да" : "Нет"}
+                    </span>
+                  </td>
                   <td>
                     <button
+                      className={user.is_blocked ? "" : "btn-danger"}
                       onClick={() =>
                         setUserBlockState(user, !user.is_blocked)
                       }
@@ -104,7 +115,7 @@ export default function UsersTab() {
       )}
 
       {loading && !initialLoad ? (
-        <div className="subtle">Обновление данных...</div>
+        <div className="subtle">Обновляем список пользователей...</div>
       ) : null}
     </section>
   );
