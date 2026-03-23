@@ -783,6 +783,36 @@ async function handleAdminAction(ctx, deps) {
     return;
   }
 
+  if (action.startsWith("admin:ai_send:")) {
+    const clientId = parseActionId(action);
+    if (!deps.services.ai?.isEnabled) {
+      await safeAnswerCbQuery(ctx, "AI не настроен");
+      return;
+    }
+
+    const history = deps.services.admin.getClientHistory(clientId, 10);
+    if (!history.ok || !history.messages.length) {
+      await safeAnswerCbQuery(ctx, "История пуста");
+      return;
+    }
+
+    const products = deps.repos.products.list();
+    const suggestion = await deps.services.ai.generateAdminSuggestedReply({
+      products,
+      conversationMessages: history.messages,
+    });
+
+    if (!suggestion) {
+      await safeAnswerCbQuery(ctx, "Не удалось сгенерировать ответ");
+      return;
+    }
+
+    deps.services.admin.selectClient(adminId, clientId);
+    await safeAnswerCbQuery(ctx, "Отправляю...");
+    await sendAdminReply(ctx, deps, clientId, suggestion);
+    return;
+  }
+
   if (action === "admin:clear_dialog") {
     deps.services.admin.clearSelectedClient(adminId);
     await safeAnswerCbQuery(ctx, "Диалог сброшен");

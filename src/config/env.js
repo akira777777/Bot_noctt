@@ -160,6 +160,8 @@ if (TELEGRAM_DELIVERY_MODE === "webhook" && !WEBHOOK_DOMAIN) {
 module.exports = {
   NODE_ENV,
   isProduction,
+  AI_GATEWAY_API_KEY,
+  AI_ENABLED,
   BOT_TOKEN,
   ADMIN_ID,
   AI_GATEWAY_API_KEY,

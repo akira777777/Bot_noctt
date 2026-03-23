@@ -25,6 +25,7 @@ const {
   handleClientAction,
   handleClientMedia,
 } = require("./handlers/client");
+const { createAiService } = require("./services/ai-service");
 const { logError } = require("./utils/logger");
 
 function createBot({ db, repos, cacheService = null, queueService = null }) {
@@ -42,6 +43,7 @@ function createBot({ db, repos, cacheService = null, queueService = null }) {
     adminId: ADMIN_ID,
     cacheService,
     queueService,
+    aiService: ai,
   });
   const admin = createAdminService({ repos });
   const session = createSessionService({ repos });
