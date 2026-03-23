@@ -47,11 +47,6 @@ services:
 
   redis:
     container_name: bot-redis
-    command: >
-      sh -c "redis-server --appendonly yes
-      ${REDIS_PASSWORD:+--requirepass \"$REDIS_PASSWORD\"}
-      --maxmemory 256mb
-      --maxmemory-policy allkeys-lru"
     logging:
       driver: "json-file"
       options:

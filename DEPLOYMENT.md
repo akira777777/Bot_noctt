@@ -135,67 +135,18 @@ environment:
 
 ## Production Deployment
 
-### Kubernetes
-
-```yaml
-# kubernetes/deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: bot-noct
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: bot-noct
-  template:
-    metadata:
-      labels:
-        app: bot-noct
-    spec:
-      containers:
-        - name: bot
-          image: bot-noct:latest
-          ports:
-            - containerPort: 3000
-          env:
-            - name: BOT_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: bot-secrets
-                  key: token
-            - name: REDIS_HOST
-              value: "redis-service"
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 3000
-            initialDelaySeconds: 10
-            periodSeconds: 30
-          readinessProbe:
-            httpGet:
-              path: /readyz
-              port: 3000
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          resources:
-            requests:
-              memory: "256Mi"
-              cpu: "250m"
-            limits:
-              memory: "1Gi"
-              cpu: "1000m"
-```
+Two supported production paths are kept in sync with `src/config/env.js`:
 
 ### Render.com
 
-The project includes `render.yaml` for Render.com deployment:
+```bash
+render deploy --config render.yaml
+```
+
+### Docker Compose override
 
 ```bash
-# Deploy using CLI
-render deploy --config render.yaml
-
-# Or use the provided GitHub integration
+docker compose -f docker-compose.yml -f docker-compose.production.yml --profile prod up -d bot redis
 ```
 
 ---
@@ -214,24 +165,9 @@ mkdir -p data
 chmod 755 data
 ```
 
-### PostgreSQL (Production)
-
-```env
-DB_HOST=your-postgres-host
-DB_PORT=5432
-DB_NAME=bot_noct
-DB_USER=postgres
-DB_PASSWORD=your-password
-DB_SSL=true
-```
-
 ### Database Migrations
 
-Migrations run automatically on startup. Manual migration:
-
-```bash
-npm run migrate
-```
+Migrations run automatically on startup.
 
 ---
 

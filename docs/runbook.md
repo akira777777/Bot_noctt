@@ -17,7 +17,7 @@ Operational steps for safe deploy, quick incident triage, rollback, and data rec
    - `npm run smoke:api`
 2. Deploy to Render (Blueprint or connected branch).
 3. Confirm service is healthy:
-   - `GET /healthz` returns `200` and `{ ok: true }`.
+   - `GET /healthz` returns `200` and a payload with `"status": "ok"`.
 4. Perform Telegram smoke:
    - admin `/start`
    - create one lead via Telegram flow (or via the web lead form)

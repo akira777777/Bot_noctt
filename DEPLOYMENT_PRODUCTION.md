@@ -1,12 +1,12 @@
-# 🚀 Production Deployment Guide
+# Production Deployment Guide
 
 ## Prerequisites
 
-1. **Node.js 18+** installed
+1. **Node.js 20+** installed
 2. **Redis** server running (for caching and queues)
 3. **PostgreSQL** (optional, for high-traffic production)
-4. **PM2** for process management
-5. **Domain** with SSL certificate
+4. **PM2** for process management (optional)
+5. **Domain** with SSL certificate for webhook mode
 
 ## Quick Start
 
@@ -30,8 +30,9 @@ cp .env.production .env
 
 - `BOT_TOKEN` - Get from [@BotFather](https://t.me/BotFather)
 - `ADMIN_ID` - Your Telegram user ID
-- `REDIS_HOST` / `REDIS_PASSWORD` - Your Redis instance
+- `REDIS_HOST` / `REDIS_PASSWORD` / `REDIS_DB` - Your Redis instance
 - `API_SECRET` - Generate secure random string
+- `WEBHOOK_DOMAIN` - Public HTTPS base URL of the deployed app
 
 ### 3. Setup Redis
 
@@ -96,23 +97,16 @@ sudo systemctl start bot-noct
 
 ```bash
 # Build image
-docker build -t bot-noct .
+docker build --target production -t bot-noct .
 
-# Run container
-docker run -d \
-  --name bot-noct \
-  -p 3052:3052 \
-  -e NODE_ENV=production \
-  -e BOT_TOKEN=your_token \
-  -e REDIS_HOST=redis \
-  --link redis \
-  bot-noct
+# Run production stack
+docker compose -f docker-compose.yml -f docker-compose.production.yml --profile prod up -d bot redis
 ```
 
 ### Docker Compose (Recommended)
 
 ```bash
-docker compose up -d
+docker compose -f docker-compose.yml -f docker-compose.production.yml --profile prod up -d bot redis
 ```
 
 ## Health Checks
@@ -120,20 +114,17 @@ docker compose up -d
 ### API Health Endpoint
 
 ```bash
-curl http://localhost:3052/health
+curl http://localhost:3000/healthz
 ```
 
 Response:
 
 ```json
 {
-  "status": "healthy",
-  "uptime": 12345,
-  "services": {
-    "database": "connected",
-    "redis": "connected",
-    "bot": "running"
-  }
+  "status": "ok",
+  "timestamp": "2026-03-23T12:00:00.000Z",
+  "uptime": 12.3,
+  "service": "telegram-bot"
 }
 ```
 
@@ -193,8 +184,6 @@ chmod 666 data/bot.sqlite
 - [ ] Change default `API_SECRET`
 - [ ] Use strong Redis password
 - [ ] Enable SSL on web server
-- [ ] Disable debug endpoints (`ENABLE_DEBUG_ENDPOINTS=false`)
-- [ ] Set `ALLOW_DIAGNOSTICS=false`
 - [ ] Use environment variables for secrets
 - [ ] Regular backups enabled
 
@@ -213,23 +202,7 @@ npm run backup
 ### Recommended Settings
 
 ```env
-QUEUE_CONCURRENCY_MESSAGES=10
-QUEUE_CONCURRENCY_WEBHOOKS=20
-CACHE_TTL_STATS=60
-WORKER_POOL_SIZE=0
+TELEGRAM_DELIVERY_MODE=webhook
 MEMORY_LIMIT_WARN=512
 MEMORY_LIMIT_CRITICAL=768
-```
-
-### For High Traffic
-
-Consider PostgreSQL over SQLite:
-
-```env
-DB_HOST=your-db-host
-DB_PORT=5432
-DB_NAME=bot_noct
-DB_USER=bot_user
-DB_PASSWORD=SECURE_PASSWORD
-DB_SSL=true
 ```
