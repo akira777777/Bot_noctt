@@ -52,3 +52,4 @@
 2026-03-23T14:15:50: {"level":"INFO","time":"2026-03-23T13:15:50.007Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"password":"[REDACTED]","db":0}}
 2026-03-23T14:15:50: {"level":"WARN","time":"2026-03-23T13:15:50.012Z","service":"telegram-bot","env":"production","msg":"Queue service initialization failed, continuing without queues","error":"queue.rateLimit is not a function"}
 2026-03-23T14:15:50: {"level":"INFO","time":"2026-03-23T13:15:50.023Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T14:16:01: {"level":"ERROR","time":"2026-03-23T13:16:01.251Z","service":"telegram-bot","env":"production","msg":"Queue messages: Max retries exceeded","error":{}}
