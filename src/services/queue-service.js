@@ -58,7 +58,14 @@ const queues = {};
  * Initialize queue service
  */
 async function initQueueService(redisConfig) {
-  log.info("Initializing queue service", { redisConfig });
+  log.info("Initializing queue service", {
+    redisConfig: {
+      host: redisConfig.host || "localhost",
+      port: redisConfig.port || 6379,
+      db: redisConfig.db || 0,
+      hasPassword: Boolean(redisConfig.password),
+    },
+  });
 
   // Create queues with Redis connection
   for (const queueName of Object.values(QUEUES)) {
@@ -101,12 +108,6 @@ function createQueue(name, redisConfig) {
       backoff: RETRY_CONFIG.backoff,
     },
   });
-
-  // Set rate limit
-  const rateLimit = RATE_LIMITS[name];
-  if (rateLimit) {
-    queue.rateLimit(rateLimit.max, rateLimit.duration);
-  }
 
   return queue;
 }

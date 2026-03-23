@@ -4,15 +4,19 @@
  */
 const express = require("express");
 const os = require("os");
-const { getCacheService } = require("../../services/cache-service");
 
 const router = express.Router();
 
 // Database check function that will be injected
 let dbCheckFn = null;
+let cacheCheckService = null;
 
 function setDbCheckFunction(fn) {
   dbCheckFn = fn;
+}
+
+function setCacheCheckService(service) {
+  cacheCheckService = service;
 }
 
 /**
@@ -126,8 +130,11 @@ async function performDatabaseCheck() {
  */
 async function performCacheCheck() {
   try {
-    const cache = getCacheService();
-    const cacheHealth = await cache.healthCheck();
+    if (!cacheCheckService) {
+      return { status: "unknown", message: "Cache check not configured" };
+    }
+
+    const cacheHealth = await cacheCheckService.healthCheck();
 
     return {
       status: cacheHealth.status === "healthy" ? "ok" : "degraded",
@@ -196,4 +203,5 @@ function performCPUCheck() {
 module.exports = {
   router,
   setDbCheckFunction,
+  setCacheCheckService,
 };

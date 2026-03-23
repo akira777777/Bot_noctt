@@ -9,7 +9,11 @@ const compression = require("compression");
 
 const { createPublicRoutes } = require("./routes/public");
 const { createAdminRoutes } = require("./routes/admin");
-const { router: healthRouter, setDbCheckFunction } = require("./routes/health");
+const {
+  router: healthRouter,
+  setDbCheckFunction,
+  setCacheCheckService,
+} = require("./routes/health");
 const { createApiKeyAuth } = require("./middleware/api-key-auth");
 const { createRateLimiter } = require("./middleware/rate-limit");
 const {
@@ -18,7 +22,7 @@ const {
   requestLogger,
   asyncHandler,
 } = require("./middleware/error-handler");
-const { log } = require("../utils/logger-enhanced");
+const log = require("../utils/logger-enhanced");
 
 function createWebServer({
   repos,
@@ -112,6 +116,10 @@ function createWebServer({
     });
   }
 
+  if (cacheService) {
+    setCacheCheckService(cacheService);
+  }
+
   // Mount health routes
   app.use("/", healthRouter);
 
@@ -195,7 +203,7 @@ function createWebServer({
       "/api/admin/cache",
       apiKeyAuth,
       asyncHandler(async (req, res) => {
-        const stats = await cacheService.getStats();
+        const stats = await cacheService.getCacheStats();
         res.json({ success: true, data: stats });
       }),
     );
@@ -204,7 +212,7 @@ function createWebServer({
       "/api/admin/cache/clear",
       apiKeyAuth,
       asyncHandler(async (req, res) => {
-        await cacheService.clear();
+        await cacheService.invalidateAll();
         res.json({ success: true, message: "Cache cleared" });
       }),
     );
