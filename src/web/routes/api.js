@@ -139,13 +139,12 @@ function createApiRouter({ repos, isProduction = false }) {
     const limit = Math.min(Math.max(1, Number(req.query.limit) || 50), 500);
     const offset = (page - 1) * limit;
 
-    const allUsers = repos.users.list(500); // Get max for counting
-    const total = allUsers.length;
-    const paginatedUsers = allUsers.slice(offset, offset + limit);
+    const total = repos.users.count();
+    const users = repos.users.list(limit, offset);
 
     return res.json({
       ok: true,
-      users: paginatedUsers,
+      users,
       pagination: {
         page,
         limit,

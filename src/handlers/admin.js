@@ -15,13 +15,11 @@ const {
 const { formatConversationRow, formatLeadRow } = require("../utils/formatters");
 const { safeAnswerCbQuery, safeSendMessage } = require("../utils/telegram");
 const { getLeadStatusLabel } = require("../domain/lead-status");
+const { parseActionId } = require("../utils/actions");
+const { logError } = require("../utils/logger");
 
 function isAdmin(ctx, deps) {
   return ctx.from.id === deps.adminId;
-}
-
-function parseActionId(action) {
-  return Number(action.split(":")[2]);
 }
 
 async function replaceWithStatusButton(ctx, text) {
@@ -29,7 +27,9 @@ async function replaceWithStatusButton(ctx, text) {
     await ctx.editMessageReplyMarkup({
       inline_keyboard: [[{ text, callback_data: "admin:noop" }]],
     });
-  } catch (_) {}
+  } catch (error) {
+    logError("Failed to replace status button on message", error);
+  }
 }
 
 async function selectClient(ctx, deps, clientId) {
@@ -407,14 +407,23 @@ async function handleAdminStart(ctx, deps) {
     : "Сейчас активный диалог не выбран.\n\n";
   const message =
     selectedText +
-    "Команды администратора:\n" +
+    "Команды администратора:\n\n" +
+    "📋 Клиенты и диалоги:\n" +
     "/clients — последние клиенты\n" +
     "/dialogs — последние диалоги\n" +
-    "/leads — последние заявки\n" +
+    "/history [id] — история диалога с клиентом\n" +
     "/setclient <id> — выбрать клиента вручную\n" +
-    "/stop — сбросить активный диалог\n" +
-    "/stats — статистика заявок\n" +
-    "/exportleads — экспорт заявок в CSV\n" +
+    "/stop — сбросить активный диалог\n\n" +
+    "📦 Заявки:\n" +
+    "/leads — последние заявки\n" +
+    "/stats — статистика по заявкам\n" +
+    "/exportleads — экспорт заявок в CSV\n\n" +
+    "🛍 Товары:\n" +
+    "/products — список всех товаров\n" +
+    "/addproduct <код> | <название> | <описание> | <цена> — добавить товар\n" +
+    "/editproduct <id> | <название> | <описание> | <цена> — редактировать товар\n" +
+    "/toggleproduct <id> — включить/выключить товар\n\n" +
+    "🔒 Пользователи:\n" +
     "/blockuser <id> — заблокировать пользователя\n" +
     "/unblockuser <id> — разблокировать пользователя";
   const webAppKeyboard = deps.webappUrl

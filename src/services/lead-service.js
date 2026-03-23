@@ -2,6 +2,7 @@ const { adminLeadKeyboard } = require("../ui/keyboards");
 const { adminLeadCard } = require("../ui/messages");
 const { formatClientLabel } = require("../utils/formatters");
 const { safeSendMessage } = require("../utils/telegram");
+const { logError } = require("../utils/logger");
 
 function createLeadService({
   db,
@@ -194,10 +195,7 @@ function createLeadService({
     try {
       await notifyAdminAboutLead(lead, client, chatId);
     } catch (err) {
-      console.warn(
-        `[lead-service] notifyAdminAboutLead failed for lead #${lead.id}:`,
-        err.message,
-      );
+      logError(`notifyAdminAboutLead failed for lead #${lead.id}`, err);
     }
 
     return lead;

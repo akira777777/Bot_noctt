@@ -6,6 +6,7 @@ const { createApiRouter } = require("./routes/api");
 const {
   createVerifyTelegramInitData,
 } = require("./middleware/verify-telegram-init-data");
+const { createRateLimiter } = require("./middleware/rate-limit");
 
 function createWebServer({
   repos,
@@ -36,6 +37,17 @@ function createWebServer({
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("X-Frame-Options", "SAMEORIGIN");
     res.setHeader("X-XSS-Protection", "1; mode=block");
+    res.setHeader(
+      "Content-Security-Policy",
+      [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline' https://telegram.org",
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' data: https:",
+        "connect-src 'self' https://api.telegram.org",
+        "frame-ancestors 'none'",
+      ].join("; "),
+    );
     next();
   });
 
@@ -56,12 +68,19 @@ function createWebServer({
     res.json({ ok: true, service: "bot_noct_web" });
   });
 
+  const apiRateLimiter = createRateLimiter({
+    windowMs: 60 * 1000,
+    max: 120,
+    message: "Слишком много запросов. Повторите попытку позже.",
+  });
+
   const verifyTelegramInitData = createVerifyTelegramInitData({
     botToken,
     adminId,
   });
   app.use(
     "/api",
+    apiRateLimiter,
     verifyTelegramInitData,
     createApiRouter({ repos, isProduction }),
   );

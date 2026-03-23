@@ -14,8 +14,9 @@ function createRepositories(db) {
       SELECT * FROM users WHERE telegram_id = ?
     `),
     listUsers: db.prepare(`
-      SELECT * FROM users ORDER BY datetime(updated_at) DESC LIMIT ?
+      SELECT * FROM users ORDER BY datetime(updated_at) DESC LIMIT ? OFFSET ?
     `),
+    countUsers: db.prepare(`SELECT COUNT(*) AS cnt FROM users`),
     ensureConversation: db.prepare(`
       INSERT INTO conversations (client_telegram_id, assigned_admin_id, status, source_payload, last_message_at)
       VALUES (?, ?, 'open', ?, CURRENT_TIMESTAMP)
@@ -188,8 +189,11 @@ function createRepositories(db) {
       getById(telegramId) {
         return statements.getUser.get(telegramId);
       },
-      list(limit = 100) {
-        return statements.listUsers.all(limit);
+      list(limit = 100, offset = 0) {
+        return statements.listUsers.all(limit, offset);
+      },
+      count() {
+        return statements.countUsers.get().cnt;
       },
       block(telegramId) {
         return statements.blockUser.run(telegramId);
@@ -334,6 +338,9 @@ function createRepositories(db) {
       },
       clear(telegramId) {
         statements.clearSession.run(telegramId);
+      },
+      clearExpired() {
+        return statements.clearExpiredSessions.run();
       },
     },
   };

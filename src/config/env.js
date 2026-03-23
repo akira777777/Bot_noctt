@@ -28,6 +28,14 @@ if (Number.isNaN(PORT) || PORT <= 0) {
 
 const isProduction = NODE_ENV === "production";
 
+if (isProduction && !process.env.CORS_ORIGIN) {
+  // eslint-disable-next-line no-console
+  console.warn(
+    "[WARN] CORS_ORIGIN is not set in production — all origins are allowed. " +
+      "Set CORS_ORIGIN to restrict cross-origin access.",
+  );
+}
+
 module.exports = {
   NODE_ENV,
   isProduction,

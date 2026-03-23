@@ -30,6 +30,7 @@ const {
   parseSourcePayload,
   resolveStartAction,
 } = require("../utils/source-payload");
+const { parseActionId } = require("../utils/actions");
 
 const HOME_ACTION_LABELS = {
   "Оставить заявку": "lead:start",
@@ -49,9 +50,6 @@ function setHomeSession(repos, clientId, sourcePayload) {
   });
 }
 
-function parseActionId(action) {
-  return Number(action.split(":")[2]);
-}
 
 async function showHomeScreen(ctx, deps, entry) {
   setHomeSession(deps.repos, ctx.from.id, entry.raw);
@@ -145,6 +143,11 @@ async function handleLeadText(ctx, deps, session) {
       comment: ctx.message.text,
     });
 
+    if (!result.ok) {
+      await ctx.reply(result.error, commentKeyboard());
+      return true;
+    }
+
     await showLeadStep(ctx, "contact", result);
     return true;
   }
@@ -202,18 +205,6 @@ async function handleClientStart(ctx, deps) {
 
   await showHomeScreen(ctx, deps, entry);
   if (deps.webappUrl) {
-    try {
-      await deps.bot.telegram.setChatMenuButton({
-        chat_id: ctx.from.id,
-        menu_button: {
-          type: "web_app",
-          text: "Mini App",
-          web_app: { url: deps.webappUrl },
-        },
-      });
-    } catch (error) {
-      // setChatMenuButton failed silently — non-critical
-    }
     await ctx.reply(
       "Открыть Mini App:",
       Markup.inlineKeyboard([
