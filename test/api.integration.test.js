@@ -1,52 +1,18 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const os = require("node:os");
-const path = require("node:path");
-const Database = require("better-sqlite3");
 
-const { runMigrations } = require("../src/db/migrations");
 const { createRepositories } = require("../src/repositories");
 const { createWebServer } = require("../src/web/server");
-
-function createTempDb() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "bot-noct-api-"));
-  const dbPath = path.join(dir, "bot.sqlite");
-  const db = new Database(dbPath);
-  db.pragma("foreign_keys = ON");
-  runMigrations(db);
-
-  return {
-    db,
-    cleanup() {
-      db.close();
-      fs.rmSync(dir, { recursive: true, force: true });
-    },
-  };
-}
-
-async function startServer(app) {
-  return new Promise((resolve) => {
-    const server = app.listen(0, "127.0.0.1", () => resolve(server));
-  });
-}
-
-async function stopServer(server) {
-  await new Promise((resolve, reject) => {
-    server.close((error) => {
-      if (error) {
-        reject(error);
-        return;
-      }
-      resolve();
-    });
-  });
-}
+const {
+  createTempDb,
+  startServer,
+  stopServer,
+} = require("../test-support/api-test-helpers");
 
 test("admin API manages leads with status filters", async (t) => {
   const adminId = 9001;
   const apiSecret = "test-api-secret";
-  const { db, cleanup } = createTempDb();
+  const { db, cleanup } = createTempDb("bot-noct-api-");
   const repos = createRepositories(db);
 
   repos.users.upsert({
@@ -141,7 +107,7 @@ test("admin API manages leads with status filters", async (t) => {
 test("admin CSV export stays protected by API key auth", async (t) => {
   const adminId = 9001;
   const apiSecret = "test-api-secret";
-  const { db, cleanup } = createTempDb();
+  const { db, cleanup } = createTempDb("bot-noct-api-");
   const repos = createRepositories(db);
 
   const app = createWebServer({

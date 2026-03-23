@@ -1,39 +1,18 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const os = require("node:os");
-const path = require("node:path");
-const Database = require("better-sqlite3");
 
-const { runMigrations } = require("../src/db/migrations");
 const { createRepositories } = require("../src/repositories");
 const { createWebServer } = require("../src/web/server");
-
-function createTempDb() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "bot-noct-authz-"));
-  const dbPath = path.join(dir, "bot.sqlite");
-  const db = new Database(dbPath);
-  db.pragma("foreign_keys = ON");
-  runMigrations(db);
-  return {
-    db,
-    cleanup() {
-      db.close();
-      fs.rmSync(dir, { recursive: true, force: true });
-    },
-  };
-}
-
-async function startServer(app) {
-  return new Promise((resolve) => {
-    const server = app.listen(0, "127.0.0.1", () => resolve(server));
-  });
-}
+const {
+  createTempDb,
+  startServer,
+  stopServer,
+} = require("../test-support/api-test-helpers");
 
 test("unauthenticated request gets 401 on admin endpoints", async (t) => {
   const adminId = 9001;
   const apiSecret = "test-secret-key";
-  const { db, cleanup } = createTempDb();
+  const { db, cleanup } = createTempDb("bot-noct-authz-");
   const repos = createRepositories(db);
 
   const app = createWebServer({
@@ -47,8 +26,8 @@ test("unauthenticated request gets 401 on admin endpoints", async (t) => {
   });
   const server = await startServer(app);
 
-  t.after(() => {
-    server.close();
+  t.after(async () => {
+    await stopServer(server);
     cleanup();
   });
 
@@ -73,7 +52,7 @@ test("unauthenticated request gets 401 on admin endpoints", async (t) => {
 
 test("admin endpoints fail closed when API secret is not configured", async (t) => {
   const adminId = 9001;
-  const { db, cleanup } = createTempDb();
+  const { db, cleanup } = createTempDb("bot-noct-authz-");
   const repos = createRepositories(db);
 
   const app = createWebServer({
@@ -87,8 +66,8 @@ test("admin endpoints fail closed when API secret is not configured", async (t) 
   });
   const server = await startServer(app);
 
-  t.after(() => {
-    server.close();
+  t.after(async () => {
+    await stopServer(server);
     cleanup();
   });
 
@@ -104,7 +83,7 @@ test("admin endpoints fail closed when API secret is not configured", async (t) 
 
 test("public lead status endpoint is disabled in production", async (t) => {
   const adminId = 9001;
-  const { db, cleanup } = createTempDb();
+  const { db, cleanup } = createTempDb("bot-noct-authz-");
   const repos = createRepositories(db);
 
   repos.users.upsert({
@@ -137,8 +116,8 @@ test("public lead status endpoint is disabled in production", async (t) => {
   });
   const server = await startServer(app);
 
-  t.after(() => {
-    server.close();
+  t.after(async () => {
+    await stopServer(server);
     cleanup();
   });
 
@@ -149,7 +128,7 @@ test("public lead status endpoint is disabled in production", async (t) => {
 
 test("public lead status endpoint remains available in non-production", async (t) => {
   const adminId = 9001;
-  const { db, cleanup } = createTempDb();
+  const { db, cleanup } = createTempDb("bot-noct-authz-");
   const repos = createRepositories(db);
 
   repos.users.upsert({
@@ -182,8 +161,8 @@ test("public lead status endpoint remains available in non-production", async (t
   });
   const server = await startServer(app);
 
-  t.after(() => {
-    server.close();
+  t.after(async () => {
+    await stopServer(server);
     cleanup();
   });
 
