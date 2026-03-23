@@ -1,9 +1,5 @@
 const { Telegraf } = require("telegraf");
-const {
-  BOT_TOKEN,
-  ADMIN_ID,
-  WEB_APP_URL,
-} = require("./config/env");
+const { BOT_TOKEN, ADMIN_ID, WEB_APP_URL } = require("./config/env");
 const {
   createConversationService,
 } = require("./services/conversation-service");
@@ -29,7 +25,7 @@ const {
 } = require("./handlers/client");
 const { logError } = require("./utils/logger");
 
-function createBot({ db, repos }) {
+function createBot({ db, repos, cacheService = null, queueService = null }) {
   const bot = new Telegraf(BOT_TOKEN);
 
   const catalog = createCatalogService({ repos });
@@ -37,6 +33,8 @@ function createBot({ db, repos }) {
     repos,
     bot,
     adminId: ADMIN_ID,
+    cacheService,
+    queueService,
   });
   const admin = createAdminService({ repos });
   const session = createSessionService({ repos });
@@ -83,9 +81,7 @@ function createBot({ db, repos }) {
   bot.command("menu", (ctx) => handleClientMenu(ctx, deps));
   bot.command("status", (ctx) => handleClientStatus(ctx, deps));
   bot.command("app", (ctx) => handleClientMiniApp(ctx, deps));
-  bot.command("myid", (ctx) =>
-    ctx.reply(`Ваш Telegram ID: ${ctx.from.id}`),
-  );
+  bot.command("myid", (ctx) => ctx.reply(`Ваш Telegram ID: ${ctx.from.id}`));
 
   bot.action(/^(catalog|lead|contact|info|menu):.*$/, (ctx) =>
     handleClientAction(ctx, deps),

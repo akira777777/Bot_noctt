@@ -3,6 +3,7 @@
  * Handles background tasks like message sending, webhooks, batch operations
  */
 const Queue = require("bull");
+const Redis = require("ioredis");
 const log = require("../utils/logger-enhanced");
 
 // Queue names
@@ -54,6 +55,25 @@ const RATE_LIMITS = {
 // Active queues storage
 const queues = {};
 
+async function validateRedisConnection(redisConfig) {
+  const client = new Redis({
+    host: redisConfig.host || "localhost",
+    port: redisConfig.port || 6379,
+    password: redisConfig.password || undefined,
+    db: redisConfig.db || 0,
+    lazyConnect: true,
+    maxRetriesPerRequest: 1,
+    enableReadyCheck: false,
+  });
+
+  try {
+    await client.connect();
+    await client.ping();
+  } finally {
+    client.disconnect();
+  }
+}
+
 /**
  * Initialize queue service
  */
@@ -66,6 +86,8 @@ async function initQueueService(redisConfig) {
       hasPassword: Boolean(redisConfig.password),
     },
   });
+
+  await validateRedisConnection(redisConfig);
 
   // Create queues with Redis connection
   for (const queueName of Object.values(QUEUES)) {
@@ -91,8 +113,6 @@ function createQueue(name, redisConfig) {
       port: redisConfig.port || 6379,
       password: redisConfig.password || undefined,
       db: redisConfig.db || 0,
-      maxRetriesPerRequest: 3,
-      enableReadyCheck: true,
       retryStrategy: (times) => {
         if (times > 10) {
           log.error(`Queue ${name}: Max retries exceeded`);

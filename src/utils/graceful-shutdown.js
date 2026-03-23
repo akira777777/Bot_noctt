@@ -166,22 +166,6 @@ function createShutdownHandler(services = {}) {
       shutdown("SIGINT");
     });
 
-    // Uncaught exceptions
-    process.on("uncaughtException", (error) => {
-      log.error("Uncaught exception", error, {
-        stack: error.stack,
-      });
-      shutdown("uncaughtException");
-    });
-
-    // Unhandled rejections
-    process.on("unhandledRejection", (reason, promise) => {
-      log.error("Unhandled rejection", reason, {
-        promise: promise.toString(),
-      });
-      shutdown("unhandledRejection");
-    });
-
     // BeforeExit - when event loop is empty
     process.on("beforeExit", (code) => {
       log.info("Process beforeExit", { code });

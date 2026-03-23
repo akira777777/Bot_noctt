@@ -31,3 +31,18 @@
 2026-03-23T14:18:25: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
 2026-03-23T14:18:25:     at internalConnectMultiple (node:net:1142:49)
 2026-03-23T14:18:25:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:19:08: Error: Connection is closed.
+2026-03-23T14:19:08:     at close (C:\Users\fear7\Desktop\Bot_noct\node_modules\ioredis\built\redis\event_handler.js:214:25)
+2026-03-23T14:19:08:     at Socket.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\node_modules\ioredis\built\redis\event_handler.js:190:20)
+2026-03-23T14:19:08:     at Object.onceWrapper (node:events:623:26)
+2026-03-23T14:19:08:     at Socket.emit (node:events:508:28)
+2026-03-23T14:19:08:     at TCP.<anonymous> (node:net:346:12)
+2026-03-23T14:19:25: Error: Connection is closed.
+2026-03-23T14:19:25:     at close (C:\Users\fear7\Desktop\Bot_noct\node_modules\ioredis\built\redis\event_handler.js:214:25)
+2026-03-23T14:19:25:     at Socket.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\node_modules\ioredis\built\redis\event_handler.js:190:20)
+2026-03-23T14:19:25:     at Object.onceWrapper (node:events:623:26)
+2026-03-23T14:19:25:     at Socket.emit (node:events:508:28)
+2026-03-23T14:19:25:     at TCP.<anonymous> (node:net:346:12)
+2026-03-23T14:19:45: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:19:45:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:19:45:     at afterConnectMultiple (node:net:1723:7)
