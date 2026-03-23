@@ -52,6 +52,11 @@ REDIS_DB=0
 NODE_ENV=production
 PORT=3000
 CORS_ORIGIN=https://your-domain.com
+TELEGRAM_DELIVERY_MODE=webhook
+WEBHOOK_DOMAIN=https://your-domain.com
+API_COMPRESSION=true
+LOG_LEVEL=info
+LOG_FORMAT=json
 ```
 
 ---
@@ -125,6 +130,8 @@ environment:
   - NODE_ENV=production
   - BOT_TOKEN=${BOT_TOKEN}
   - ADMIN_ID=${ADMIN_ID}
+  - TELEGRAM_DELIVERY_MODE=${TELEGRAM_DELIVERY_MODE}
+  - WEBHOOK_DOMAIN=${WEBHOOK_DOMAIN}
   - REDIS_HOST=redis
   - REDIS_PORT=6379
   - LOG_LEVEL=info
@@ -205,10 +212,13 @@ REDIS_PORT=6379
 REDIS_PASSWORD=your-password  # Optional
 REDIS_DB=0
 
-# Memory limits
+# Cache + runtime thresholds
 CACHE_TTL_SESSION=3600      # 1 hour
 CACHE_TTL_CATALOG=300      # 5 minutes
+CACHE_TTL_PRODUCT=600      # 10 minutes
 CACHE_TTL_STATS=60         # 1 minute
+MEMORY_LIMIT_WARN=512
+MEMORY_LIMIT_CRITICAL=768
 ```
 
 ---

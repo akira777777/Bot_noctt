@@ -4,7 +4,7 @@
 
 1. **Node.js 20+** installed
 2. **Redis** server running (for caching and queues)
-3. **PostgreSQL** (optional, for high-traffic production)
+3. **SQLite disk or managed database** (SQLite is the default runtime in this repo)
 4. **PM2** for process management (optional)
 5. **Domain** with SSL certificate for webhook mode
 
@@ -33,6 +33,7 @@ cp .env.production .env
 - `REDIS_HOST` / `REDIS_PASSWORD` / `REDIS_DB` - Your Redis instance
 - `API_SECRET` - Generate secure random string
 - `WEBHOOK_DOMAIN` - Public HTTPS base URL of the deployed app
+- `TELEGRAM_DELIVERY_MODE` - Set to `webhook` in production
 
 ### 3. Setup Redis
 
@@ -203,6 +204,10 @@ npm run backup
 
 ```env
 TELEGRAM_DELIVERY_MODE=webhook
+TELEGRAM_STARTUP_TIMEOUT_MS=15000
+ALLOW_BOT_LAUNCH_FAILURE=false
 MEMORY_LIMIT_WARN=512
 MEMORY_LIMIT_CRITICAL=768
+LOG_LEVEL=info
+LOG_FORMAT=json
 ```

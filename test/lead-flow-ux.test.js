@@ -23,8 +23,8 @@ function createLeadServiceHarness() {
       },
     },
     conversationService: {
-      ensureConversation() {
-        return { id: 1 };
+      ensureConversation(clientId, sourcePayload) {
+        return repos.conversations.ensure(clientId, 1, sourcePayload);
       },
     },
   });
@@ -311,4 +311,91 @@ test("confirm edit contact_custom returns to confirm after manual contact", () =
   assert.equal(saveCustom.nextStep, "confirm");
   assert.equal(saveCustom.draft.contactLabel, "+7 999 123-45-67");
   assert.equal(saveCustom.draft.isConfirmEditing, false);
+});
+
+test("confirmLead creates a lead, records a system message and clears the session", async () => {
+  const { repos, service } = createLeadServiceHarness();
+  const clientId = 901;
+
+  repos.users.upsert({
+    telegram_id: clientId,
+    username: "client901",
+    first_name: "Client",
+    last_name: null,
+    role: "client",
+  });
+
+  const product = { id: 1, code: "p1", title: "Товар" };
+  service.startLeadDraft({ clientId, product, sourcePayload: "from_channel" });
+  service.saveQuantity({
+    clientId,
+    session: service.getSession(clientId),
+    rawQuantity: "2",
+  });
+  service.skipComment({ clientId, session: service.getSession(clientId) });
+  service.useTelegramContact({
+    client: { id: clientId, username: "client901" },
+    session: service.getSession(clientId),
+  });
+
+  const lead = await service.confirmLead({
+    client: { id: clientId, username: "client901", first_name: "Client" },
+    chatId: clientId,
+  });
+
+  assert.equal(lead.product_code, "p1");
+  assert.equal(lead.quantity, 2);
+  assert.equal(repos.sessions.get(clientId), null);
+
+  const latestLead = repos.leads.getLatestByClient(clientId);
+  assert.equal(latestLead.id, lead.id);
+
+  const messages = repos.messages.listByConversation(1, 10);
+  assert.equal(messages.length, 1);
+  assert.match(messages[0].message_text, /Создана заявка/);
+});
+
+test("confirmLead returns duplicate metadata when an open lead already exists", async () => {
+  const { repos, service } = createLeadServiceHarness();
+  const clientId = 902;
+
+  repos.users.upsert({
+    telegram_id: clientId,
+    username: "client902",
+    first_name: "Client",
+    last_name: null,
+    role: "client",
+  });
+
+  const existingLead = repos.leads.create({
+    client_telegram_id: clientId,
+    product_code: "p1",
+    product_name: "Товар",
+    quantity: 1,
+    comment: "",
+    contact_label: "Telegram: @client902",
+    source_payload: "from_channel",
+    status: "new",
+  });
+
+  repos.sessions.set(clientId, "lead", "confirm", {
+    productId: 1,
+    productCode: "p1",
+    productName: "Товар",
+    quantity: 3,
+    comment: "",
+    contactLabel: "Telegram: @client902",
+    sourcePayload: "from_channel",
+  });
+
+  const result = await service.confirmLead({
+    client: { id: clientId, username: "client902", first_name: "Client" },
+    chatId: clientId,
+  });
+
+  assert.deepEqual(result, {
+    duplicate: true,
+    existingLead,
+  });
+  assert.equal(repos.sessions.get(clientId).step, "confirm");
 });

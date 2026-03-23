@@ -8,10 +8,24 @@ module.exports = {
       max_memory_restart: "768M",
       env: {
         NODE_ENV: "development",
+        LOG_LEVEL: "debug",
+        LOG_FORMAT: "pretty",
+        API_COMPRESSION: "true",
+        TELEGRAM_DELIVERY_MODE: "polling",
       },
       env_production: {
         NODE_ENV: "production",
-        TELEGRAM_DELIVERY_MODE: "webhook",
+        TELEGRAM_DELIVERY_MODE: process.env.TELEGRAM_DELIVERY_MODE || "webhook",
+        WEBHOOK_DOMAIN: process.env.WEBHOOK_DOMAIN || "",
+        LOG_LEVEL: process.env.LOG_LEVEL || "info",
+        LOG_FORMAT: process.env.LOG_FORMAT || "json",
+        API_COMPRESSION: process.env.API_COMPRESSION || "true",
+        MEMORY_LIMIT_WARN: process.env.MEMORY_LIMIT_WARN || "512",
+        MEMORY_LIMIT_CRITICAL: process.env.MEMORY_LIMIT_CRITICAL || "768",
+        TELEGRAM_STARTUP_TIMEOUT_MS:
+          process.env.TELEGRAM_STARTUP_TIMEOUT_MS || "15000",
+        ALLOW_BOT_LAUNCH_FAILURE:
+          process.env.ALLOW_BOT_LAUNCH_FAILURE || "false",
       },
       error_file: "./logs/pm2-error.log",
       out_file: "./logs/pm2-out.log",

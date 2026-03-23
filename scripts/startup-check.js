@@ -5,8 +5,17 @@
  */
 
 const fs = require("fs");
-const path = require("path");
-require("dotenv").config();
+const {
+  NODE_ENV,
+  TELEGRAM_DELIVERY_MODE,
+  WEBHOOK_DOMAIN,
+  REDIS_CONFIG,
+  API_COMPRESSION,
+  LOG_FORMAT,
+  LOG_LEVEL,
+  MEMORY_LIMIT_WARN,
+  MEMORY_LIMIT_CRITICAL,
+} = require("../src/config/env");
 
 const required = ["BOT_TOKEN", "ADMIN_ID", "API_SECRET"];
 const warnings = [];
@@ -68,18 +77,29 @@ for (const varName of required) {
 
 // Check Redis connection
 console.log("\n🔗 Services:");
-const redisHost = process.env.REDIS_HOST || "localhost";
-const redisPort = process.env.REDIS_PORT || "6379";
-console.log(`📡 Redis: ${redisHost}:${redisPort}`);
+console.log(`📡 Redis: ${REDIS_CONFIG.host}:${REDIS_CONFIG.port}`);
 
 // Check NODE_ENV
 console.log("\n⚙️  Environment:");
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = NODE_ENV === "production";
 const envEmoji = isProduction ? "🟢" : "🟡";
-console.log(`${envEmoji} NODE_ENV: ${process.env.NODE_ENV || "not set"}`);
+console.log(`${envEmoji} NODE_ENV: ${NODE_ENV}`);
+console.log(`📨 Telegram delivery: ${TELEGRAM_DELIVERY_MODE}`);
+console.log(`🗜 API compression: ${API_COMPRESSION ? "enabled" : "disabled"}`);
+console.log(`🪵 Logging: level=${LOG_LEVEL}, format=${LOG_FORMAT}`);
+console.log(
+  `🧠 Memory thresholds: warn=${MEMORY_LIMIT_WARN}MB, critical=${MEMORY_LIMIT_CRITICAL}MB`,
+);
 
 if (!isProduction) {
   console.log("⚠️  Warning: Not running in production mode");
+}
+
+if (TELEGRAM_DELIVERY_MODE === "webhook" && !WEBHOOK_DOMAIN) {
+  console.log("❌ WEBHOOK_DOMAIN is required when TELEGRAM_DELIVERY_MODE=webhook");
+  allValid = false;
+} else if (TELEGRAM_DELIVERY_MODE === "webhook") {
+  console.log(`✅ WEBHOOK_DOMAIN: ${WEBHOOK_DOMAIN}`);
 }
 
 // Security checks

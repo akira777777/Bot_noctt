@@ -19,6 +19,20 @@ services:
         sync: false
       - key: CORS_ORIGIN
         sync: false
+      - key: API_COMPRESSION
+        value: true
+      - key: LOG_LEVEL
+        value: info
+      - key: LOG_FORMAT
+        value: json
+      - key: MEMORY_LIMIT_WARN
+        value: 512
+      - key: MEMORY_LIMIT_CRITICAL
+        value: 768
+      - key: TELEGRAM_STARTUP_TIMEOUT_MS
+        value: 15000
+      - key: ALLOW_BOT_LAUNCH_FAILURE
+        value: false
       - key: TELEGRAM_DELIVERY_MODE
         value: webhook
       - key: WEBHOOK_DOMAIN
@@ -26,6 +40,14 @@ services:
           type: web
           name: bot-noct
           property: host
+      - key: REDIS_HOST
+        sync: false
+      - key: REDIS_PORT
+        sync: false
+      - key: REDIS_PASSWORD
+        sync: false
+      - key: REDIS_DB
+        value: 0
     disks:
       - name: sqlite-data
         mountPath: /opt/render/project/src/data

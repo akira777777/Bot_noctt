@@ -38,7 +38,7 @@ npm run restore-check -- backups/bot.sqlite.<timestamp>
    - Builds services + repository layer from `src/services/*` and `src/repositories/*`
    - Creates Telegraf bot handlers in `src/bot.js` + `src/handlers/*`
    - Starts Express API via `src/web/server.js`
-   - Uses polling by default; webhook mode if `WEBHOOK_DOMAIN` is set
+   - Uses `TELEGRAM_DELIVERY_MODE` as the source of truth; webhook requires a usable `WEBHOOK_DOMAIN`
 
 2. Telegram state
    - Multi-step client lead flow stored in SQLite `sessions`
@@ -46,12 +46,14 @@ npm run restore-check -- backups/bot.sqlite.<timestamp>
 
 3. Express API
    - Health check: `GET /healthz`
-   - Public endpoints: `GET /api/catalog`, `GET /api/lead/:id/status`, `POST /api/lead`
-   - Admin endpoints: `GET/PATCH /api/admin/*` protected by `X-Api-Key` when `API_SECRET` is set
+   - Public endpoints: `GET /api/catalog`, `GET /api/lead/track/:token/status`, `POST /api/lead`
+   - Admin endpoints: `GET/PATCH /api/admin/*` protected by `X-Api-Key`; in production without `API_SECRET` they fail closed
 
 4. Web dashboard (`web/`)
    - Next.js UI
-   - Admin API calls are done through `web/lib/api.ts` which injects `X-Api-Key`
+   - Public API calls use `web/lib/api.ts`
+   - Server-side admin API calls use `web/lib/admin-api.ts`
+   - Client-side admin mutations go through internal Next route handlers under `web/app/api/admin/*`
 
 ## Environment Configuration
 
@@ -64,9 +66,14 @@ Common:
 
 - `DB_PATH` (default: `data/bot.sqlite`)
 - `PORT` (default: `3000`)
-- `API_SECRET` (optional; in production without it admin endpoints are effectively unprotected)
+- `API_SECRET` (required in production if admin HTTP API must stay available)
 - `CORS_ORIGIN` (optional; strict CORS when set)
-- `WEBHOOK_DOMAIN` (optional; webhook mode when present)
+- `TELEGRAM_DELIVERY_MODE` (`polling` or `webhook`)
+- `WEBHOOK_DOMAIN` (required when `TELEGRAM_DELIVERY_MODE=webhook`)
+- `REDIS_HOST` / `REDIS_PORT` / `REDIS_PASSWORD` / `REDIS_DB`
+- `LOG_LEVEL` / `LOG_FORMAT`
+- `MEMORY_LIMIT_WARN` / `MEMORY_LIMIT_CRITICAL`
+- `API_COMPRESSION`
 
 Local dev loads `.env.local` first (then falls back to `.env`).
 

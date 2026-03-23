@@ -55,21 +55,30 @@ services:
       - WEB_APP_URL=${WEB_APP_URL:-http://localhost:3000}
       - CORS_ORIGIN=${CORS_ORIGIN:-*}
       - RENDER_EXTERNAL_URL=${RENDER_EXTERNAL_URL:-}
+      - API_COMPRESSION=${API_COMPRESSION:-true}
       # Redis Configuration
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=${REDIS_PASSWORD:-}
       - REDIS_DB=0
       # Cache Configuration
-      - CACHE_ENABLED=${CACHE_ENABLED:-true}
       - CACHE_TTL_SESSION=3600
       - CACHE_TTL_CATALOG=300
+      - CACHE_TTL_PRODUCT=600
       - CACHE_TTL_STATS=60
+      - CACHE_TTL_USER=1800
+      - CACHE_TTL_LEAD=300
+      - CACHE_TTL_CONVERSATION=900
       # Queue Configuration
       - QUEUE_ENABLED=${QUEUE_ENABLED:-true}
       # Logging
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - LOG_FORMAT=${LOG_FORMAT:-json}
+      # Runtime safeguards
+      - MEMORY_LIMIT_WARN=${MEMORY_LIMIT_WARN:-512}
+      - MEMORY_LIMIT_CRITICAL=${MEMORY_LIMIT_CRITICAL:-768}
+      - TELEGRAM_STARTUP_TIMEOUT_MS=${TELEGRAM_STARTUP_TIMEOUT_MS:-15000}
+      - ALLOW_BOT_LAUNCH_FAILURE=${ALLOW_BOT_LAUNCH_FAILURE:-false}
     volumes:
       - bot_data:/app/data
     healthcheck:
@@ -121,13 +130,17 @@ services:
       - DB_PATH=/app/data/bot.sqlite
       - WEB_APP_URL=http://localhost:5173
       - CORS_ORIGIN=http://localhost:5173
+      - API_COMPRESSION=true
       # Redis Configuration
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      - REDIS_DB=0
       # Logging
       - LOG_LEVEL=debug
       - LOG_FORMAT=pretty
+      - MEMORY_LIMIT_WARN=512
+      - MEMORY_LIMIT_CRITICAL=768
     volumes:
       - ./src:/app/src:ro
       - ./index.js:/app/index.js:ro
@@ -154,6 +167,7 @@ services:
       - PORT=3000
       - API_URL=http://bot-dev:3000
       - API_SECRET=${API_SECRET:-}
+      - NEXT_PUBLIC_BASE_URL=http://localhost:5173
     volumes:
       - ./web:/app/web:ro
       - web_node_modules:/app/web/node_modules
