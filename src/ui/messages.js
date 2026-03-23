@@ -34,18 +34,6 @@ function howToOrderMessage() {
   );
 }
 
-function catalogIntroMessage() {
-  return "Каталог открыт. Выберите позицию, чтобы посмотреть описание и перейти к заявке.";
-}
-
-function productCardMessage(product) {
-  return (
-    `Товар: ${product.title}\n` +
-    `Описание: ${product.description}\n` +
-    `Стоимость: ${product.price_text}`
-  );
-}
-
 function askQuantityMessage(product) {
   return `Шаг 1 из 4.\n\nВы выбрали "${product.title}".\nУкажите количество одним сообщением цифрой.`;
 }
@@ -208,8 +196,6 @@ module.exports = {
   welcomeMessage,
   helpMessage,
   howToOrderMessage,
-  catalogIntroMessage,
-  productCardMessage,
   askQuantityMessage,
   askCommentMessage,
   askContactMessage,

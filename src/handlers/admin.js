@@ -16,13 +16,10 @@ const {
 const { formatConversationRow, formatLeadRow } = require("../utils/formatters");
 const { safeAnswerCbQuery, safeSendMessage } = require("../utils/telegram");
 const { getLeadStatusLabel } = require("../domain/lead-status");
+const { parseActionId } = require("../utils/actions");
 
 function isAdmin(ctx, deps) {
   return ctx.from.id === deps.adminId;
-}
-
-function parseActionId(action) {
-  return Number(action.split(":")[2]);
 }
 
 async function replaceWithStatusButton(ctx, text) {

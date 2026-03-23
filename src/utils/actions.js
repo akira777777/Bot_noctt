@@ -1,3 +1,8 @@
+function parseActionId(action) {
+  return Number(action.split(":")[2]);
+}
+
+module.exports = {
 const ACTIONS = Object.freeze({
   MENU_MAIN: "menu:main",
   CATALOG_ROOT: "catalog:root",

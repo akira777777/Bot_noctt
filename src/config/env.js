@@ -2,6 +2,7 @@ const path = require("path");
 const dotenv = require("dotenv");
 const { logWarn } = require("../utils/logger");
 
+dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
 dotenv.config();
 
 function requiredString(key, fallbackKeys = []) {
