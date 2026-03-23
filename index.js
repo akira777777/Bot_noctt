@@ -59,6 +59,22 @@ try {
 let appResources = null;
 let teardownInProgress = false;
 
+function formatError(error) {
+  if (error instanceof Error) {
+    return error.message || error.name || String(error);
+  }
+
+  if (typeof error === "object" && error !== null) {
+    try {
+      return JSON.stringify(error);
+    } catch {
+      return String(error);
+    }
+  }
+
+  return String(error);
+}
+
 function startHttpServer(app, port) {
   return new Promise((resolve, reject) => {
     const server = app.listen(port, () => resolve(server));
@@ -99,7 +115,7 @@ async function teardown(resources, reason) {
       resources.bot.stop(reason);
       log.info("Bot stopped");
     } catch (error) {
-      log.error("Error stopping bot", { error: error.message });
+      log.error("Error stopping bot", { error: formatError(error) });
     }
   }
 
@@ -111,7 +127,7 @@ async function teardown(resources, reason) {
       });
       log.info("HTTP server closed");
     } catch (error) {
-      log.error("Error closing HTTP server", { error: error.message });
+      log.error("Error closing HTTP server", { error: formatError(error) });
     }
   }
 
@@ -121,7 +137,7 @@ async function teardown(resources, reason) {
       await closeQueueService();
       log.info("Queue service closed");
     } catch (error) {
-      log.error("Error closing queue service", { error: error.message });
+      log.error("Error closing queue service", { error: formatError(error) });
     }
   }
 
@@ -131,7 +147,7 @@ async function teardown(resources, reason) {
       await resources.cacheService.disconnect();
       log.info("Cache service closed");
     } catch (error) {
-      log.error("Error closing cache service", { error: error.message });
+      log.error("Error closing cache service", { error: formatError(error) });
     }
   }
 
@@ -141,7 +157,7 @@ async function teardown(resources, reason) {
       resources.db.close();
       log.info("Database closed");
     } catch (error) {
-      log.error("Error closing database", { error: error.message });
+      log.error("Error closing database", { error: formatError(error) });
     }
   }
 
@@ -157,7 +173,7 @@ function startSessionCleanup(repos) {
       repos.sessions.clearExpired();
       log.debug("Session cleanup completed");
     } catch (error) {
-      log.error("Session cleanup failed", { error: error.message });
+      log.error("Session cleanup failed", { error: formatError(error) });
     }
   }, SESSION_CLEANUP_INTERVAL_MS);
   timer.unref();
@@ -225,7 +241,7 @@ async function bootstrap() {
     });
   } catch (error) {
     log.warn("Cache service initialization failed, continuing without cache", {
-      error: error.message,
+      error: formatError(error),
     });
   }
 
@@ -247,7 +263,7 @@ async function bootstrap() {
     }
   } catch (error) {
     log.warn("Queue service initialization failed, continuing without queues", {
-      error: error.message,
+      error: formatError(error),
     });
   }
 
@@ -264,7 +280,7 @@ async function bootstrap() {
       } catch (error) {
         log.error("Failed to send queued message", {
           chatId,
-          error: error.message,
+          error: formatError(error),
         });
         throw error;
       }
@@ -344,7 +360,7 @@ async function bootstrap() {
         throw error;
       }
       log.warn("Bot launch failed; continuing in API-only mode", {
-        error: error.message,
+        error: formatError(error),
       });
     }
 
@@ -385,7 +401,7 @@ async function bootstrap() {
     return resources;
   } catch (error) {
     log.error("Application bootstrap failed", {
-      error: error.message,
+      error: formatError(error),
       stack: error.stack,
     });
     await teardown(resources, "bootstrap_failed");
@@ -433,7 +449,7 @@ bootstrap()
   .catch((error) => {
     if (typeof log !== "undefined" && log?.error) {
       log.error("Application failed to start", {
-        error: error.message,
+        error: formatError(error),
         stack: error.stack,
       });
     } else {

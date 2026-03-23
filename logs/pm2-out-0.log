@@ -318,3 +318,12 @@
 2026-03-23T14:34:03: {"level":"INFO","time":"2026-03-23T13:34:03.989Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
 2026-03-23T14:34:03: {"level":"WARN","time":"2026-03-23T13:34:03.993Z","service":"telegram-bot","env":"production","msg":"Queue service initialization failed, continuing without queues","error":""}
 2026-03-23T14:34:04: {"level":"INFO","time":"2026-03-23T13:34:04.000Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T14:35:20: {"level":"ERROR","time":"2026-03-23T13:35:20.423Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T14:35:20: {"level":"INFO","time":"2026-03-23T13:35:20.423Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T14:35:20: {"level":"INFO","time":"2026-03-23T13:35:20.424Z","service":"telegram-bot","env":"production","msg":"HTTP server closed"}
+2026-03-23T14:35:20: {"level":"INFO","time":"2026-03-23T13:35:20.424Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T14:35:20: {"level":"INFO","time":"2026-03-23T13:35:20.424Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T14:35:20: {"level":"INFO","time":"2026-03-23T13:35:20.424Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T14:35:20: {"level":"ERROR","time":"2026-03-23T13:35:20.424Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T14:35:24: [dotenv@17.3.1] injecting env (5) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+2026-03-23T14:35:24: [dotenv@17.3.1] injecting env (34) from .env -- tip: 🤖 agentic secret storage: https://dotenvx.com/as2
