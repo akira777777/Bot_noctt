@@ -149,22 +149,28 @@ async function bootstrap() {
     resources.httpServer = await startHttpServer(webServer, PORT);
     logInfo(`Web server started on port ${PORT}`);
 
-    await bot.launch();
-    resources.botLaunched = true;
-    logInfo("Bot started");
+    try {
+      await bot.launch();
+      resources.botLaunched = true;
+      logInfo("Bot started");
+    } catch (error) {
+      if (isProduction) {
+        throw error;
+      }
+      logError(
+        "Bot launch failed; continuing in web-only mode for local development",
+        error,
+      );
+    }
 
     resources.sessionCleanupTimer = startSessionCleanup(repos);
 
-    await configureAdminMenu(bot);
+    if (resources.botLaunched) {
+      await configureAdminMenu(bot);
+    }
 
-    // Clean up expired sessions on startup, then every hour
+    // Clean up expired sessions on startup (hourly timer already set above)
     repos.sessions.clearExpired();
-    const sessionCleanupTimer = setInterval(
-      () => repos.sessions.clearExpired(),
-      60 * 60 * 1000,
-    );
-    sessionCleanupTimer.unref();
-    resources.sessionCleanupTimer = sessionCleanupTimer;
 
     return resources;
   } catch (error) {
