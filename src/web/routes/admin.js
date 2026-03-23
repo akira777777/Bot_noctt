@@ -216,8 +216,24 @@ function createAdminRoutes({
     const byStatus = repos.stats.leadCountsByStatus();
     const topProducts = repos.stats.topProductsByLeads(5);
     const newToday = repos.leads.countNewToday();
+    const dashboard = {
+      last24Hours: {
+        draftsStarted: repos.leadEvents?.countByTypeSince?.(
+          "lead_flow_started",
+          new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        ) || 0,
+        confirmedLeads: repos.leadEvents?.countByTypeSince?.(
+          "lead_confirmed",
+          new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        ) || 0,
+      },
+      overdueLeads: repos.stats.countOverdueLeads(),
+    };
 
-    res.json({ ok: true, stats: { total, newToday, byStatus, topProducts } });
+    res.json({
+      ok: true,
+      stats: { total, newToday, byStatus, topProducts, dashboard },
+    });
   });
 
   router.get("/stats/daily", (req, res) => {
@@ -232,9 +248,10 @@ function createAdminRoutes({
     const leads = repos.leads.listAll();
 
     const headers = [
-      "id", "status", "product_code", "product_name", "quantity",
+      "id", "status", "closed_reason", "product_code", "product_name", "quantity",
       "comment", "contact_label", "client_telegram_id", "username",
-      "first_name", "last_name", "source_payload", "created_at", "updated_at",
+      "first_name", "last_name", "source_payload", "first_admin_reply_at",
+      "next_follow_up_at", "created_at", "updated_at",
     ];
 
     function escapeCsv(value) {

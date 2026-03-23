@@ -68,7 +68,7 @@ test("message builders render lead and admin text variants", () => {
   assert.match(helpMessage(), /\/status/);
   assert.match(howToOrderMessage(), /Как оформить заказ/);
   assert.match(askQuantityMessage({ title: "Товар" }), /Вы выбрали "Товар"/);
-  assert.match(askCommentMessage(), /Пропустить комментарий/);
+  assert.match(askCommentMessage(), /Оставить без комментария/);
   assert.match(askContactMessage(), /Как с вами удобнее связаться/);
   assert.match(askCustomContactMessage(), /@username/);
   assert.match(
@@ -230,7 +230,7 @@ test("keyboard builders expose expected callback and web app actions", () => {
   );
   assert.equal(
     adminQuickReplyKeyboard(12).reply_markup.inline_keyboard[0][0].callback_data,
-    "admin:template:price:12",
+    "admin:template:ack:12",
   );
   assert.match(
     adminInboxKeyboard([{ username: "alice", client_telegram_id: 7 }]).reply_markup
@@ -242,12 +242,17 @@ test("keyboard builders expose expected callback and web app actions", () => {
 test("reply keyboards and catalog views render primary user flows", () => {
   assert.equal(
     clientHomeReplyKeyboard().reply_markup.keyboard[0][0],
-    "💬 Что вас интересует?",
+    "🛍 Оставить заявку",
   );
   assert.equal(
     clientHomeReplyKeyboard("https://example.com/app").reply_markup.keyboard[0][0]
       .web_app.url,
     "https://example.com/app",
+  );
+  assert.equal(
+    clientHomeReplyKeyboard(null, { hasActiveLeadDraft: true }).reply_markup
+      .keyboard[0][0],
+    "▶️ Продолжить заявку",
   );
   assert.deepEqual(removeReplyKeyboard().reply_markup, { remove_keyboard: true });
 

@@ -73,6 +73,25 @@ function createLeadService({
     return `Telegram: id ${client?.id || clientId}`;
   }
 
+  function recordLeadEvent(payload) {
+    if (!repos.leadEvents) {
+      return;
+    }
+    if (
+      Number.isInteger(payload?.clientTelegramId) &&
+      repos.users &&
+      typeof repos.users.getById === "function" &&
+      !repos.users.getById(payload.clientTelegramId)
+    ) {
+      return;
+    }
+    try {
+      repos.leadEvents.create(payload);
+    } catch (error) {
+      logError("Failed to persist lead event", error);
+    }
+  }
+
   function startLeadDraft({ clientId, product, sourcePayload }) {
     const existingSession = repos.sessions.get(clientId);
     if (
@@ -103,28 +122,26 @@ function createLeadService({
     };
 
     repos.sessions.set(clientId, "lead", "quantity", draft);
-    if (repos.leadEvents) {
-      repos.leadEvents.create({
-        leadId: null,
-        clientTelegramId: clientId,
-        eventType: "lead_flow_started",
-        sourcePayload: draft.sourcePayload,
-        metadata: {
-          product_code: draft.productCode,
-          product_name: draft.productName,
-        },
-      });
-      repos.leadEvents.create({
-        leadId: null,
-        clientTelegramId: clientId,
-        eventType: "product_selected",
-        sourcePayload: draft.sourcePayload,
-        metadata: {
-          product_code: draft.productCode,
-          product_name: draft.productName,
-        },
-      });
-    }
+    recordLeadEvent({
+      leadId: null,
+      clientTelegramId: clientId,
+      eventType: "lead_flow_started",
+      sourcePayload: draft.sourcePayload,
+      metadata: {
+        product_code: draft.productCode,
+        product_name: draft.productName,
+      },
+    });
+    recordLeadEvent({
+      leadId: null,
+      clientTelegramId: clientId,
+      eventType: "product_selected",
+      sourcePayload: draft.sourcePayload,
+      metadata: {
+        product_code: draft.productCode,
+        product_name: draft.productName,
+      },
+    });
     return {
       resumed: false,
       step: "quantity",
@@ -167,18 +184,16 @@ function createLeadService({
         session?.draft?.contactLabel || buildTelegramContactLabel(client, clientId),
       isConfirmEditing: false,
     });
-    if (repos.leadEvents) {
-      repos.leadEvents.create({
-        leadId: null,
-        clientTelegramId: clientId,
-        eventType: "quantity_submitted",
-        sourcePayload: result.draft.sourcePayload || null,
-        metadata: {
-          quantity,
-          product_code: result.draft.productCode,
-        },
-      });
-    }
+    recordLeadEvent({
+      leadId: null,
+      clientTelegramId: clientId,
+      eventType: "quantity_submitted",
+      sourcePayload: result.draft.sourcePayload || null,
+      metadata: {
+        quantity,
+        product_code: result.draft.productCode,
+      },
+    });
     return result;
   }
 
@@ -202,14 +217,12 @@ function createLeadService({
       comment: trimmed,
       isConfirmEditing: false,
     });
-    if (repos.leadEvents) {
-      repos.leadEvents.create({
-        leadId: null,
-        clientTelegramId: clientId,
-        eventType: "comment_added",
-        sourcePayload: result.draft.sourcePayload || null,
-      });
-    }
+    recordLeadEvent({
+      leadId: null,
+      clientTelegramId: clientId,
+      eventType: "comment_added",
+      sourcePayload: result.draft.sourcePayload || null,
+    });
     return result;
   }
 
@@ -219,14 +232,12 @@ function createLeadService({
       comment: "",
       isConfirmEditing: false,
     });
-    if (repos.leadEvents) {
-      repos.leadEvents.create({
-        leadId: null,
-        clientTelegramId: clientId,
-        eventType: "comment_skipped",
-        sourcePayload: result.draft.sourcePayload || null,
-      });
-    }
+    recordLeadEvent({
+      leadId: null,
+      clientTelegramId: clientId,
+      eventType: "comment_skipped",
+      sourcePayload: result.draft.sourcePayload || null,
+    });
     return result;
   }
 
@@ -236,15 +247,13 @@ function createLeadService({
       contactLabel,
       isConfirmEditing: false,
     });
-    if (repos.leadEvents) {
-      repos.leadEvents.create({
-        leadId: null,
-        clientTelegramId: client.id,
-        eventType: "contact_confirmed",
-        sourcePayload: result.draft.sourcePayload || null,
-        metadata: { via: "telegram" },
-      });
-    }
+    recordLeadEvent({
+      leadId: null,
+      clientTelegramId: client.id,
+      eventType: "contact_confirmed",
+      sourcePayload: result.draft.sourcePayload || null,
+      metadata: { via: "telegram" },
+    });
     return result;
   }
 
@@ -269,22 +278,20 @@ function createLeadService({
       contactLabel: value,
       isConfirmEditing: false,
     });
-    if (repos.leadEvents) {
-      repos.leadEvents.create({
-        leadId: null,
-        clientTelegramId: clientId,
-        eventType: "contact_confirmed",
-        sourcePayload: result.draft.sourcePayload || null,
-        metadata: { via: "custom" },
-      });
-    }
+    recordLeadEvent({
+      leadId: null,
+      clientTelegramId: clientId,
+      eventType: "contact_confirmed",
+      sourcePayload: result.draft.sourcePayload || null,
+      metadata: { via: "custom" },
+    });
     return result;
   }
 
   function cancelLeadDraft(clientId) {
     const session = repos.sessions.get(clientId);
-    if (session?.flow === "lead" && repos.leadEvents) {
-      repos.leadEvents.create({
+    if (session?.flow === "lead") {
+      recordLeadEvent({
         leadId: null,
         clientTelegramId: clientId,
         eventType: "lead_cancelled",
@@ -375,18 +382,16 @@ function createLeadService({
         `Создана заявка #${result.id}: ${result.product_name} x${result.quantity}`,
       );
 
-      if (repos.leadEvents) {
-        repos.leadEvents.create({
-          leadId: result.id,
-          clientTelegramId: client.id,
-          eventType: "lead_confirmed",
-          sourcePayload: session.draft.sourcePayload || null,
-          metadata: {
-            product_code: result.product_code,
-            quantity: result.quantity,
-          },
-        });
-      }
+      recordLeadEvent({
+        leadId: result.id,
+        clientTelegramId: client.id,
+        eventType: "lead_confirmed",
+        sourcePayload: session.draft.sourcePayload || null,
+        metadata: {
+          product_code: result.product_code,
+          quantity: result.quantity,
+        },
+      });
 
       repos.sessions.clear(client.id);
       return result;
