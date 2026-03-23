@@ -13,7 +13,11 @@
     "lint": "node --check index.js && node --check src/bot.js && node --check src/web/server.js",
     "backup": "node scripts/backup-sqlite.js",
     "restore-check": "node scripts/restore-check.js",
-    "smoke:status": "node scripts/verify-postfix-status-update.js"
+    "build:web": "npm --prefix web run build",
+    "dev:web": "npm --prefix web run dev",
+    "preview:web": "npm --prefix web run start",
+    "smoke:api": "node scripts/smoke-api.js",
+    "smoke:status": "npm run smoke:api"
   },
   "dependencies": {
     "better-sqlite3": "^12.8.0",
