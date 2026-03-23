@@ -33,7 +33,27 @@ const {
   createShutdownHandler,
   createMemoryMonitor,
 } = require("./src/utils/graceful-shutdown");
-const { log } = require("./src/utils/logger-enhanced");
+// Import logger with fallback to console if module fails
+let log;
+try {
+  const loggerModule = require("./src/utils/logger-enhanced");
+  log = loggerModule.log || loggerModule;
+  if (!log || !log.info) {
+    throw new Error("Logger module did not export valid log object");
+  }
+} catch (err) {
+  console.error(
+    "Failed to load logger-enhanced, using console fallback:",
+    err.message,
+  );
+  log = {
+    info: (...args) => console.log("[INFO]", ...args),
+    warn: (...args) => console.warn("[WARN]", ...args),
+    error: (...args) => console.error("[ERROR]", ...args),
+    debug: (...args) => console.debug("[DEBUG]", ...args),
+    fatal: (...args) => console.error("[FATAL]", ...args),
+  };
+}
 
 // Application resources
 let appResources = null;
@@ -366,9 +386,12 @@ async function bootstrap() {
 
 // Handle fatal errors
 process.on("uncaughtException", (error) => {
-  log.error("Uncaught exception", error, {
-    stack: error.stack,
-  });
+  // Use console if log is not yet initialized (module loading errors)
+  if (typeof log !== "undefined" && log?.error) {
+    log.error("Uncaught exception", error, { stack: error.stack });
+  } else {
+    console.error("Uncaught exception (logger not ready):", error);
+  }
   teardown(appResources, "uncaughtException").then(() => {
     process.exit(1);
   });
@@ -379,9 +402,11 @@ process.on("unhandledRejection", (reason) => {
     reason instanceof Error
       ? reason
       : new Error(`Unhandled rejection: ${reason}`);
-  log.error("Unhandled rejection", error, {
-    stack: error.stack,
-  });
+  if (typeof log !== "undefined" && log?.error) {
+    log.error("Unhandled rejection", error, { stack: error.stack });
+  } else {
+    console.error("Unhandled rejection (logger not ready):", error);
+  }
   teardown(appResources, "unhandledRejection").then(() => {
     process.exit(1);
   });
@@ -397,9 +422,13 @@ bootstrap()
     });
   })
   .catch((error) => {
-    log.error("Application failed to start", {
-      error: error.message,
-      stack: error.stack,
-    });
+    if (typeof log !== "undefined" && log?.error) {
+      log.error("Application failed to start", {
+        error: error.message,
+        stack: error.stack,
+      });
+    } else {
+      console.error("Application failed to start:", error);
+    }
     process.exit(1);
   });
