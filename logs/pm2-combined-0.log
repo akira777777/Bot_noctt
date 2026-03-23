@@ -8199,3 +8199,15 @@
 2026-03-23T18:59:28: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
 2026-03-23T18:59:28: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
 2026-03-23T18:59:28: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:59:43: {"level":"ERROR","time":"2026-03-23T17:59:43.343Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T18:59:43: {"level":"INFO","time":"2026-03-23T17:59:43.343Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T18:59:43: {"level":"INFO","time":"2026-03-23T17:59:43.343Z","service":"telegram-bot","env":"production","msg":"HTTP server closed"}
+2026-03-23T18:59:43: {"level":"INFO","time":"2026-03-23T17:59:43.343Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T18:59:43: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:59:43: {"level":"INFO","time":"2026-03-23T17:59:43.860Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:59:43: {"level":"INFO","time":"2026-03-23T17:59:43.860Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:59:43: {"level":"INFO","time":"2026-03-23T17:59:43.861Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T18:59:43: {"level":"INFO","time":"2026-03-23T17:59:43.861Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T18:59:43: {"level":"INFO","time":"2026-03-23T17:59:43.861Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T18:59:43: {"level":"INFO","time":"2026-03-23T17:59:43.861Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T18:59:43: {"level":"ERROR","time":"2026-03-23T17:59:43.861Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}

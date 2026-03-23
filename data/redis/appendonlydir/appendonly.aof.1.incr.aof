@@ -9136,3 +9136,13 @@ $4
 INCR
 $17
 bull:analytics:id
+*2
+$3
+DEL
+$27
+bull:messages:stalled-check
+*2
+$4
+INCR
+$24
+bull:batch-operations:id

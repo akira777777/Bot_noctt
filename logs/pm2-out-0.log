@@ -5026,3 +5026,14 @@
 2026-03-23T18:59:28: {"level":"WARN","time":"2026-03-23T17:59:28.169Z","service":"telegram-bot","env":"production","msg":"Webhook mode requested but domain is not usable; using polling","webhookDomain":null}
 2026-03-23T18:59:28: {"level":"INFO","time":"2026-03-23T17:59:28.169Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"webhook","effectiveMode":"polling"}
 2026-03-23T18:59:28: {"level":"INFO","time":"2026-03-23T17:59:28.200Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3060"}
+2026-03-23T18:59:43: {"level":"ERROR","time":"2026-03-23T17:59:43.343Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T18:59:43: {"level":"INFO","time":"2026-03-23T17:59:43.343Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T18:59:43: {"level":"INFO","time":"2026-03-23T17:59:43.343Z","service":"telegram-bot","env":"production","msg":"HTTP server closed"}
+2026-03-23T18:59:43: {"level":"INFO","time":"2026-03-23T17:59:43.343Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T18:59:43: {"level":"INFO","time":"2026-03-23T17:59:43.860Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:59:43: {"level":"INFO","time":"2026-03-23T17:59:43.860Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:59:43: {"level":"INFO","time":"2026-03-23T17:59:43.861Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T18:59:43: {"level":"INFO","time":"2026-03-23T17:59:43.861Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T18:59:43: {"level":"INFO","time":"2026-03-23T17:59:43.861Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T18:59:43: {"level":"INFO","time":"2026-03-23T17:59:43.861Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T18:59:43: {"level":"ERROR","time":"2026-03-23T17:59:43.861Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
