@@ -33,6 +33,11 @@ function createBot({ db, repos, cacheService = null, queueService = null }) {
 
   const catalog = createCatalogService({ repos });
   const ai = createAiService({ repos });
+  const aiAgent = createAiAgentService({
+    repos,
+    catalogService: catalog,
+    config: { enabled: AI_ENABLED, aiModel: AI_MODEL },
+  });
   const conversation = createConversationService({
     repos,
     bot,
@@ -65,6 +70,7 @@ function createBot({ db, repos, cacheService = null, queueService = null }) {
       leadStatus,
       lead,
       ai,
+      aiAgent,
     },
     adminId: ADMIN_ID,
     webAppUrl: WEB_APP_URL,
