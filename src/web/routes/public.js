@@ -6,6 +6,8 @@ const {
   normalizeLeadTrackingToken,
 } = require("../../domain/tracking-token");
 
+const WEB_LEAD_CLIENT_ID = 0;
+
 function createPublicRoutes({ repos, bot, adminId, isProduction }) {
   const router = express.Router();
 
@@ -61,8 +63,18 @@ function createPublicRoutes({ repos, bot, adminId, isProduction }) {
         .json({ ok: false, error: "Product not found or inactive" });
     }
 
+    if (!repos.users.getById(WEB_LEAD_CLIENT_ID)) {
+      repos.users.upsert({
+        telegram_id: WEB_LEAD_CLIENT_ID,
+        username: "web_guest",
+        first_name: "Website",
+        last_name: "Lead",
+        role: "client",
+      });
+    }
+
     const lead = repos.leads.create({
-      client_telegram_id: 0,
+      client_telegram_id: WEB_LEAD_CLIENT_ID,
       product_code: product.code,
       product_name: product.title,
       quantity: req.body.quantity,

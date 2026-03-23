@@ -9,6 +9,9 @@ const initialMigration = require("../src/db/migrations/001_initial");
 const phase2ColumnsMigration = require("../src/db/migrations/002_phase2_columns");
 const isBlockedMigration = require("../src/db/migrations/003_is_blocked");
 const { runMigrations } = require("../src/db/migrations");
+const {
+  LEAD_TRACKING_TOKEN_LENGTH,
+} = require("../src/domain/tracking-token");
 
 function createTempDb() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "bot-noct-migration-"));
@@ -83,12 +86,18 @@ test("runMigrations normalizes legacy lead open status without changing conversa
 
     runMigrations(db);
 
-    const lead = db.prepare("SELECT status FROM leads WHERE id = ?").get(leadId);
+    const lead = db
+      .prepare("SELECT status, tracking_token FROM leads WHERE id = ?")
+      .get(leadId);
     const conversation = db
       .prepare("SELECT status FROM conversations WHERE client_telegram_id = ?")
       .get(101);
 
     assert.equal(lead.status, "new");
+    assert.match(
+      lead.tracking_token,
+      new RegExp(`^[a-f0-9]{${LEAD_TRACKING_TOKEN_LENGTH}}$`),
+    );
     assert.equal(conversation.status, "open");
   } finally {
     cleanup();

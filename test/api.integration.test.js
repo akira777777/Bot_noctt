@@ -215,3 +215,74 @@ test("admin API status update reuses lead workflow side effects", async (t) => {
     },
   ]);
 });
+
+test("public web lead creation returns a tracking token and status lookup works by token", async (t) => {
+  const adminId = 9001;
+  const apiSecret = "test-api-secret";
+  const { db, cleanup } = createTempDb("bot-noct-api-");
+  const repos = createRepositories(db);
+
+  repos.products.create({
+    code: "basic",
+    title: "Базовый пакет",
+    description: "Тестовый товар",
+    price_text: "100 USDT",
+    sort_order: 1,
+  });
+
+  const app = createWebServer({
+    repos,
+    conversationService: {},
+    bot: {
+      telegram: {
+        async sendMessage() {
+          return { ok: true };
+        },
+      },
+    },
+    adminId,
+    apiSecret,
+    corsOrigin: null,
+    isProduction: true,
+  });
+  const server = await startServer(app);
+  t.after(async () => {
+    await stopServer(server);
+    cleanup();
+  });
+
+  const baseUrl = `http://127.0.0.1:${server.address().port}`;
+
+  const createResponse = await fetch(`${baseUrl}/api/lead`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      product_code: "basic",
+      quantity: 2,
+      comment: "Позвоните вечером",
+      contact_label: "@client",
+    }),
+  });
+
+  assert.equal(createResponse.status, 201);
+  const createPayload = await createResponse.json();
+  assert.equal(createPayload.ok, true);
+  assert.match(createPayload.lead.tracking_token, /^[a-f0-9]{24}$/);
+  assert.equal(createPayload.lead.status, "new");
+
+  const statusResponse = await fetch(
+    `${baseUrl}/api/lead/track/${createPayload.lead.tracking_token}/status`,
+  );
+
+  assert.equal(statusResponse.status, 200);
+  const statusPayload = await statusResponse.json();
+  assert.equal(statusPayload.ok, true);
+  assert.equal(
+    statusPayload.lead.tracking_token,
+    createPayload.lead.tracking_token,
+  );
+  assert.equal(statusPayload.lead.product_name, "Базовый пакет");
+  assert.equal(statusPayload.lead.quantity, 2);
+});
