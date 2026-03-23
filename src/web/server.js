@@ -119,7 +119,7 @@ function createWebServer({
   if (hasBuiltFrontend) {
     app.use(protectMiniApp);
     app.use(express.static(webappDistPath));
-    app.get("*", (req, res, next) => {
+    app.get(/.*/, (req, res, next) => {
       if (req.path.startsWith("/api")) {
         return next();
       }

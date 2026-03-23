@@ -146,6 +146,11 @@ async function handleLeadText(ctx, deps, session) {
       comment: ctx.message.text,
     });
 
+    if (!result.ok) {
+      await safeReply(ctx, result.error, commentKeyboard());
+      return true;
+    }
+
     await showLeadStep(ctx, "contact", result);
     return true;
   }
@@ -191,13 +196,24 @@ async function rejectBlocked(ctx) {
   await safeReply(ctx, "Ваш аккаунт заблокирован. Обратитесь к администратору.");
 }
 
-async function handleClientStart(ctx, deps) {
-  const user = deps.services.conversation.upsertTelegramUser(
-    ctx.from,
-    "client",
-  );
-  if (isUserBlocked(user)) {
+async function ensureClientAccess(ctx, deps, blockedMode = "reply") {
+  const user = deps.services.conversation.upsertTelegramUser(ctx.from, "client");
+  if (!isUserBlocked(user)) {
+    return user;
+  }
+
+  if (blockedMode === "callback") {
+    await safeAnswerCbQuery(ctx, "Ваш аккаунт заблокирован.");
+  } else {
     await rejectBlocked(ctx);
+  }
+
+  return null;
+}
+
+async function handleClientStart(ctx, deps) {
+  const user = await ensureClientAccess(ctx, deps);
+  if (!user) {
     return;
   }
   const entry = parseSourcePayload(ctx.startPayload);
@@ -251,12 +267,8 @@ async function handleClientMenu(ctx, deps) {
 }
 
 async function handleClientStatus(ctx, deps) {
-  const user = deps.services.conversation.upsertTelegramUser(
-    ctx.from,
-    "client",
-  );
-  if (isUserBlocked(user)) {
-    await rejectBlocked(ctx);
+  const user = await ensureClientAccess(ctx, deps);
+  if (!user) {
     return;
   }
   const lead = deps.repos.leads.getLatestByClient(ctx.from.id);
@@ -264,12 +276,8 @@ async function handleClientStatus(ctx, deps) {
 }
 
 async function handleClientText(ctx, deps) {
-  const user = deps.services.conversation.upsertTelegramUser(
-    ctx.from,
-    "client",
-  );
-  if (isUserBlocked(user)) {
-    await rejectBlocked(ctx);
+  const user = await ensureClientAccess(ctx, deps);
+  if (!user) {
     return;
   }
 
@@ -298,12 +306,8 @@ async function handleClientText(ctx, deps) {
 }
 
 async function handleClientAction(ctx, deps) {
-  const user = deps.services.conversation.upsertTelegramUser(
-    ctx.from,
-    "client",
-  );
-  if (isUserBlocked(user)) {
-    await ctx.answerCbQuery("Ваш аккаунт заблокирован.").catch(() => {});
+  const user = await ensureClientAccess(ctx, deps, "callback");
+  if (!user) {
     return;
   }
 

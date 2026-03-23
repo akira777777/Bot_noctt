@@ -1,5 +1,33 @@
-function createRepositories(db) {
+/**
+ * Repository factory with support for DatabaseConnectionManager
+ * Provides retry logic and health checks for database operations
+ */
+
+function createRepositories(dbOrManager) {
+  // Determine if we're using DatabaseConnectionManager or raw db
+  const isManager = dbOrManager && typeof dbOrManager.execute === "function";
+  const db = isManager ? dbOrManager.getDatabase() : dbOrManager;
+
+  // Helper to execute database operations with optional retry
+  const execute = async (operation, operationName) => {
+    if (isManager) {
+      return dbOrManager.execute(operation, operationName);
+    }
+    return operation(db);
+  };
+
+  // Helper for transactions
+  const transaction = async (handler, operationName) => {
+    if (isManager) {
+      return dbOrManager.transaction(handler, operationName);
+    }
+    const tx = db.transaction(handler);
+    return tx();
+  };
+
+  // Prepare statements
   const statements = {
+    // Users
     upsertUser: db.prepare(`
       INSERT INTO users (telegram_id, username, first_name, last_name, role, updated_at)
       VALUES (@telegram_id, @username, @first_name, @last_name, @role, CURRENT_TIMESTAMP)
@@ -16,6 +44,14 @@ function createRepositories(db) {
     listUsers: db.prepare(`
       SELECT * FROM users ORDER BY datetime(updated_at) DESC LIMIT ?
     `),
+    blockUser: db.prepare(
+      `UPDATE users SET is_blocked = 1, updated_at = CURRENT_TIMESTAMP WHERE telegram_id = ?`,
+    ),
+    unblockUser: db.prepare(
+      `UPDATE users SET is_blocked = 0, updated_at = CURRENT_TIMESTAMP WHERE telegram_id = ?`,
+    ),
+
+    // Conversations
     ensureConversation: db.prepare(`
       INSERT INTO conversations (client_telegram_id, assigned_admin_id, status, source_payload, last_message_at)
       VALUES (?, ?, 'open', ?, CURRENT_TIMESTAMP)
@@ -45,6 +81,8 @@ function createRepositories(db) {
       ORDER BY datetime(c.last_message_at) DESC
       LIMIT ?
     `),
+
+    // Messages
     insertMessage: db.prepare(`
       INSERT INTO messages (conversation_id, sender_role, sender_telegram_id, message_text)
       VALUES (?, ?, ?, ?)
@@ -52,6 +90,8 @@ function createRepositories(db) {
     listMessagesByConversation: db.prepare(`
       SELECT * FROM messages WHERE conversation_id = ? ORDER BY datetime(created_at) DESC LIMIT ?
     `),
+
+    // Leads
     createLead: db.prepare(`
       INSERT INTO leads (
         client_telegram_id,
@@ -106,6 +146,8 @@ function createRepositories(db) {
       SET status = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `),
+
+    // Products
     listProducts: db.prepare(`
       SELECT * FROM products WHERE is_active = 1 ORDER BY sort_order ASC, id ASC
     `),
@@ -130,6 +172,8 @@ function createRepositories(db) {
     setProductActive: db.prepare(`
       UPDATE products SET is_active = ? WHERE id = ?
     `),
+
+    // Admin state
     setAdminState: db.prepare(`
       INSERT INTO admin_state (admin_telegram_id, active_client_telegram_id, updated_at)
       VALUES (?, ?, CURRENT_TIMESTAMP)
@@ -143,6 +187,8 @@ function createRepositories(db) {
     clearAdminState: db.prepare(`
       DELETE FROM admin_state WHERE admin_telegram_id = ?
     `),
+
+    // Sessions
     setSession: db.prepare(`
       INSERT INTO sessions (telegram_id, flow, step, draft_json, updated_at)
       VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
@@ -161,6 +207,8 @@ function createRepositories(db) {
     clearExpiredSessions: db.prepare(`
       DELETE FROM sessions WHERE datetime(updated_at) < datetime('now', '-24 hours')
     `),
+
+    // Stats
     leadCountsByStatus: db.prepare(`
       SELECT status, COUNT(*) AS cnt FROM leads GROUP BY status ORDER BY cnt DESC
     `),
@@ -172,18 +220,20 @@ function createRepositories(db) {
       LIMIT ?
     `),
     totalLeads: db.prepare(`SELECT COUNT(*) AS cnt FROM leads`),
-    blockUser: db.prepare(
-      `UPDATE users SET is_blocked = 1, updated_at = CURRENT_TIMESTAMP WHERE telegram_id = ?`,
-    ),
-    unblockUser: db.prepare(
-      `UPDATE users SET is_blocked = 0, updated_at = CURRENT_TIMESTAMP WHERE telegram_id = ?`,
-    ),
   };
 
   return {
+    // Database health check
+    getHealth() {
+      return isManager
+        ? dbOrManager.getHealth()
+        : { isHealthy: true, pendingTransactions: 0 };
+    },
+
+    // Users
     users: {
       upsert(user) {
-        statements.upsertUser.run(user);
+        return statements.upsertUser.run(user);
       },
       getById(telegramId) {
         return statements.getUser.get(telegramId);
@@ -198,6 +248,8 @@ function createRepositories(db) {
         return statements.unblockUser.run(telegramId);
       },
     },
+
+    // Conversations
     conversations: {
       ensure(clientTelegramId, adminId, sourcePayload = null) {
         statements.ensureConversation.run(
@@ -214,9 +266,11 @@ function createRepositories(db) {
         return statements.listRecentConversations.all(limit);
       },
     },
+
+    // Messages
     messages: {
       create(conversationId, senderRole, senderTelegramId, text) {
-        statements.insertMessage.run(
+        return statements.insertMessage.run(
           conversationId,
           senderRole,
           senderTelegramId,
@@ -227,6 +281,8 @@ function createRepositories(db) {
         return statements.listMessagesByConversation.all(conversationId, limit);
       },
     },
+
+    // Leads
     leads: {
       create(payload) {
         const result = statements.createLead.run(payload);
@@ -255,6 +311,8 @@ function createRepositories(db) {
         return statements.getLeadById.get(id);
       },
     },
+
+    // Products
     products: {
       list() {
         return statements.listProducts.all();
@@ -281,17 +339,21 @@ function createRepositories(db) {
         return statements.getProductById.get(id);
       },
     },
+
+    // Admin state
     adminState: {
       setActiveClient(adminTelegramId, clientTelegramId) {
-        statements.setAdminState.run(adminTelegramId, clientTelegramId);
+        return statements.setAdminState.run(adminTelegramId, clientTelegramId);
       },
       get(adminTelegramId) {
         return statements.getAdminState.get(adminTelegramId);
       },
       clear(adminTelegramId) {
-        statements.clearAdminState.run(adminTelegramId);
+        return statements.clearAdminState.run(adminTelegramId);
       },
     },
+
+    // Stats
     stats: {
       leadCountsByStatus() {
         return statements.leadCountsByStatus.all();
@@ -303,9 +365,11 @@ function createRepositories(db) {
         return statements.totalLeads.get().cnt;
       },
     },
+
+    // Sessions
     sessions: {
       set(telegramId, flow, step, draft) {
-        statements.setSession.run(
+        return statements.setSession.run(
           telegramId,
           flow,
           step,
@@ -317,25 +381,23 @@ function createRepositories(db) {
         if (!session) {
           return null;
         }
-
-        // Auto-expire sessions older than 24 hours
-        const updatedAt = new Date(session.updated_at + "Z").getTime();
-        if (Date.now() - updatedAt > 24 * 60 * 60 * 1000) {
-          statements.clearSession.run(telegramId);
-          return null;
-        }
-
-        let draft = {};
         try {
-          draft = JSON.parse(session.draft_json || "{}");
-        } catch (_) {}
-
-        return { ...session, draft };
+          return { ...session, draft: JSON.parse(session.draft_json) };
+        } catch {
+          return { ...session, draft: {} };
+        }
       },
       clear(telegramId) {
-        statements.clearSession.run(telegramId);
+        return statements.clearSession.run(telegramId);
+      },
+      clearExpired() {
+        return statements.clearExpiredSessions.run();
       },
     },
+
+    // Raw execute for custom operations
+    execute,
+    transaction,
   };
 }
 

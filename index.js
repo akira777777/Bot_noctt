@@ -1,4 +1,4 @@
-const { createDatabase } = require("./src/db/sqlite");
+const { DatabaseConnectionManager } = require("./src/db/connection");
 const { createRepositories } = require("./src/repositories");
 const { createBot } = require("./src/bot");
 const {
@@ -9,36 +9,21 @@ const {
   CORS_ORIGIN,
   isProduction,
 } = require("./src/config/env");
-const { createWebServer } = require("./src/web/server");
+const {
+  createEnhancedWebServer,
+  startServer,
+  GracefulShutdown,
+} = require("./src/web/enhanced-server");
+const { runMigrations } = require("./src/db/migrations");
 const { logError, logInfo } = require("./src/utils/logger");
 
+// Global state
 let appResources = null;
 let isShuttingDown = false;
 
-function startHttpServer(app, port) {
-  return new Promise((resolve, reject) => {
-    const server = app.listen(port, () => resolve(server));
-    server.once("error", reject);
-  });
-}
-
-function closeHttpServer(server) {
-  if (!server || !server.listening) {
-    return Promise.resolve();
-  }
-
-  return new Promise((resolve, reject) => {
-    server.close((error) => {
-      if (error) {
-        reject(error);
-        return;
-      }
-
-      resolve();
-    });
-  });
-}
-
+/**
+ * Stop Telegram bot gracefully
+ */
 function stopBot(bot, signal) {
   if (!bot) {
     return;
@@ -54,38 +39,44 @@ function stopBot(bot, signal) {
   }
 }
 
-function closeDatabase(db) {
-  if (!db) {
-    return;
-  }
-
-  try {
-    db.close();
-  } catch (error) {
-    logError("Failed to close database", error);
-  }
-}
-
+/**
+ * Teardown all resources
+ */
 async function teardown(resources, reason) {
   if (!resources) {
     return;
   }
 
+  logInfo(`Starting teardown due to: ${reason}`);
+
+  // Stop bot first to prevent new messages
   if (resources.botLaunched) {
     stopBot(resources.bot, reason);
   }
 
-  if (resources.httpServer) {
+  // Close HTTP server (handled by GracefulShutdown)
+  // DB shutdown is handled by GracefulShutdown beforeShutdown hook
+
+  // Shutdown database manager
+  if (resources.dbManager) {
     try {
-      await closeHttpServer(resources.httpServer);
+      await resources.dbManager.shutdown(30000);
     } catch (error) {
-      logError("Failed to close HTTP server", error);
+      logError("Failed to shutdown database manager", error);
     }
   }
 
-  closeDatabase(resources.db);
+  // Stop rate limiter cleanup
+  if (resources.rateLimiter) {
+    resources.rateLimiter.stop();
+  }
+
+  logInfo("Teardown complete");
 }
 
+/**
+ * Configure admin menu button
+ */
 async function configureAdminMenu(bot) {
   if (!WEBAPP_URL) {
     return;
@@ -113,68 +104,155 @@ async function configureAdminMenu(bot) {
   }
 }
 
+/**
+ * Bootstrap the application
+ */
 async function bootstrap() {
-  const db = createDatabase();
-  const repos = createRepositories(db);
+  // Create database manager with retry logic
+  const dbManager = new DatabaseConnectionManager(
+    require("./src/config/env").DB_PATH,
+    {
+      maxRetries: 3,
+      retryDelayMs: 100,
+      healthCheckIntervalMs: 30000,
+      busyTimeout: 5000,
+    },
+  );
+
+  // Connect to database
+  await dbManager.connect();
+
+  // Run migrations
+  const db = dbManager.getDatabase();
+  runMigrations(db);
+
+  // Seed products if needed
+  seedProducts(db);
+
+  // Create repositories
+  const repos = createRepositories(dbManager);
+
+  // Create bot
   const bot = createBot({ db, repos });
-  const webServer = createWebServer({
+
+  // Create enhanced web server with rate limiting and timeouts
+  const { app, rateLimiter } = createEnhancedWebServer({
     repos,
+    dbManager,
     botToken: BOT_TOKEN,
     adminId: ADMIN_ID,
     corsOrigin: CORS_ORIGIN,
     isProduction,
+    requestTimeoutMs: 30000,
+    rateLimitWindowMs: 60000,
+    rateLimitMaxRequests: 100,
   });
 
-  const resources = {
-    db,
+  // Start HTTP server
+  const httpServer = await startServer(app, PORT);
+
+  // Setup graceful shutdown
+  const gracefulShutdown = new GracefulShutdown(httpServer, {
+    timeoutMs: 30000,
+    beforeShutdown: async () => {
+      // Stop accepting new bot updates
+      stopBot(bot, "shutdown");
+      // Shutdown database
+      await dbManager.shutdown(30000);
+    },
+    afterShutdown: async () => {
+      rateLimiter.stop();
+    },
+  });
+  gracefulShutdown.attach();
+
+  // Launch bot
+  await bot.launch();
+
+  // Configure admin menu
+  await configureAdminMenu(bot);
+
+  logInfo("Application started successfully");
+
+  return {
+    dbManager,
     repos,
     bot,
-    botLaunched: false,
-    webServer,
-    httpServer: null,
+    botLaunched: true,
+    httpServer,
+    rateLimiter,
+    gracefulShutdown,
   };
-
-  try {
-    resources.httpServer = await startHttpServer(webServer, PORT);
-    logInfo(`Web server started on port ${PORT}`);
-
-    await bot.launch();
-    resources.botLaunched = true;
-    logInfo("Bot started");
-
-    await configureAdminMenu(bot);
-
-    return resources;
-  } catch (error) {
-    await teardown(resources, "bootstrap_failed");
-    throw error;
-  }
 }
 
-async function shutdown(signal) {
-  if (isShuttingDown) {
+/**
+ * Seed default products
+ */
+function seedProducts(db) {
+  const count = db
+    .prepare("SELECT COUNT(*) AS count FROM products")
+    .get().count;
+
+  if (count > 0) {
     return;
   }
 
-  isShuttingDown = true;
-  await teardown(appResources, signal);
+  const insert = db.prepare(`
+    INSERT INTO products (code, title, description, price_text, sort_order)
+    VALUES (@code, @title, @description, @price_text, @sort_order)
+  `);
+
+  const defaults = [
+    {
+      code: "basic",
+      title: "Базовый пакет",
+      description: "Подходит для быстрого старта и базовой консультации.",
+      price_text: "Цена уточняется",
+      sort_order: 1,
+    },
+    {
+      code: "standard",
+      title: "Стандартный пакет",
+      description:
+        "Оптимальный вариант с расширенной поддержкой и доработками.",
+      price_text: "Цена уточняется",
+      sort_order: 2,
+    },
+    {
+      code: "premium",
+      title: "Премиум пакет",
+      description:
+        "Для клиентов, которым нужен приоритет и индивидуальные условия.",
+      price_text: "Цена уточняется",
+      sort_order: 3,
+    },
+  ];
+
+  const tx = db.transaction(() => {
+    for (const product of defaults) {
+      insert.run(product);
+    }
+  });
+  tx();
+
+  logInfo("Default products seeded");
 }
 
+/**
+ * Handle fatal errors
+ */
 async function handleFatalError(type, error) {
   logError(`${type} detected`, error);
   process.exitCode = 1;
-  await shutdown(type);
+
+  if (appResources) {
+    await teardown(appResources, type);
+  }
+
   process.exit(1);
 }
 
-process.once("SIGINT", () => {
-  void shutdown("SIGINT");
-});
-
-process.once("SIGTERM", () => {
-  void shutdown("SIGTERM");
-});
-
+// Process error handlers
 process.on("uncaughtException", (error) => {
   void handleFatalError("uncaughtException", error);
 });
@@ -183,16 +261,22 @@ process.on("unhandledRejection", (reason) => {
   const error =
     reason instanceof Error
       ? reason
-      : new Error(`Unhandled rejection: ${reason}`);
+      : new Error(`Unhandled rejection: ${String(reason)}`);
   void handleFatalError("unhandledRejection", error);
 });
 
+// Start application
 bootstrap()
   .then((resources) => {
     appResources = resources;
   })
   .catch(async (error) => {
     logError("Application bootstrap failed", error);
+
+    if (appResources) {
+      await teardown(appResources, "bootstrap_failed");
+    }
+
     process.exitCode = 1;
     process.exit(1);
   });

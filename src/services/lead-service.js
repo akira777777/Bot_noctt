@@ -4,7 +4,6 @@ const { formatClientLabel } = require("../utils/formatters");
 const { safeSendMessage } = require("../utils/telegram");
 
 function createLeadService({
-  db,
   repos,
   bot,
   adminId,
@@ -163,7 +162,7 @@ function createLeadService({
       return { duplicate: true, existingLead };
     }
 
-    const transaction = db.transaction(() => {
+    const lead = await repos.transaction(() => {
       const conversation = conversationService.ensureConversation(
         client.id,
         session.draft.sourcePayload || null,
@@ -188,9 +187,8 @@ function createLeadService({
 
       repos.sessions.clear(client.id);
       return result;
-    });
+    }, "confirmLead");
 
-    const lead = transaction();
     try {
       await notifyAdminAboutLead(lead, client, chatId);
     } catch (err) {

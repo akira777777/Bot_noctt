@@ -1,32 +1,51 @@
-const fs = require("fs");
-const path = require("path");
-const Database = require("better-sqlite3");
-const { DB_PATH } = require("../config/env");
+/**
+ * Database initialization module
+ * Backward-compatible wrapper around DatabaseConnectionManager
+ */
+
+const { DatabaseConnectionManager } = require("./connection");
 const { runMigrations } = require("./migrations");
+const { logInfo, logDebug } = require("../utils/logger");
 
-function ensureDbDirectory() {
-  const dir = path.dirname(DB_PATH);
-  fs.mkdirSync(dir, { recursive: true });
-}
+/**
+ * Legacy function for backward compatibility
+ * Creates database with migrations and seeding
+ */
+async function createDatabase(dbPath, options = {}) {
+  const manager = new DatabaseConnectionManager(dbPath, {
+    maxRetries: options.maxRetries || 3,
+    retryDelayMs: options.retryDelayMs || 100,
+    busyTimeout: options.busyTimeout || 5000,
+  });
 
-function createDatabase() {
-  ensureDbDirectory();
+  await manager.connect();
 
-  const db = new Database(DB_PATH);
-  db.pragma("foreign_keys = ON");
-  db.pragma("journal_mode = WAL");
-  db.pragma("synchronous = NORMAL");
+  const db = manager.getDatabase();
 
+  // Run migrations
   runMigrations(db);
 
+  // Seed products
   seedProducts(db);
-  return db;
+
+  logInfo("Database initialized successfully");
+
+  // Return both db and manager for new code
+  return {
+    db,
+    manager,
+    close: () => manager.close(),
+  };
 }
 
+/**
+ * Seed default products
+ */
 function seedProducts(db) {
   const count = db
     .prepare("SELECT COUNT(*) AS count FROM products")
     .get().count;
+
   if (count > 0) {
     return;
   }
@@ -62,13 +81,17 @@ function seedProducts(db) {
     },
   ];
 
-  db.transaction(() => {
+  const tx = db.transaction(() => {
     for (const product of defaults) {
       insert.run(product);
     }
-  })();
+  });
+  tx();
+
+  logInfo("Default products seeded");
 }
 
 module.exports = {
   createDatabase,
+  DatabaseConnectionManager,
 };
