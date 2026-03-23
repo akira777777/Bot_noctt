@@ -834,17 +834,20 @@ async function handleAdminAction(ctx, deps) {
     return;
   }
 
-  if (action.startsWith("admin:lead_awaiting_payment:")) {
+  if (
+    action.startsWith("admin:lead_proposal_sent:") ||
+    action.startsWith("admin:lead_awaiting_payment:")
+  ) {
     const leadId = parseActionId(action);
     await applyLeadStatusAction({
       ctx,
       deps,
       leadId,
-      status: "awaiting_payment",
-      cbSuccessText: "Статус: Ждём оплату",
-      buttonText: "✅ Ждём оплату",
+      status: "proposal_sent",
+      cbSuccessText: "Статус: Предложение отправлено",
+      buttonText: "✅ Предложение отправлено",
       adminReplyText: (id) =>
-        `Заявка #${id} переведена в статус "awaiting_payment".`,
+        `Заявка #${id} переведена в статус "proposal_sent".`,
     });
     return;
   }

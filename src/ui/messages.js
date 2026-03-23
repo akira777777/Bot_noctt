@@ -6,14 +6,13 @@ function withFallback(value, fallback) {
 }
 
 function welcomeMessage(entry) {
-  const tagline =
-    "Оставьте заявку в пару шагов или сразу напишите менеджеру.";
+  const tagline = "Оставьте заявку в пару шагов или сразу напишите менеджеру.";
 
   if (entry?.source === "channel") {
     return `${entry.title}.\n\n${tagline}`;
   }
 
-  return `Здравствуйте! Мы можем найти для вас всё что угодно.\n\n${tagline}`;
+  return `Здравствуйте! Поможем подобрать подходящее решение под ваш запрос.\n\n${tagline}`;
 }
 
 function helpMessage() {
@@ -29,7 +28,7 @@ function helpMessage() {
 
 function howToOrderMessage() {
   return (
-    "Как оформить заказ:\n" +
+    "Как оформить заявку:\n" +
     '1. Откройте каталог или нажмите "Оставить заявку".\n' +
     "2. Выберите товар.\n" +
     "3. Укажите количество и комментарий.\n" +
@@ -90,8 +89,8 @@ function leadCreatedMessage() {
 
 function contactManagerMessage() {
   return (
-    "Напишите, что вас интересует — любой товар или услуга.\n\n" +
-    "Мы подберём вариант и сообщим цену в ответном сообщении."
+    "Напишите, какая задача, товар или услуга вас интересует.\n\n" +
+    "Мы уточним детали, подберём решение и вернёмся с ответом."
   );
 }
 
@@ -166,12 +165,12 @@ function clientLeadCalledBackMessage() {
   return "Менеджер свяжется с вами в ближайшее время. Ожидайте звонка или сообщения!";
 }
 
-function clientLeadAwaitingPaymentMessage() {
-  return "Ваша заявка подтверждена. Ожидаем оплату — реквизиты уже отправлены или будут высланы менеджером.";
+function clientLeadProposalSentMessage() {
+  return "По вашей заявке подготовлено предложение. Проверьте детали, а если нужно что-то уточнить, просто ответьте в этот чат.";
 }
 
 function clientLeadFulfilledMessage() {
-  return "Ваша заявка выполнена. Спасибо за покупку! Будем рады снова помочь 🎉";
+  return "Ваша заявка выполнена. Если понадобится новый запрос, просто напишите нам снова.";
 }
 
 function conversationResolvedMessage() {
@@ -233,7 +232,7 @@ module.exports = {
   clientLeadOutOfStockMessage,
   clientLeadNotRelevantMessage,
   clientLeadCalledBackMessage,
-  clientLeadAwaitingPaymentMessage,
+  clientLeadProposalSentMessage,
   clientLeadFulfilledMessage,
   clientLeadStatusMessage,
 };

@@ -4,17 +4,20 @@ const {
   clientLeadOutOfStockMessage,
   clientLeadNotRelevantMessage,
   clientLeadCalledBackMessage,
-  clientLeadAwaitingPaymentMessage,
+  clientLeadProposalSentMessage,
   clientLeadFulfilledMessage,
 } = require("../ui/messages");
-const { isCanonicalLeadStatus } = require("../domain/lead-status");
+const {
+  isCanonicalLeadStatus,
+  normalizeLeadStatus,
+} = require("../domain/lead-status");
 const { safeSendMessage } = require("../utils/telegram");
 
 const STATUS_NOTIFICATIONS = Object.freeze({
   in_progress: clientLeadTakenMessage,
   closed: clientLeadClosedMessage,
   called_back: clientLeadCalledBackMessage,
-  awaiting_payment: clientLeadAwaitingPaymentMessage,
+  proposal_sent: clientLeadProposalSentMessage,
   fulfilled: clientLeadFulfilledMessage,
 });
 
@@ -25,16 +28,17 @@ const CLOSED_REASON_NOTIFICATIONS = Object.freeze({
 
 function createLeadStatusService({ repos, bot = null }) {
   async function updateStatus(leadId, status, options = {}) {
-    if (!isCanonicalLeadStatus(status)) {
+    const normalizedStatus = normalizeLeadStatus(status);
+    if (!normalizedStatus || !isCanonicalLeadStatus(normalizedStatus)) {
       return null;
     }
 
-    const lead = repos.leads.updateStatus(leadId, status, options);
+    const lead = repos.leads.updateStatus(leadId, normalizedStatus, options);
     if (!lead) {
       return null;
     }
 
-    if (status === "closed" && repos.leadEvents) {
+    if (normalizedStatus === "closed" && repos.leadEvents) {
       repos.leadEvents.create({
         leadId: lead.id,
         clientTelegramId: lead.client_telegram_id,
@@ -47,10 +51,10 @@ function createLeadStatusService({ repos, bot = null }) {
     }
 
     const notificationFactory =
-      status === "closed" && lead.closed_reason
+      normalizedStatus === "closed" && lead.closed_reason
         ? CLOSED_REASON_NOTIFICATIONS[lead.closed_reason] ||
-          STATUS_NOTIFICATIONS[status]
-        : STATUS_NOTIFICATIONS[status];
+          STATUS_NOTIFICATIONS[normalizedStatus]
+        : STATUS_NOTIFICATIONS[normalizedStatus];
     if (
       options.notifyClient !== false &&
       notificationFactory &&

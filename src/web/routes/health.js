@@ -4,145 +4,128 @@
  */
 const express = require("express");
 const os = require("os");
-const {
-  APP_VERSION,
-  NODE_ENV,
-  MEMORY_LIMIT_WARN,
-  MEMORY_LIMIT_CRITICAL,
-} = require("../../config/env");
 
-const router = express.Router();
+function createHealthRouter({
+  appVersion,
+  environment,
+  memoryLimitWarn,
+  memoryLimitCritical,
+  dbCheck = null,
+  cacheService = null,
+}) {
+  const router = express.Router();
 
-// Database check function that will be injected
-let dbCheckFn = null;
-let cacheCheckService = null;
+  router.get("/healthz", async (req, res) => {
+    void req;
 
-function setDbCheckFunction(fn) {
-  dbCheckFn = fn;
-}
-
-function setCacheCheckService(service) {
-  cacheCheckService = service;
-}
-
-/**
- * Basic health check - for container orchestration
- * Returns 200 if the service is running
- */
-router.get("/healthz", async (req, res) => {
-  const health = {
-    status: "ok",
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    service: "telegram-bot",
-  };
-
-  res.status(200).json(health);
-});
-
-/**
- * Readiness probe - checks if service is ready to accept traffic
- * Used by Kubernetes/load balancers to determine if pod should receive traffic
- */
-router.get("/readyz", async (req, res) => {
-  const checks = {
-    database: await performDatabaseCheck(),
-    cache: await performCacheCheck(),
-    memory: performMemoryCheck(),
-  };
-
-  const isReady = Object.values(checks).every(
-    (c) => c.status === "ok" || c.status === "degraded",
-  );
-
-  const response = {
-    ready: isReady,
-    timestamp: new Date().toISOString(),
-    checks,
-  };
-
-  res.status(isReady ? 200 : 503).json(response);
-});
-
-/**
- * Liveness probe - checks if service is alive
- * Kubernetes restarts container if this fails
- */
-router.get("/livez", async (req, res) => {
-  const isAlive = process.uptime() > 0;
-
-  res.status(isAlive ? 200 : 503).json({
-    alive: isAlive,
-    timestamp: new Date().toISOString(),
+    res.status(200).json({
+      status: "ok",
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      service: "telegram-bot",
+    });
   });
-});
 
-/**
- * Detailed health check with all system metrics
- */
-router.get("/health", async (req, res) => {
-  const checks = {
-    database: await performDatabaseCheck(),
-    cache: await performCacheCheck(),
-    memory: performMemoryCheck(),
-    cpu: performCPUCheck(),
-  };
+  router.get("/readyz", async (req, res) => {
+    void req;
 
-  const allHealthy = Object.values(checks).every((c) => c.status === "ok");
-  const anyDegraded = Object.values(checks).some(
-    (c) => c.status === "degraded",
-  );
+    const checks = {
+      database: await performDatabaseCheck(dbCheck),
+      cache: await performCacheCheck(cacheService),
+      memory: performMemoryCheck({
+        memoryLimitWarn,
+        memoryLimitCritical,
+      }),
+    };
 
-  let status = "healthy";
-  if (!allHealthy) status = "unhealthy";
-  else if (anyDegraded) status = "degraded";
+    const isReady = Object.values(checks).every(
+      (check) => check.status === "ok" || check.status === "degraded",
+    );
 
-  const response = {
-    status,
-    timestamp: new Date().toISOString(),
-    version: APP_VERSION,
-    uptime: process.uptime(),
-    environment: NODE_ENV,
-    checks,
-    system: {
-      totalMemory: os.totalmem(),
-      freeMemory: os.freemem(),
-      usedMemory: os.totalmem() - os.freemem(),
-      cpuCount: os.cpus().length,
-      loadAverage: os.loadavg(),
-      platform: os.platform(),
-      arch: os.arch(),
-      nodeVersion: process.version,
-    },
-  };
+    res.status(isReady ? 200 : 503).json({
+      ready: isReady,
+      timestamp: new Date().toISOString(),
+      checks,
+    });
+  });
 
-  res.status(status === "unhealthy" ? 503 : 200).json(response);
-});
+  router.get("/livez", async (req, res) => {
+    void req;
 
-/**
- * Perform database health check
- */
-async function performDatabaseCheck() {
-  try {
-    if (dbCheckFn) {
-      return await dbCheckFn();
+    const isAlive = process.uptime() > 0;
+    res.status(isAlive ? 200 : 503).json({
+      alive: isAlive,
+      timestamp: new Date().toISOString(),
+    });
+  });
+
+  router.get("/health", async (req, res) => {
+    void req;
+
+    const checks = {
+      database: await performDatabaseCheck(dbCheck),
+      cache: await performCacheCheck(cacheService),
+      memory: performMemoryCheck({
+        memoryLimitWarn,
+        memoryLimitCritical,
+      }),
+      cpu: performCPUCheck(),
+    };
+
+    const allHealthy = Object.values(checks).every((check) => check.status === "ok");
+    const anyDegraded = Object.values(checks).some(
+      (check) => check.status === "degraded",
+    );
+
+    let status = "healthy";
+    if (!allHealthy) {
+      status = "unhealthy";
+    } else if (anyDegraded) {
+      status = "degraded";
     }
+
+    res.status(status === "unhealthy" ? 503 : 200).json({
+      status,
+      timestamp: new Date().toISOString(),
+      version: appVersion,
+      uptime: process.uptime(),
+      environment,
+      checks,
+      system: {
+        totalMemory: os.totalmem(),
+        freeMemory: os.freemem(),
+        usedMemory: os.totalmem() - os.freemem(),
+        cpuCount: os.cpus().length,
+        loadAverage: os.loadavg(),
+        platform: os.platform(),
+        arch: os.arch(),
+        nodeVersion: process.version,
+      },
+    });
+  });
+
+  return router;
+}
+
+async function performDatabaseCheck(dbCheck) {
+  try {
+    if (typeof dbCheck === "function") {
+      return await dbCheck();
+    }
+
     return { status: "unknown", message: "DB check not configured" };
   } catch (error) {
     return { status: "error", message: error.message };
   }
 }
 
-/**
- * Perform cache health check
- */
-async function performCacheCheck() {
+async function performCacheCheck(cacheService) {
   try {
-    if (!cacheCheckService) {
+    if (!cacheService) {
       return { status: "unknown", message: "Cache check not configured" };
     }
 
-    const cacheHealth = await cacheCheckService.healthCheck();
+    const cacheHealth = await cacheService.healthCheck();
     const isMemoryFallback = cacheHealth.mode === "memory";
 
     return {
@@ -157,56 +140,52 @@ async function performCacheCheck() {
   }
 }
 
-/**
- * Perform memory health check
- */
-function performMemoryCheck() {
+function performMemoryCheck({ memoryLimitWarn, memoryLimitCritical }) {
   const used = process.memoryUsage();
   const total = os.totalmem();
   const free = os.freemem();
   const usedPercent = ((total - free) / total) * 100;
   const processRssMb = Math.round(used.rss / 1024 / 1024);
-  const warnThresholdMb = MEMORY_LIMIT_WARN;
-  const criticalThresholdMb = MEMORY_LIMIT_CRITICAL;
 
   let status = "ok";
-  if (processRssMb > criticalThresholdMb) status = "critical";
-  else if (processRssMb > warnThresholdMb) status = "degraded";
+  if (processRssMb > memoryLimitCritical) {
+    status = "critical";
+  } else if (processRssMb > memoryLimitWarn) {
+    status = "degraded";
+  }
 
   return {
     status,
     used: {
-      rss: Math.round(used.rss / 1024 / 1024), // MB
-      heapTotal: Math.round(used.heapTotal / 1024 / 1024), // MB
-      heapUsed: Math.round(used.heapUsed / 1024 / 1024), // MB
-      external: Math.round(used.external / 1024 / 1024), // MB
+      rss: Math.round(used.rss / 1024 / 1024),
+      heapTotal: Math.round(used.heapTotal / 1024 / 1024),
+      heapUsed: Math.round(used.heapUsed / 1024 / 1024),
+      external: Math.round(used.external / 1024 / 1024),
     },
     system: {
-      total: Math.round(total / 1024 / 1024), // MB
-      free: Math.round(free / 1024 / 1024), // MB
+      total: Math.round(total / 1024 / 1024),
+      free: Math.round(free / 1024 / 1024),
       usedPercent: usedPercent.toFixed(2),
     },
     thresholds: {
-      warnRssMb: warnThresholdMb,
-      criticalRssMb: criticalThresholdMb,
+      warnRssMb: memoryLimitWarn,
+      criticalRssMb: memoryLimitCritical,
       currentRssMb: processRssMb,
     },
   };
 }
 
-/**
- * Perform CPU health check
- */
 function performCPUCheck() {
   const loadAvg = os.loadavg();
   const cpuCount = os.cpus().length;
-
-  // Calculate average load per core
   const avgLoad = loadAvg[0] / cpuCount;
 
   let status = "ok";
-  if (avgLoad > 1.5) status = "critical";
-  else if (avgLoad > 0.8) status = "degraded";
+  if (avgLoad > 1.5) {
+    status = "critical";
+  } else if (avgLoad > 0.8) {
+    status = "degraded";
+  }
 
   return {
     status,
@@ -221,7 +200,5 @@ function performCPUCheck() {
 }
 
 module.exports = {
-  router,
-  setDbCheckFunction,
-  setCacheCheckService,
+  createHealthRouter,
 };

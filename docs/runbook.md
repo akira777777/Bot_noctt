@@ -2,85 +2,95 @@
 
 ## Purpose
 
-Operational steps for safe deploy, quick incident triage, rollback, and data recovery.
+Operational guidance for deployment verification, incident triage, rollback, and data recovery.
 
-## Environments
+## Standard Deployment Verification
 
-- **Local**: developer machine (`npm start`).
-- **Render**: production deployment via `render.yaml`.
+Run before or immediately after deployment:
 
-## Standard Deployment
+- `npm test`
+- `npm run smoke:api`
+- `npm run build:web`
 
-1. Ensure quality gates pass locally:
-   - `npm run test:coverage`
-   - `npm run build:web`
-   - `npm run smoke:api`
-2. Deploy to Render (Blueprint or connected branch).
-3. Confirm service is healthy:
-   - `GET /healthz` returns `200` and a payload with `"status": "ok"`.
-4. Perform Telegram smoke:
-   - admin `/start`
-   - create one lead via Telegram flow (or via the web lead form)
-   - confirm that admin receives a lead notification.
+Then verify:
 
-## Post-Deploy Smoke Checklist
+- `GET /healthz` returns `200`
+- `GET /api/catalog` returns `{ ok: true }`
+- if `BOT_ENABLED=true`, Telegram `/start` works and one request can be created
+
+## Post-Deploy Smoke
 
 - API:
-  - `GET /api/catalog` returns `{ ok: true }` and a non-empty products list (when DB is seeded).
-  - `GET /api/admin/leads` works when the request includes `X-Api-Key` (if `API_SECRET` is configured) or via the web dashboard UI.
+  - `GET /api/catalog`
+  - `GET /api/admin/leads` with `X-Api-Key`
+- Dashboard:
+  - admin page loads
+  - requests list renders
 - Bot:
-  - client can open menu and send message to manager.
-  - lead flow reaches `confirm` and successfully creates a lead.
+  - client opens menu
+  - request flow reaches confirm
+  - admin receives request notification
 - Observability:
-  - request logs include `requestId`, status, and duration.
+  - request logs contain `requestId`, status, and duration
 
 ## Incident Triage
 
-1. Check Render deploy status and recent logs.
+1. Check deploy status and recent logs.
 2. Check `/healthz`.
 3. If API is failing:
-   - look for `unhandled_http_error` log entries with `requestId`.
-   - identify failing route and payload.
-4. If bot is failing:
-   - inspect `Unhandled bot error` and lead/action callback logs.
-5. If issue is active and user-facing, rollback immediately.
+   - inspect `requestId`
+   - identify failing route and payload shape
+4. If Telegram is failing:
+   - inspect bot startup/runtime logs
+   - verify token and delivery mode
+5. If issue is user-facing and active, rollback first.
+
+## Common Failure Modes
+
+- Missing `BOT_TOKEN` with `BOT_ENABLED=true`
+- `TELEGRAM_DELIVERY_MODE=webhook` without a usable `WEBHOOK_DOMAIN`
+- missing `API_SECRET` in production causing admin HTTP API to fail closed
+- Redis unavailable, causing cache/queue fallback or degraded background processing
 
 ## Rollback Procedure
 
-1. In Render, open the latest successful deployment before the incident.
-2. Rollback to that deployment.
-3. Re-check:
+1. Roll back application code or container image.
+2. Re-check:
    - `/healthz`
-   - Telegram `/start`
-   - one lead creation path.
-4. Record incident summary and root cause in team notes.
+   - `/api/catalog`
+   - Telegram `/start` if bot mode is enabled
+3. If data recovery is required:
+   - `npm run backup`
+   - `npm run restore-check`
+   - restore the SQLite file used by `DB_PATH`
+4. Re-run a smoke request through the system.
 
-## Data Backup and Restore Drill
+## Backup and Restore Drill
 
-### Create backup
+Create backup:
 
-- `npm run backup`
+```bash
+npm run backup
+```
 
-### Verify backup integrity
+Verify integrity:
 
-- `npm run restore-check`
+```bash
+npm run restore-check
+```
 
-### Recovery drill (staging/local)
+Recovery drill:
 
-1. Stop app.
-2. Replace DB file used by `DB_PATH` with the restored backup copy.
-3. Start app.
+1. Stop the app
+2. Replace the DB file at `DB_PATH` with a verified backup
+3. Start the app
 4. Validate:
-   - `/dialogs` shows historical conversations.
-   - `/leads` shows expected lead statuses.
+   - dialogs exist
+   - requests exist
+   - canonical statuses render as expected
 
-## Escalation Guidance
+## Severity Guidance
 
-- **P1**: service unavailable, cannot create leads, admin cannot access API.
-- **P2**: degraded behavior in one flow (for example callback actions failing).
-- **P3**: non-blocking UI or formatting issues.
-
-For P1/P2:
-
-- rollback first, investigate second.
-- include failing `requestId` and timestamp in escalation message.
+- P1: service unavailable, cannot create requests, admin API unavailable unexpectedly
+- P2: one major flow degraded, including Telegram delivery failures or callback actions failing
+- P3: non-blocking UI/copy/reporting issues

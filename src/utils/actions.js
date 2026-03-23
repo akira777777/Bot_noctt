@@ -30,6 +30,7 @@ const ACTION_PREFIXES = Object.freeze({
   ADMIN_LEAD_OUT_OF_STOCK: "admin:lead_out_of_stock:",
   ADMIN_LEAD_NOT_RELEVANT: "admin:lead_not_relevant:",
   ADMIN_LEAD_CALLED_BACK: "admin:lead_called_back:",
+  ADMIN_LEAD_PROPOSAL_SENT: "admin:lead_proposal_sent:",
   ADMIN_LEAD_AWAITING_PAYMENT: "admin:lead_awaiting_payment:",
   ADMIN_LEAD_FULFILLED: "admin:lead_fulfilled:",
   ADMIN_TEMPLATE: "admin:template:",

@@ -1,6 +1,11 @@
 const {
   generateLeadTrackingToken,
 } = require("../domain/tracking-token");
+const {
+  normalizeLeadRecord,
+  normalizeLeadRecords,
+  normalizeLeadStatus,
+} = require("../domain/lead-status");
 
 function createLeadsRepo(db) {
   const create = db.prepare(`
@@ -257,6 +262,7 @@ function createLeadsRepo(db) {
     create(payload) {
       const nextPayload = {
         ...payload,
+        status: normalizeLeadStatus(payload.status) || payload.status,
         tracking_token: payload.tracking_token || generateLeadTrackingToken(),
         first_admin_reply_at: payload.first_admin_reply_at || null,
         closed_reason: payload.closed_reason || null,
@@ -265,61 +271,63 @@ function createLeadsRepo(db) {
       };
 
       try {
-        return create.get(nextPayload);
+        return normalizeLeadRecord(create.get(nextPayload));
       } catch (error) {
         if (
           !payload.tracking_token &&
           typeof error?.message === "string" &&
           error.message.includes("idx_leads_tracking_token")
         ) {
-          return create.get({
+          return normalizeLeadRecord(create.get({
             ...nextPayload,
             tracking_token: generateLeadTrackingToken(),
-          });
+          }));
         }
         throw error;
       }
     },
     list(limit = 10) {
-      return list.all(limit);
+      return normalizeLeadRecords(list.all(limit));
     },
     listAll() {
-      return listAll.all();
+      return normalizeLeadRecords(listAll.all());
     },
     listPaginated(limit, offset) {
-      return listPaginated.all(limit, offset);
+      return normalizeLeadRecords(listPaginated.all(limit, offset));
     },
     listByStatusPaginated(status, limit, offset) {
-      return listByStatusPaginated.all(status, limit, offset);
+      return normalizeLeadRecords(
+        listByStatusPaginated.all(normalizeLeadStatus(status) || status, limit, offset),
+      );
     },
     countAll() {
       return countAll.get().cnt;
     },
     countByStatus(status) {
-      return countByStatus.get(status).cnt;
+      return countByStatus.get(normalizeLeadStatus(status) || status).cnt;
     },
     getById(id) {
-      return getById.get(id);
+      return normalizeLeadRecord(getById.get(id));
     },
     getByTrackingToken(trackingToken) {
-      return getByTrackingToken.get(trackingToken);
+      return normalizeLeadRecord(getByTrackingToken.get(trackingToken));
     },
     getLatestByClient(telegramId) {
-      return getLatestByClient.get(telegramId);
+      return normalizeLeadRecord(getLatestByClient.get(telegramId));
     },
     getLatestOpenByClient(telegramId) {
-      return getLatestOpenByClient.get(telegramId);
+      return normalizeLeadRecord(getLatestOpenByClient.get(telegramId));
     },
     getOpenByClientAndProduct(telegramId, productCode) {
-      return getOpenByClientAndProduct.get(telegramId, productCode);
+      return normalizeLeadRecord(getOpenByClientAndProduct.get(telegramId, productCode));
     },
     updateStatus(id, status, metadata = {}) {
-      return updateStatus.get({
+      return normalizeLeadRecord(updateStatus.get({
         id,
-        status,
+        status: normalizeLeadStatus(status) || status,
         closed_reason: metadata.closedReason || null,
         next_follow_up_at: metadata.nextFollowUpAt || null,
-      });
+      }));
     },
     recordFirstAdminReplyByClient(telegramId) {
       const lead = getLatestOpenByClient.get(telegramId);
@@ -348,9 +356,11 @@ function createLeadsRepo(db) {
       return countNewToday.get().cnt;
     },
     listPendingSlaReminder(reminderKey, limit = 20) {
-      return reminderKey === "60m"
-        ? listPendingSla60m.all(limit)
-        : listPendingSla15m.all(limit);
+      return normalizeLeadRecords(
+        reminderKey === "60m"
+          ? listPendingSla60m.all(limit)
+          : listPendingSla15m.all(limit),
+      );
     },
     markSlaReminderSent(leadId, reminderKey) {
       if (reminderKey === "60m") {
@@ -360,13 +370,13 @@ function createLeadsRepo(db) {
       markSla15mReminderSent.run(leadId);
     },
     listDueFollowUps(limit = 20) {
-      return listDueFollowUps.all(limit);
+      return normalizeLeadRecords(listDueFollowUps.all(limit));
     },
     markFollowUpReminderSent(leadId) {
       markFollowUpReminderSent.run(leadId);
     },
     listPriorityInbox(limit = 10) {
-      return listPriorityInbox.all(limit);
+      return normalizeLeadRecords(listPriorityInbox.all(limit));
     },
     countOverdue() {
       return countOverdue.get().cnt;
