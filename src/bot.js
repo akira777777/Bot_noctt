@@ -1,5 +1,6 @@
 const { Telegraf } = require("telegraf");
-const { BOT_TOKEN, ADMIN_ID, WEB_APP_URL } = require("./config/env");
+const { BOT_TOKEN, ADMIN_ID, WEB_APP_URL, AI_MODEL, AI_ENABLED } = require("./config/env");
+const { createAiAgentService } = require("./services/ai-agent-service");
 const {
   createConversationService,
 } = require("./services/conversation-service");
@@ -32,6 +33,11 @@ function createBot({ db, repos, cacheService = null, queueService = null }) {
 
   const catalog = createCatalogService({ repos });
   const ai = createAiService({ repos });
+  const aiAgent = createAiAgentService({
+    repos,
+    catalogService: catalog,
+    config: { enabled: AI_ENABLED, aiModel: AI_MODEL },
+  });
   const conversation = createConversationService({
     repos,
     bot,
@@ -64,6 +70,7 @@ function createBot({ db, repos, cacheService = null, queueService = null }) {
       leadStatus,
       lead,
       ai,
+      aiAgent,
     },
     adminId: ADMIN_ID,
     webAppUrl: WEB_APP_URL,
