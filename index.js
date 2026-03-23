@@ -82,6 +82,21 @@ function startHttpServer(app, port) {
   });
 }
 
+function shouldUseWebhookMode(webhookDomain) {
+  if (!webhookDomain) {
+    return false;
+  }
+  const normalized = String(webhookDomain).trim().toLowerCase();
+  // Guard against placeholder values that break local bot updates.
+  if (
+    normalized.includes("your-app.onrender.com") ||
+    normalized.includes("example.com")
+  ) {
+    return false;
+  }
+  return true;
+}
+
 async function teardown(resources, reason) {
   if (!resources) {
     return;
@@ -303,6 +318,13 @@ async function bootstrap() {
     cacheService,
   });
 
+  const webhookEnabled = shouldUseWebhookMode(WEBHOOK_DOMAIN);
+  if (WEBHOOK_DOMAIN && !webhookEnabled) {
+    log.warn("WEBHOOK_DOMAIN looks like placeholder; falling back to polling", {
+      webhookDomain: WEBHOOK_DOMAIN,
+    });
+  }
+
   // Create web server
   const webServer = createWebServer({
     repos,
@@ -318,7 +340,7 @@ async function bootstrap() {
   });
 
   // Mount webhook handler if using webhook mode
-  if (WEBHOOK_DOMAIN) {
+  if (webhookEnabled) {
     const webhookPath = `/webhook/${BOT_TOKEN}`;
     webServer.use(bot.webhookCallback(webhookPath));
     log.info("Webhook handler mounted", { path: webhookPath });
@@ -345,7 +367,7 @@ async function bootstrap() {
 
     // Launch bot
     try {
-      if (WEBHOOK_DOMAIN) {
+      if (webhookEnabled) {
         const webhookUrl = `${WEBHOOK_DOMAIN}/webhook/${BOT_TOKEN}`;
         await bot.telegram.setWebhook(webhookUrl);
         resources.botLaunched = true;
