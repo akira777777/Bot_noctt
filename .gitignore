@@ -9,18 +9,19 @@ data/*.sqlite-shm
 # Backups
 backups/
 
-# Build output
-webapp/dist/
+# Next.js build output
+web/.next/
+web/out/
 
 # Vercel
 .vercel/
 
 # Local env overrides
 .env.local
+.env*.local
 
 # Windows reserved names (avoid git add failures)
 nul
 con
 prn
 aux
-.claude/worktrees/charming-mahavira
