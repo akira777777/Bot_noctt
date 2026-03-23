@@ -633,3 +633,315 @@
 2026-03-23T14:54:11: {"level":"INFO","time":"2026-03-23T13:54:11.793Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
 2026-03-23T14:54:11: {"level":"INFO","time":"2026-03-23T13:54:11.793Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
 2026-03-23T14:54:11: {"level":"INFO","time":"2026-03-23T13:54:11.834Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T16:05:29: [dotenv@17.3.1] injecting env (6) from .env.local -- tip: ⚡️ secrets for agents: https://dotenvx.com/as2
+2026-03-23T16:05:29: [dotenv@17.3.1] injecting env (11) from .env -- tip: ⚡️ secrets for agents: https://dotenvx.com/as2
+2026-03-23T16:05:29: {"ts":"2026-03-23T15:05:29.455Z","level":"warn","msg":"CORS_ORIGIN is not set in production; all origins are allowed"}
+2026-03-23T16:05:30: {"level":"INFO","time":"2026-03-23T15:05:30.030Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T16:05:30: {"level":"INFO","time":"2026-03-23T15:05:30.049Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T16:05:30: {"level":"INFO","time":"2026-03-23T15:05:30.069Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T16:05:30: {"level":"INFO","time":"2026-03-23T15:05:30.071Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T16:05:30: {"level":"INFO","time":"2026-03-23T15:05:30.072Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T16:05:30: {"level":"INFO","time":"2026-03-23T15:05:30.072Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T16:05:30: {"level":"INFO","time":"2026-03-23T15:05:30.072Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
+2026-03-23T16:05:30: {"level":"INFO","time":"2026-03-23T15:05:30.079Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T16:05:30: {"level":"INFO","time":"2026-03-23T15:05:30.079Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T16:05:30: {"level":"INFO","time":"2026-03-23T15:05:30.079Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T16:05:30: {"level":"INFO","time":"2026-03-23T15:05:30.080Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"polling","effectiveMode":"polling"}
+2026-03-23T16:05:30: {"level":"INFO","time":"2026-03-23T15:05:30.103Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T16:05:45: {"level":"ERROR","time":"2026-03-23T15:05:45.108Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T16:05:45: {"level":"INFO","time":"2026-03-23T15:05:45.108Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T16:05:45: {"level":"ERROR","time":"2026-03-23T15:05:45.108Z","service":"telegram-bot","env":"production","msg":"Error closing HTTP server","error":{"error":"[object Object]"}}
+2026-03-23T16:05:45: {"level":"INFO","time":"2026-03-23T15:05:45.108Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T16:05:45: {"level":"INFO","time":"2026-03-23T15:05:45.624Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:05:45: {"level":"INFO","time":"2026-03-23T15:05:45.624Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:05:45: {"level":"INFO","time":"2026-03-23T15:05:45.625Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T16:05:45: {"level":"INFO","time":"2026-03-23T15:05:45.625Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T16:05:45: {"level":"INFO","time":"2026-03-23T15:05:45.625Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T16:05:45: {"level":"INFO","time":"2026-03-23T15:05:45.625Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T16:05:45: {"level":"ERROR","time":"2026-03-23T15:05:45.625Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T16:05:49: [dotenv@17.3.1] injecting env (6) from .env.local -- tip: ⚡️ secrets for agents: https://dotenvx.com/as2
+2026-03-23T16:05:49: [dotenv@17.3.1] injecting env (11) from .env -- tip: ⚙️  override existing env vars with { override: true }
+2026-03-23T16:05:49: {"ts":"2026-03-23T15:05:49.871Z","level":"warn","msg":"CORS_ORIGIN is not set in production; all origins are allowed"}
+2026-03-23T16:05:50: {"level":"INFO","time":"2026-03-23T15:05:50.375Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T16:05:50: {"level":"INFO","time":"2026-03-23T15:05:50.384Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T16:05:50: {"level":"INFO","time":"2026-03-23T15:05:50.401Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T16:05:50: {"level":"INFO","time":"2026-03-23T15:05:50.403Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T16:05:50: {"level":"INFO","time":"2026-03-23T15:05:50.403Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T16:05:50: {"level":"INFO","time":"2026-03-23T15:05:50.403Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T16:05:50: {"level":"INFO","time":"2026-03-23T15:05:50.403Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
+2026-03-23T16:05:50: {"level":"INFO","time":"2026-03-23T15:05:50.411Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T16:05:50: {"level":"INFO","time":"2026-03-23T15:05:50.411Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T16:05:50: {"level":"INFO","time":"2026-03-23T15:05:50.411Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T16:05:50: {"level":"INFO","time":"2026-03-23T15:05:50.412Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"polling","effectiveMode":"polling"}
+2026-03-23T16:05:50: {"level":"INFO","time":"2026-03-23T15:05:50.435Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T16:06:05: {"level":"ERROR","time":"2026-03-23T15:06:05.437Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T16:06:05: {"level":"INFO","time":"2026-03-23T15:06:05.437Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T16:06:05: {"level":"ERROR","time":"2026-03-23T15:06:05.438Z","service":"telegram-bot","env":"production","msg":"Error closing HTTP server","error":{"error":"[object Object]"}}
+2026-03-23T16:06:05: {"level":"INFO","time":"2026-03-23T15:06:05.438Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T16:06:05: {"level":"INFO","time":"2026-03-23T15:06:05.946Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:06:05: {"level":"INFO","time":"2026-03-23T15:06:05.946Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:06:05: {"level":"INFO","time":"2026-03-23T15:06:05.946Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T16:06:05: {"level":"INFO","time":"2026-03-23T15:06:05.946Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T16:06:05: {"level":"INFO","time":"2026-03-23T15:06:05.947Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T16:06:05: {"level":"INFO","time":"2026-03-23T15:06:05.947Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T16:06:05: {"level":"ERROR","time":"2026-03-23T15:06:05.947Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T16:06:10: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+2026-03-23T16:06:10: [dotenv@17.3.1] injecting env (17) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+2026-03-23T16:06:10: {"ts":"2026-03-23T15:06:10.270Z","level":"warn","msg":"CORS_ORIGIN is not set in production; all origins are allowed"}
+2026-03-23T16:06:10: {"level":"INFO","time":"2026-03-23T15:06:10.831Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T16:06:10: {"level":"INFO","time":"2026-03-23T15:06:10.840Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T16:06:10: {"level":"INFO","time":"2026-03-23T15:06:10.858Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T16:06:10: {"level":"INFO","time":"2026-03-23T15:06:10.860Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T16:06:10: {"level":"INFO","time":"2026-03-23T15:06:10.861Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T16:06:10: {"level":"INFO","time":"2026-03-23T15:06:10.861Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T16:06:10: {"level":"INFO","time":"2026-03-23T15:06:10.861Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
+2026-03-23T16:06:10: {"level":"INFO","time":"2026-03-23T15:06:10.869Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T16:06:10: {"level":"INFO","time":"2026-03-23T15:06:10.869Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T16:06:10: {"level":"INFO","time":"2026-03-23T15:06:10.869Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T16:06:10: {"level":"INFO","time":"2026-03-23T15:06:10.871Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"polling","effectiveMode":"polling"}
+2026-03-23T16:06:10: {"level":"INFO","time":"2026-03-23T15:06:10.895Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T16:06:11: {"level":"ERROR","time":"2026-03-23T15:06:11.002Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T16:06:11: {"level":"INFO","time":"2026-03-23T15:06:11.002Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T16:06:11: {"level":"ERROR","time":"2026-03-23T15:06:11.002Z","service":"telegram-bot","env":"production","msg":"Error closing HTTP server","error":{"error":"[object Object]"}}
+2026-03-23T16:06:11: {"level":"INFO","time":"2026-03-23T15:06:11.002Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T16:06:11: {"level":"INFO","time":"2026-03-23T15:06:11.522Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:06:11: {"level":"INFO","time":"2026-03-23T15:06:11.522Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:06:11: {"level":"INFO","time":"2026-03-23T15:06:11.523Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T16:06:11: {"level":"INFO","time":"2026-03-23T15:06:11.523Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T16:06:11: {"level":"INFO","time":"2026-03-23T15:06:11.523Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T16:06:11: {"level":"INFO","time":"2026-03-23T15:06:11.523Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T16:06:11: {"level":"ERROR","time":"2026-03-23T15:06:11.523Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T16:06:15: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+2026-03-23T16:06:15: [dotenv@17.3.1] injecting env (17) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+2026-03-23T16:06:15: {"ts":"2026-03-23T15:06:15.768Z","level":"warn","msg":"CORS_ORIGIN is not set in production; all origins are allowed"}
+2026-03-23T16:06:16: {"level":"INFO","time":"2026-03-23T15:06:16.220Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T16:06:16: {"level":"INFO","time":"2026-03-23T15:06:16.227Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T16:06:16: {"level":"INFO","time":"2026-03-23T15:06:16.246Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T16:06:16: {"level":"INFO","time":"2026-03-23T15:06:16.248Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T16:06:16: {"level":"INFO","time":"2026-03-23T15:06:16.249Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T16:06:16: {"level":"INFO","time":"2026-03-23T15:06:16.249Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T16:06:16: {"level":"INFO","time":"2026-03-23T15:06:16.249Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
+2026-03-23T16:06:16: {"level":"INFO","time":"2026-03-23T15:06:16.257Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T16:06:16: {"level":"INFO","time":"2026-03-23T15:06:16.257Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T16:06:16: {"level":"INFO","time":"2026-03-23T15:06:16.257Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T16:06:16: {"level":"INFO","time":"2026-03-23T15:06:16.258Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"polling","effectiveMode":"polling"}
+2026-03-23T16:06:16: {"level":"INFO","time":"2026-03-23T15:06:16.280Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T16:06:16: {"level":"ERROR","time":"2026-03-23T15:06:16.376Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T16:06:16: {"level":"INFO","time":"2026-03-23T15:06:16.376Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T16:06:16: {"level":"ERROR","time":"2026-03-23T15:06:16.376Z","service":"telegram-bot","env":"production","msg":"Error closing HTTP server","error":{"error":"[object Object]"}}
+2026-03-23T16:06:16: {"level":"INFO","time":"2026-03-23T15:06:16.376Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T16:06:16: {"level":"INFO","time":"2026-03-23T15:06:16.894Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:06:16: {"level":"INFO","time":"2026-03-23T15:06:16.894Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:06:16: {"level":"INFO","time":"2026-03-23T15:06:16.895Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T16:06:16: {"level":"INFO","time":"2026-03-23T15:06:16.896Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T16:06:16: {"level":"INFO","time":"2026-03-23T15:06:16.896Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T16:06:16: {"level":"INFO","time":"2026-03-23T15:06:16.896Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T16:06:16: {"level":"ERROR","time":"2026-03-23T15:06:16.896Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T16:06:21: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: 🛡️ auth for agents: https://vestauth.com
+2026-03-23T16:06:21: [dotenv@17.3.1] injecting env (17) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+2026-03-23T16:06:21: {"ts":"2026-03-23T15:06:21.149Z","level":"warn","msg":"CORS_ORIGIN is not set in production; all origins are allowed"}
+2026-03-23T16:06:21: {"level":"INFO","time":"2026-03-23T15:06:21.686Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T16:06:21: {"level":"INFO","time":"2026-03-23T15:06:21.694Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T16:06:21: {"level":"INFO","time":"2026-03-23T15:06:21.713Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T16:06:21: {"level":"INFO","time":"2026-03-23T15:06:21.715Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T16:06:21: {"level":"INFO","time":"2026-03-23T15:06:21.716Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T16:06:21: {"level":"INFO","time":"2026-03-23T15:06:21.716Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T16:06:21: {"level":"INFO","time":"2026-03-23T15:06:21.716Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
+2026-03-23T16:06:21: {"level":"INFO","time":"2026-03-23T15:06:21.724Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T16:06:21: {"level":"INFO","time":"2026-03-23T15:06:21.724Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T16:06:21: {"level":"INFO","time":"2026-03-23T15:06:21.724Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T16:06:21: {"level":"INFO","time":"2026-03-23T15:06:21.726Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"polling","effectiveMode":"polling"}
+2026-03-23T16:06:21: {"level":"INFO","time":"2026-03-23T15:06:21.752Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T16:06:21: {"level":"ERROR","time":"2026-03-23T15:06:21.850Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T16:06:21: {"level":"INFO","time":"2026-03-23T15:06:21.850Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T16:06:21: {"level":"ERROR","time":"2026-03-23T15:06:21.851Z","service":"telegram-bot","env":"production","msg":"Error closing HTTP server","error":{"error":"[object Object]"}}
+2026-03-23T16:06:21: {"level":"INFO","time":"2026-03-23T15:06:21.851Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T16:06:22: {"level":"INFO","time":"2026-03-23T15:06:22.368Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:06:22: {"level":"INFO","time":"2026-03-23T15:06:22.368Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:06:22: {"level":"INFO","time":"2026-03-23T15:06:22.369Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T16:06:22: {"level":"INFO","time":"2026-03-23T15:06:22.369Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T16:06:22: {"level":"INFO","time":"2026-03-23T15:06:22.370Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T16:06:22: {"level":"INFO","time":"2026-03-23T15:06:22.370Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T16:06:22: {"level":"ERROR","time":"2026-03-23T15:06:22.370Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T16:06:26: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: 🛡️ auth for agents: https://vestauth.com
+2026-03-23T16:06:26: [dotenv@17.3.1] injecting env (17) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+2026-03-23T16:06:26: {"ts":"2026-03-23T15:06:26.660Z","level":"warn","msg":"CORS_ORIGIN is not set in production; all origins are allowed"}
+2026-03-23T16:06:27: {"level":"INFO","time":"2026-03-23T15:06:27.319Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T16:06:27: {"level":"INFO","time":"2026-03-23T15:06:27.326Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T16:06:27: {"level":"INFO","time":"2026-03-23T15:06:27.346Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T16:06:27: {"level":"INFO","time":"2026-03-23T15:06:27.348Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T16:06:27: {"level":"INFO","time":"2026-03-23T15:06:27.349Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T16:06:27: {"level":"INFO","time":"2026-03-23T15:06:27.349Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T16:06:27: {"level":"INFO","time":"2026-03-23T15:06:27.349Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
+2026-03-23T16:06:27: {"level":"INFO","time":"2026-03-23T15:06:27.356Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T16:06:27: {"level":"INFO","time":"2026-03-23T15:06:27.356Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T16:06:27: {"level":"INFO","time":"2026-03-23T15:06:27.357Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T16:06:27: {"level":"INFO","time":"2026-03-23T15:06:27.358Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"polling","effectiveMode":"polling"}
+2026-03-23T16:06:27: {"level":"INFO","time":"2026-03-23T15:06:27.381Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T16:06:27: {"level":"ERROR","time":"2026-03-23T15:06:27.484Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T16:06:27: {"level":"INFO","time":"2026-03-23T15:06:27.484Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T16:06:27: {"level":"ERROR","time":"2026-03-23T15:06:27.484Z","service":"telegram-bot","env":"production","msg":"Error closing HTTP server","error":{"error":"[object Object]"}}
+2026-03-23T16:06:27: {"level":"INFO","time":"2026-03-23T15:06:27.485Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T16:06:27: {"level":"INFO","time":"2026-03-23T15:06:27.999Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:06:27: {"level":"INFO","time":"2026-03-23T15:06:27.999Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:06:27: {"level":"INFO","time":"2026-03-23T15:06:28.000Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T16:06:28: {"level":"INFO","time":"2026-03-23T15:06:28.000Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T16:06:28: {"level":"INFO","time":"2026-03-23T15:06:28.000Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T16:06:28: {"level":"INFO","time":"2026-03-23T15:06:28.000Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T16:06:28: {"level":"ERROR","time":"2026-03-23T15:06:28.000Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T16:06:32: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+2026-03-23T16:06:32: [dotenv@17.3.1] injecting env (17) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+2026-03-23T16:06:32: {"ts":"2026-03-23T15:06:32.235Z","level":"warn","msg":"CORS_ORIGIN is not set in production; all origins are allowed"}
+2026-03-23T16:06:32: {"level":"INFO","time":"2026-03-23T15:06:32.709Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T16:06:32: {"level":"INFO","time":"2026-03-23T15:06:32.717Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T16:06:32: {"level":"INFO","time":"2026-03-23T15:06:32.736Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T16:06:32: {"level":"INFO","time":"2026-03-23T15:06:32.739Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T16:06:32: {"level":"INFO","time":"2026-03-23T15:06:32.739Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T16:06:32: {"level":"INFO","time":"2026-03-23T15:06:32.739Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T16:06:32: {"level":"INFO","time":"2026-03-23T15:06:32.739Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
+2026-03-23T16:06:32: {"level":"INFO","time":"2026-03-23T15:06:32.747Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T16:06:32: {"level":"INFO","time":"2026-03-23T15:06:32.748Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T16:06:32: {"level":"INFO","time":"2026-03-23T15:06:32.748Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T16:06:32: {"level":"INFO","time":"2026-03-23T15:06:32.749Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"polling","effectiveMode":"polling"}
+2026-03-23T16:06:32: {"level":"INFO","time":"2026-03-23T15:06:32.771Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T16:06:32: {"level":"ERROR","time":"2026-03-23T15:06:32.864Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T16:06:32: {"level":"INFO","time":"2026-03-23T15:06:32.864Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T16:06:32: {"level":"ERROR","time":"2026-03-23T15:06:32.865Z","service":"telegram-bot","env":"production","msg":"Error closing HTTP server","error":{"error":"[object Object]"}}
+2026-03-23T16:06:32: {"level":"INFO","time":"2026-03-23T15:06:32.865Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T16:06:33: {"level":"INFO","time":"2026-03-23T15:06:33.372Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:06:33: {"level":"INFO","time":"2026-03-23T15:06:33.372Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:06:33: {"level":"INFO","time":"2026-03-23T15:06:33.373Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T16:06:33: {"level":"INFO","time":"2026-03-23T15:06:33.373Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T16:06:33: {"level":"INFO","time":"2026-03-23T15:06:33.373Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T16:06:33: {"level":"INFO","time":"2026-03-23T15:06:33.374Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T16:06:33: {"level":"ERROR","time":"2026-03-23T15:06:33.374Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T16:06:37: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+2026-03-23T16:06:37: [dotenv@17.3.1] injecting env (17) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+2026-03-23T16:06:37: {"ts":"2026-03-23T15:06:37.612Z","level":"warn","msg":"CORS_ORIGIN is not set in production; all origins are allowed"}
+2026-03-23T16:06:38: {"level":"INFO","time":"2026-03-23T15:06:38.104Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T16:06:38: {"level":"INFO","time":"2026-03-23T15:06:38.112Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T16:06:38: {"level":"INFO","time":"2026-03-23T15:06:38.131Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T16:06:38: {"level":"INFO","time":"2026-03-23T15:06:38.133Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T16:06:38: {"level":"INFO","time":"2026-03-23T15:06:38.133Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T16:06:38: {"level":"INFO","time":"2026-03-23T15:06:38.133Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T16:06:38: {"level":"INFO","time":"2026-03-23T15:06:38.133Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
+2026-03-23T16:06:38: {"level":"INFO","time":"2026-03-23T15:06:38.141Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T16:06:38: {"level":"INFO","time":"2026-03-23T15:06:38.141Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T16:06:38: {"level":"INFO","time":"2026-03-23T15:06:38.141Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T16:06:38: {"level":"INFO","time":"2026-03-23T15:06:38.143Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"polling","effectiveMode":"polling"}
+2026-03-23T16:06:38: {"level":"INFO","time":"2026-03-23T15:06:38.166Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T16:06:38: {"level":"ERROR","time":"2026-03-23T15:06:38.268Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T16:06:38: {"level":"INFO","time":"2026-03-23T15:06:38.268Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T16:06:38: {"level":"ERROR","time":"2026-03-23T15:06:38.269Z","service":"telegram-bot","env":"production","msg":"Error closing HTTP server","error":{"error":"[object Object]"}}
+2026-03-23T16:06:38: {"level":"INFO","time":"2026-03-23T15:06:38.269Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T16:06:38: {"level":"INFO","time":"2026-03-23T15:06:38.778Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:06:38: {"level":"INFO","time":"2026-03-23T15:06:38.778Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:06:38: {"level":"INFO","time":"2026-03-23T15:06:38.779Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T16:06:38: {"level":"INFO","time":"2026-03-23T15:06:38.779Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T16:06:38: {"level":"INFO","time":"2026-03-23T15:06:38.779Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T16:06:38: {"level":"INFO","time":"2026-03-23T15:06:38.779Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T16:06:38: {"level":"ERROR","time":"2026-03-23T15:06:38.779Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T16:06:43: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+2026-03-23T16:06:43: [dotenv@17.3.1] injecting env (17) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+2026-03-23T16:06:43: {"ts":"2026-03-23T15:06:43.032Z","level":"warn","msg":"CORS_ORIGIN is not set in production; all origins are allowed"}
+2026-03-23T16:06:43: {"level":"INFO","time":"2026-03-23T15:06:43.614Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T16:06:43: {"level":"INFO","time":"2026-03-23T15:06:43.621Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T16:06:43: {"level":"INFO","time":"2026-03-23T15:06:43.640Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T16:06:43: {"level":"INFO","time":"2026-03-23T15:06:43.642Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T16:06:43: {"level":"INFO","time":"2026-03-23T15:06:43.643Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T16:06:43: {"level":"INFO","time":"2026-03-23T15:06:43.643Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T16:06:43: {"level":"INFO","time":"2026-03-23T15:06:43.643Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
+2026-03-23T16:06:43: {"level":"INFO","time":"2026-03-23T15:06:43.651Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T16:06:43: {"level":"INFO","time":"2026-03-23T15:06:43.651Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T16:06:43: {"level":"INFO","time":"2026-03-23T15:06:43.651Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T16:06:43: {"level":"INFO","time":"2026-03-23T15:06:43.653Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"polling","effectiveMode":"polling"}
+2026-03-23T16:06:43: {"level":"INFO","time":"2026-03-23T15:06:43.676Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T16:06:43: {"level":"ERROR","time":"2026-03-23T15:06:43.769Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T16:06:43: {"level":"INFO","time":"2026-03-23T15:06:43.769Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T16:06:43: {"level":"ERROR","time":"2026-03-23T15:06:43.769Z","service":"telegram-bot","env":"production","msg":"Error closing HTTP server","error":{"error":"[object Object]"}}
+2026-03-23T16:06:43: {"level":"INFO","time":"2026-03-23T15:06:43.769Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T16:06:44: {"level":"INFO","time":"2026-03-23T15:06:44.276Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:06:44: {"level":"INFO","time":"2026-03-23T15:06:44.276Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:06:44: {"level":"INFO","time":"2026-03-23T15:06:44.277Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T16:06:44: {"level":"INFO","time":"2026-03-23T15:06:44.277Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T16:06:44: {"level":"INFO","time":"2026-03-23T15:06:44.277Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T16:06:44: {"level":"INFO","time":"2026-03-23T15:06:44.277Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T16:06:44: {"level":"ERROR","time":"2026-03-23T15:06:44.277Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T16:06:48: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+2026-03-23T16:06:48: [dotenv@17.3.1] injecting env (17) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+2026-03-23T16:06:48: {"ts":"2026-03-23T15:06:48.500Z","level":"warn","msg":"CORS_ORIGIN is not set in production; all origins are allowed"}
+2026-03-23T16:06:48: {"level":"INFO","time":"2026-03-23T15:06:48.957Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T16:06:48: {"level":"INFO","time":"2026-03-23T15:06:48.965Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T16:06:48: {"level":"INFO","time":"2026-03-23T15:06:48.983Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T16:06:48: {"level":"INFO","time":"2026-03-23T15:06:48.985Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T16:06:48: {"level":"INFO","time":"2026-03-23T15:06:48.986Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T16:06:48: {"level":"INFO","time":"2026-03-23T15:06:48.986Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T16:06:48: {"level":"INFO","time":"2026-03-23T15:06:48.986Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
+2026-03-23T16:06:48: {"level":"INFO","time":"2026-03-23T15:06:48.993Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T16:06:49: {"level":"INFO","time":"2026-03-23T15:06:48.993Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T16:06:49: {"level":"INFO","time":"2026-03-23T15:06:48.993Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T16:06:49: {"level":"INFO","time":"2026-03-23T15:06:48.994Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"polling","effectiveMode":"polling"}
+2026-03-23T16:06:49: {"level":"INFO","time":"2026-03-23T15:06:49.017Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T16:06:49: {"level":"ERROR","time":"2026-03-23T15:06:49.133Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T16:06:49: {"level":"INFO","time":"2026-03-23T15:06:49.133Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T16:06:49: {"level":"ERROR","time":"2026-03-23T15:06:49.133Z","service":"telegram-bot","env":"production","msg":"Error closing HTTP server","error":{"error":"[object Object]"}}
+2026-03-23T16:06:49: {"level":"INFO","time":"2026-03-23T15:06:49.133Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T16:06:49: {"level":"INFO","time":"2026-03-23T15:06:49.655Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:06:49: {"level":"INFO","time":"2026-03-23T15:06:49.655Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:06:49: {"level":"INFO","time":"2026-03-23T15:06:49.656Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T16:06:49: {"level":"INFO","time":"2026-03-23T15:06:49.656Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T16:06:49: {"level":"INFO","time":"2026-03-23T15:06:49.657Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T16:06:49: {"level":"INFO","time":"2026-03-23T15:06:49.657Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T16:06:49: {"level":"ERROR","time":"2026-03-23T15:06:49.657Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T16:06:53: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+2026-03-23T16:06:53: [dotenv@17.3.1] injecting env (17) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+2026-03-23T16:06:53: {"ts":"2026-03-23T15:06:53.921Z","level":"warn","msg":"CORS_ORIGIN is not set in production; all origins are allowed"}
+2026-03-23T16:06:54: {"level":"INFO","time":"2026-03-23T15:06:54.435Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T16:06:54: {"level":"INFO","time":"2026-03-23T15:06:54.443Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T16:06:54: {"level":"INFO","time":"2026-03-23T15:06:54.458Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T16:06:54: {"level":"INFO","time":"2026-03-23T15:06:54.460Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T16:06:54: {"level":"INFO","time":"2026-03-23T15:06:54.461Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T16:06:54: {"level":"INFO","time":"2026-03-23T15:06:54.461Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T16:06:54: {"level":"INFO","time":"2026-03-23T15:06:54.461Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
+2026-03-23T16:06:54: {"level":"INFO","time":"2026-03-23T15:06:54.468Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T16:06:54: {"level":"INFO","time":"2026-03-23T15:06:54.468Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T16:06:54: {"level":"INFO","time":"2026-03-23T15:06:54.468Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T16:06:54: {"level":"INFO","time":"2026-03-23T15:06:54.470Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"polling","effectiveMode":"polling"}
+2026-03-23T16:06:54: {"level":"INFO","time":"2026-03-23T15:06:54.492Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T16:06:54: {"level":"ERROR","time":"2026-03-23T15:06:54.577Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T16:06:54: {"level":"INFO","time":"2026-03-23T15:06:54.577Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T16:06:54: {"level":"ERROR","time":"2026-03-23T15:06:54.577Z","service":"telegram-bot","env":"production","msg":"Error closing HTTP server","error":{"error":"[object Object]"}}
+2026-03-23T16:06:54: {"level":"INFO","time":"2026-03-23T15:06:54.577Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T16:06:55: {"level":"INFO","time":"2026-03-23T15:06:55.090Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:06:55: {"level":"INFO","time":"2026-03-23T15:06:55.090Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:06:55: {"level":"INFO","time":"2026-03-23T15:06:55.090Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T16:06:55: {"level":"INFO","time":"2026-03-23T15:06:55.090Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T16:06:55: {"level":"INFO","time":"2026-03-23T15:06:55.091Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T16:06:55: {"level":"INFO","time":"2026-03-23T15:06:55.091Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T16:06:55: {"level":"ERROR","time":"2026-03-23T15:06:55.091Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T16:06:59: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+2026-03-23T16:06:59: [dotenv@17.3.1] injecting env (17) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+2026-03-23T16:06:59: {"ts":"2026-03-23T15:06:59.396Z","level":"warn","msg":"CORS_ORIGIN is not set in production; all origins are allowed"}
+2026-03-23T16:07:00: {"level":"INFO","time":"2026-03-23T15:07:00.012Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T16:07:00: {"level":"INFO","time":"2026-03-23T15:07:00.023Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T16:07:00: {"level":"INFO","time":"2026-03-23T15:07:00.052Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T16:07:00: {"level":"INFO","time":"2026-03-23T15:07:00.065Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T16:07:00: {"level":"INFO","time":"2026-03-23T15:07:00.065Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T16:07:00: {"level":"INFO","time":"2026-03-23T15:07:00.066Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T16:07:00: {"level":"INFO","time":"2026-03-23T15:07:00.066Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
+2026-03-23T16:07:00: {"level":"INFO","time":"2026-03-23T15:07:00.078Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T16:07:00: {"level":"INFO","time":"2026-03-23T15:07:00.078Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T16:07:00: {"level":"INFO","time":"2026-03-23T15:07:00.079Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T16:07:00: {"level":"INFO","time":"2026-03-23T15:07:00.081Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"polling","effectiveMode":"polling"}
+2026-03-23T16:07:00: {"level":"INFO","time":"2026-03-23T15:07:00.121Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T16:07:00: {"level":"ERROR","time":"2026-03-23T15:07:00.214Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T16:07:00: {"level":"INFO","time":"2026-03-23T15:07:00.214Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T16:07:00: {"level":"ERROR","time":"2026-03-23T15:07:00.214Z","service":"telegram-bot","env":"production","msg":"Error closing HTTP server","error":{"error":"[object Object]"}}
+2026-03-23T16:07:00: {"level":"INFO","time":"2026-03-23T15:07:00.214Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T16:07:00: {"level":"INFO","time":"2026-03-23T15:07:00.732Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:07:00: {"level":"INFO","time":"2026-03-23T15:07:00.732Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T16:07:00: {"level":"INFO","time":"2026-03-23T15:07:00.734Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T16:07:00: {"level":"INFO","time":"2026-03-23T15:07:00.734Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T16:07:00: {"level":"INFO","time":"2026-03-23T15:07:00.734Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T16:07:00: {"level":"INFO","time":"2026-03-23T15:07:00.734Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T16:07:00: {"level":"ERROR","time":"2026-03-23T15:07:00.734Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
