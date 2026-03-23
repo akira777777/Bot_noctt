@@ -27,10 +27,22 @@ const LOG_FORMAT =
   optionalString("LOG_FORMAT") || (isProduction ? "json" : "pretty");
 const MEMORY_LIMIT_WARN = optionalInteger("MEMORY_LIMIT_WARN", 512);
 const MEMORY_LIMIT_CRITICAL = optionalInteger("MEMORY_LIMIT_CRITICAL", 768);
-const APP_VERSION =
-  optionalString("APP_VERSION", ["npm_package_version"]) || "1.0.0";
+const TELEGRAM_STARTUP_TIMEOUT_MS = optionalInteger(
+  "TELEGRAM_STARTUP_TIMEOUT_MS",
+  15000,
+);
+const ALLOW_BOT_LAUNCH_FAILURE = optionalBoolean(
+  "ALLOW_BOT_LAUNCH_FAILURE",
+  false,
+);
+const APP_VERSION = optionalString("APP_VERSION", ["npm_package_version"]) || "1.0.0";
+// AI via Vercel AI Gateway. Auth options:
+//   • OIDC (recommended): run `vercel link` then `vercel env pull`
+//   • Manual key: set AI_GATEWAY_API_KEY from the Vercel dashboard
+// On Vercel, VERCEL_OIDC_TOKEN is auto-provisioned. Model uses "provider/model" format: "anthropic/claude-haiku-4.5"
 const AI_GATEWAY_API_KEY = optionalString("AI_GATEWAY_API_KEY");
 const VERCEL_OIDC_TOKEN = optionalString("VERCEL_OIDC_TOKEN");
+const AI_MODEL = optionalString("AI_MODEL") || "anthropic/claude-haiku-4.5";
 const AI_ENABLED = Boolean(AI_GATEWAY_API_KEY || VERCEL_OIDC_TOKEN);
 const REDIS_URL = optionalString("REDIS_URL");
 const REDIS_HOST = optionalString("REDIS_HOST") || "localhost";
@@ -72,8 +84,14 @@ if (isProduction && !CORS_ORIGIN) {
 module.exports = {
   NODE_ENV,
   isProduction,
-  BOT_ENABLED,
+  AI_GATEWAY_API_KEY,
+  AI_MODEL,
+  AI_ENABLED,
+  BOT_TOKEN,
   ADMIN_ID,
+  AI_GATEWAY_API_KEY,
+  AI_MODEL,
+  AI_ENABLED,
   DB_PATH,
   PORT,
   API_SECRET,

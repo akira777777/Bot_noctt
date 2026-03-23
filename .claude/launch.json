@@ -9,8 +9,8 @@
     },
     {
       "name": "Web dashboard (dev:web)",
-      "runtimeExecutable": "/d/Nodejs/npm",
-      "runtimeArgs": ["run", "dev:web"],
+      "runtimeExecutable": "cmd.exe",
+      "runtimeArgs": ["/c", "npm.cmd run dev:web"],
       "port": 3000,
       "autoPort": true
     }
