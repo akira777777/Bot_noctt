@@ -1,5 +1,6 @@
 const { Telegraf } = require("telegraf");
-const { BOT_TOKEN, ADMIN_ID, WEB_APP_URL } = require("./config/env");
+const { BOT_TOKEN, ADMIN_ID, WEB_APP_URL, AI_MODEL, AI_ENABLED } = require("./config/env");
+const { createAiAgentService } = require("./services/ai-agent-service");
 const {
   createConversationService,
 } = require("./services/conversation-service");
