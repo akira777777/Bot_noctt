@@ -3,6 +3,10 @@ const { leadResumeKeyboard } = require("../ui/keyboards");
 
 function createSchedulerService({ repos, bot, adminId }) {
   async function sendDraftReminders() {
+    if (!bot?.telegram?.sendMessage) {
+      return;
+    }
+
     const reminderConfigs = [
       {
         key: "15m",
@@ -51,6 +55,10 @@ function createSchedulerService({ repos, bot, adminId }) {
   }
 
   async function sendSlaReminders() {
+    if (!bot?.telegram?.sendMessage) {
+      return;
+    }
+
     const reminderConfigs = [
       { key: "15m", label: "15 минут" },
       { key: "60m", label: "60 минут" },
@@ -82,6 +90,10 @@ function createSchedulerService({ repos, bot, adminId }) {
   }
 
   async function sendDueFollowUpReminders() {
+    if (!bot?.telegram?.sendMessage) {
+      return;
+    }
+
     const leads = repos.leads.listDueFollowUps(20);
     if (leads.length === 0) {
       return;

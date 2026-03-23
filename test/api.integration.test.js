@@ -286,3 +286,49 @@ test("public web lead creation returns a tracking token and status lookup works 
   assert.equal(statusPayload.lead.product_name, "Базовый пакет");
   assert.equal(statusPayload.lead.quantity, 2);
 });
+
+test("admin reply returns 503 when Telegram delivery is disabled", async (t) => {
+  const adminId = 9001;
+  const apiSecret = "test-api-secret";
+  const { db, cleanup } = createTempDb("bot-noct-api-");
+  const repos = createRepositories(db);
+
+  const app = createWebServer({
+    repos,
+    conversationService: {
+      async sendAdminReply() {
+        const error = new Error("Telegram delivery is disabled");
+        error.code = "TELEGRAM_DELIVERY_DISABLED";
+        throw error;
+      },
+    },
+    bot: null,
+    adminId,
+    apiSecret,
+    corsOrigin: null,
+    isProduction: false,
+  });
+  const server = await startServer(app);
+  t.after(async () => {
+    await stopServer(server);
+    cleanup();
+  });
+
+  const baseUrl = `http://127.0.0.1:${server.address().port}`;
+  const response = await fetch(
+    `${baseUrl}/api/admin/conversations/1001/reply`,
+    {
+      method: "POST",
+      headers: {
+        "X-Api-Key": apiSecret,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text: "Проверяю детали заявки" }),
+    },
+  );
+
+  assert.equal(response.status, 503);
+  const payload = await response.json();
+  assert.equal(payload.ok, false);
+  assert.match(payload.error, /disabled/i);
+});

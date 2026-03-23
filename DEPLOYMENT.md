@@ -1,434 +1,140 @@
-# Deployment Guide - Bot_noct
+# Deployment Guide
 
-## Table of Contents
+This project supports two deployment modes:
 
-1. [Prerequisites](#prerequisites)
-2. [Environment Configuration](#environment-configuration)
-3. [Local Development](#local-development)
-4. [Docker Deployment](#docker-deployment)
-5. [Production Deployment](#production-deployment)
-6. [Database Setup](#database-setup)
-7. [Redis Setup](#redis-setup)
-8. [Health Checks](#health-checks)
-9. [Monitoring](#monitoring)
-10. [Troubleshooting](#troubleshooting)
-
----
+- Full mode: API + Telegram bot with `BOT_ENABLED=true`
+- API-only mode: API/web runtime without Telegram with `BOT_ENABLED=false`
 
 ## Prerequisites
 
-- Node.js 18+ (LTS recommended)
-- Docker & Docker Compose
-- Telegram Bot Token (from [@BotFather](https://t.me/BotFather))
-- Redis 6+ (for caching and queues)
+- Node.js 18+
+- SQLite filesystem access
+- Redis 6+ if you want external cache/queues
+- Public HTTPS domain if you use Telegram webhooks
 
----
+## 1. Configure Environment
 
-## Environment Configuration
-
-1. Copy the example environment file:
+Start from the template:
 
 ```bash
 cp .env.example .env
 ```
 
-2. Configure the required variables:
+Base runtime variables:
 
 ```env
-# Telegram Configuration
-BOT_TOKEN=your_telegram_bot_token
-ADMIN_ID=your_telegram_user_id
-
-# Database
+NODE_ENV=production
+BOT_ENABLED=true
+PORT=3000
 DB_PATH=./data/bot.sqlite
-
-# Redis (Cache & Queue)
+API_SECRET=replace_with_strong_secret
+CORS_ORIGIN=https://your-web-domain.example
+API_COMPRESSION=true
 REDIS_HOST=localhost
 REDIS_PORT=6379
-REDIS_PASSWORD=
-REDIS_DB=0
-
-# Application
-NODE_ENV=production
-PORT=3000
-CORS_ORIGIN=https://your-domain.com
-TELEGRAM_DELIVERY_MODE=webhook
-WEBHOOK_DOMAIN=https://your-domain.com
-API_COMPRESSION=true
 LOG_LEVEL=info
 LOG_FORMAT=json
 ```
 
----
+Telegram variables, only if `BOT_ENABLED=true`:
 
-## Local Development
-
-### Option 1: Docker Compose (Recommended)
-
-```bash
-# Start all services
-docker compose up -d
-
-# View logs
-docker compose logs -f
-
-# Stop services
-docker compose down
+```env
+BOT_TOKEN=your_telegram_bot_token
+ADMIN_ID=123456789
+TELEGRAM_DELIVERY_MODE=webhook
+WEBHOOK_DOMAIN=https://your-public-domain.example
+TELEGRAM_STARTUP_TIMEOUT_MS=15000
+ALLOW_BOT_LAUNCH_FAILURE=false
 ```
 
-### Option 2: Manual Development
+## 2. Validate Configuration
 
 ```bash
-# Install dependencies
-npm install
+npm run validate
+```
 
-# Start Redis locally
-docker run -d -p 6379:6379 redis:alpine
+`validate` now respects `BOT_ENABLED`. In API-only mode it skips Telegram-only requirements.
 
-# Run with hot reload
-npm run dev
+## 3. Start the Service
 
-# Or run normally
+Local process:
+
+```bash
 npm start
 ```
 
----
-
-## Docker Deployment
-
-### Build Image
+API-only process:
 
 ```bash
-# Build production image
-docker build -t bot-noct:latest --target production .
-
-# Or using docker compose
-docker compose build bot
+BOT_ENABLED=false npm start
 ```
 
-### Run Container
+Docker Compose:
 
 ```bash
-# Run bot service
-docker compose up -d bot
-
-# Run with Redis
-docker compose up -d bot redis
-
-# View logs
-docker compose logs -f bot
-
-# Scale (for production)
-docker compose up -d --scale bot=3
+docker compose up -d
 ```
 
-### Environment Variables for Docker
-
-```yaml
-# docker-compose.yml service configuration
-environment:
-  - NODE_ENV=production
-  - BOT_TOKEN=${BOT_TOKEN}
-  - ADMIN_ID=${ADMIN_ID}
-  - TELEGRAM_DELIVERY_MODE=${TELEGRAM_DELIVERY_MODE}
-  - WEBHOOK_DOMAIN=${WEBHOOK_DOMAIN}
-  - REDIS_HOST=redis
-  - REDIS_PORT=6379
-  - LOG_LEVEL=info
-  - LOG_FORMAT=json
-```
-
----
-
-## Production Deployment
-
-Two supported production paths are kept in sync with `src/config/env.js`:
-
-### Render.com
-
-```bash
-render deploy --config render.yaml
-```
-
-### Docker Compose override
+Production Compose profile:
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.production.yml --profile prod up -d bot redis
 ```
 
----
-
-## Database Setup
-
-### SQLite (Development/Default)
-
-Data is stored in `./data/bot.sqlite` and automatically created on first run.
+## 4. Health and Smoke Checks
 
 ```bash
-# Create data directory
-mkdir -p data
-
-# Set permissions
-chmod 755 data
+curl http://localhost:3000/healthz
+curl http://localhost:3000/api/catalog
 ```
 
-### Database Migrations
-
-Migrations run automatically on startup.
-
----
-
-## Redis Setup
-
-### Local Installation
+Recommended verification:
 
 ```bash
-# macOS
-brew install redis
-brew services start redis
-
-# Ubuntu/Debian
-sudo apt install redis-server
-sudo systemctl start redis
+npm test
+npm run smoke:api
+npm run lint
+npm run build:web
 ```
 
-### Docker Redis
+## 5. Telegram Delivery Modes
 
-```bash
-# Run Redis container
-docker run -d \
-  --name redis \
-  -p 6379:6379 \
-  -v redis_data:/data \
-  redis:alpine \
-  redis-server --appendonly yes --maxmemory 256mb
-```
+- `polling`: preferred for local development
+- `webhook`: preferred for production with a stable HTTPS domain
 
-### Redis Configuration
+If `TELEGRAM_DELIVERY_MODE=webhook` but `WEBHOOK_DOMAIN` is missing or placeholder-like, the runtime logs a warning and falls back to polling.
 
-```env
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_PASSWORD=your-password  # Optional
-REDIS_DB=0
+## 6. Operational Notes
 
-# Cache + runtime thresholds
-CACHE_TTL_SESSION=3600      # 1 hour
-CACHE_TTL_CATALOG=300      # 5 minutes
-CACHE_TTL_PRODUCT=600      # 10 minutes
-CACHE_TTL_STATS=60         # 1 minute
-MEMORY_LIMIT_WARN=512
-MEMORY_LIMIT_CRITICAL=768
-```
+- Admin HTTP routes fail closed without `API_SECRET` in production
+- Legacy status `awaiting_payment` is normalized to `proposal_sent`
+- Default catalog seeds are lawful sample items; existing user-created rows are preserved
+- Queue and cache startup do not require Telegram secrets
 
----
+## 7. Troubleshooting
 
-## Health Checks
-
-The bot exposes health check endpoints for container orchestration:
-
-| Endpoint   | Purpose   | Description                           |
-| ---------- | --------- | ------------------------------------- |
-| `/healthz` | Liveness  | Basic check if service is running     |
-| `/readyz`  | Readiness | Checks DB, cache, memory availability |
-| `/livez`   | Liveness  | Simple alive check                    |
-| `/health`  | Detailed  | Full system metrics and status        |
-
-### Example Health Response
-
-```json
-{
-  "status": "healthy",
-  "timestamp": "2024-01-15T10:30:00Z",
-  "checks": {
-    "database": { "status": "ok" },
-    "cache": { "status": "ok", "mode": "redis" },
-    "memory": { "status": "ok", "used": { "heapUsed": 120 } }
-  },
-  "system": {
-    "totalMemory": 8192,
-    "freeMemory": 4096,
-    "cpuCount": 4,
-    "loadAverage": [1.5, 1.2, 1.0]
-  }
-}
-```
-
----
-
-## Monitoring
-
-### Metrics Endpoint
-
-For Prometheus-style monitoring:
-
-```bash
-# Get metrics
-curl http://localhost:3000/metrics
-```
-
-### Queue Statistics
-
-```bash
-# Get queue stats (admin only)
-curl -H "X-API-Key: your-api-key" \
-  http://localhost:3000/api/admin/queues
-```
-
-### Cache Statistics
-
-```bash
-# Get cache stats (admin only)
-curl -H "X-API-Key: your-api-key" \
-  http://localhost:3000/api/admin/cache
-```
-
----
-
-## Troubleshooting
-
-### Bot Not Starting
-
-1. Check Telegram token validity:
+Bot does not start:
 
 ```bash
 curl -s https://api.telegram.org/bot${BOT_TOKEN}/getMe
 ```
 
-2. Verify environment variables:
+API-only smoke:
 
 ```bash
-docker compose exec bot env | grep -E "BOT_|ADMIN_|REDIS"
+BOT_ENABLED=false npm run smoke:api
 ```
 
-### Database Errors
-
-1. Check SQLite file permissions:
-
-```bash
-ls -la data/
-chmod 644 data/bot.sqlite
-```
-
-2. Verify migrations:
-
-```bash
-docker compose logs bot | grep migration
-```
-
-### Redis Connection Issues
-
-1. Test Redis connection:
+Redis issues:
 
 ```bash
 redis-cli ping
-docker compose exec redis redis-cli ping
-```
-
-2. Check Redis logs:
-
-```bash
 docker compose logs redis
 ```
 
-### Memory Issues
-
-1. Check memory usage:
+Migrations and DB:
 
 ```bash
-curl http://localhost:3000/debug/memory
+npm run backup
+npm run restore-check
 ```
-
-2. Adjust memory limits in docker-compose.yml
-
-### Queue Processing Issues
-
-1. Check queue status:
-
-```bash
-curl -H "X-API-Key: your-key" \
-  http://localhost:3000/api/admin/queues
-```
-
-2. View queue logs:
-
-```bash
-docker compose logs bot | grep queue
-```
-
----
-
-## Security Checklist
-
-- [ ] Change default `API_SECRET`
-- [ ] Set strong `REDIS_PASSWORD`
-- [ ] Configure `CORS_ORIGIN` for specific domains
-- [ ] Enable `LOG_FORMAT=json` in production
-- [ ] Set `LOG_LEVEL=warn` in production
-- [ ] Use TLS/SSL for production URLs
-- [ ] Enable Redis authentication
-- [ ] Configure firewall rules
-- [ ] Enable rate limiting
-- [ ] Set up monitoring alerts
-
----
-
-## Performance Tuning
-
-### Memory Limits
-
-```yaml
-# docker-compose.yml
-deploy:
-  resources:
-    limits:
-      memory: 1G
-    reservations:
-      memory: 512M
-```
-
-### Cache TTL Optimization
-
-```env
-CACHE_TTL_SESSION=3600    # Increase for stable sessions
-CACHE_TTL_CATALOG=600    # Decrease for frequently changing catalog
-```
-
-### Queue Concurrency
-
-```env
-QUEUE_CONCURRENCY_MESSAGES=10
-QUEUE_CONCURRENCY_WEBHOOKS=5
-QUEUE_CONCURRENCY_BATCH=2
-```
-
----
-
-## Backup & Recovery
-
-### Database Backup
-
-```bash
-# SQLite backup
-cp data/bot.sqlite data/bot.sqlite.backup
-
-# Automated backup script
-./scripts/backup-sqlite.js
-```
-
-### Redis Backup
-
-```bash
-# Redis persistence handles this automatically
-# RDB and AOF files are in data/redis/
-```
-
----
-
-## Support
-
-For issues and questions:
-
-1. Check logs: `docker compose logs bot`
-2. Review health status: `curl http://localhost:3000/health`
-3. Consult the [main README](README.md)

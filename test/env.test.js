@@ -21,20 +21,29 @@ function loadEnvModule(overrides) {
   return { result, error };
 }
 
-test("env loader parses valid config", () => {
+test("runtime env loader parses valid config without bot token", () => {
   const { result, error } = loadEnvModule({
-    BOT_TOKEN: "bot:test",
     ADMIN_ID: "123",
     PORT: "4000",
   });
   assert.equal(error, undefined);
   assert.equal(result.ADMIN_ID, 123);
   assert.equal(result.PORT, 4000);
+  assert.equal(result.BOT_ENABLED, true);
+});
+
+test("runtime env loader allows disabling bot explicitly", () => {
+  const { result, error } = loadEnvModule({
+    ADMIN_ID: "123",
+    BOT_ENABLED: "false",
+  });
+
+  assert.equal(error, undefined);
+  assert.equal(result.BOT_ENABLED, false);
 });
 
 test("env loader fails on invalid ADMIN_ID", () => {
   const { error } = loadEnvModule({
-    BOT_TOKEN: "bot:test",
     ADMIN_ID: "abc",
   });
   assert.equal(error instanceof Error, true);

@@ -13,6 +13,8 @@ const {
   LEAD_TRACKING_TOKEN_LENGTH,
 } = require("../src/domain/tracking-token");
 
+const LAWFUL_INQUIRY_MIGRATION_ID = "010_lawful_inquiry_cleanup";
+
 function createTempDb() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "bot-noct-migration-"));
   const dbPath = path.join(dir, "bot.sqlite");
@@ -132,6 +134,107 @@ test("runMigrations adds lead workflow ops columns and lead events table", () =>
     assert.ok(
       leadEventsColumns.some((column) => column.name === "event_type"),
     );
+  } finally {
+    cleanup();
+  }
+});
+
+test("runMigrations normalizes awaiting_payment leads to proposal_sent", () => {
+  const { db, cleanup } = createTempDb();
+
+  try {
+    runMigrations(db);
+
+    db.prepare(`
+      INSERT INTO users (telegram_id, username, first_name, role)
+      VALUES (@telegram_id, @username, @first_name, @role)
+    `).run({
+      telegram_id: 202,
+      username: "client_202",
+      first_name: "Client",
+      role: "client",
+    });
+
+    const leadId = db
+      .prepare(`
+        INSERT INTO leads (
+          client_telegram_id,
+          product_code,
+          product_name,
+          quantity,
+          comment,
+          contact_label,
+          source_payload,
+          status,
+          tracking_token
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `)
+      .run(
+        202,
+        "starter-pack",
+        "Стартовый пакет",
+        1,
+        "",
+        "Telegram",
+        "from_channel",
+        "awaiting_payment",
+        "aaaaaaaaaaaaaaaaaaaaaaaa",
+      ).lastInsertRowid;
+
+    db.prepare("DELETE FROM schema_migrations WHERE id = ?").run(
+      LAWFUL_INQUIRY_MIGRATION_ID,
+    );
+    const rerunMigrations = require("../src/db/migrations").runMigrations;
+    rerunMigrations(db);
+
+    const lead = db.prepare("SELECT status FROM leads WHERE id = ?").get(leadId);
+    assert.equal(lead.status, "proposal_sent");
+  } finally {
+    cleanup();
+  }
+});
+
+test("runMigrations sanitizes legacy seeded catalog rows only when they exactly match defaults", () => {
+  const { db, cleanup } = createTempDb();
+
+  try {
+    runMigrations(db);
+
+    db.prepare(`
+      INSERT INTO products (code, title, description, price_text, is_active, sort_order)
+      VALUES (?, ?, ?, ?, 1, ?)
+    `).run("methamphetamine", "METH", "EPHEDRINE 95%, Netherlands", "35USDT per 1g", 1);
+
+    db.prepare(`
+      INSERT INTO products (code, title, description, price_text, is_active, sort_order)
+      VALUES (?, ?, ?, ?, 1, ?)
+    `).run("custom-legacy", "METH", "Custom legacy row", "custom", 99);
+
+    db.prepare("DELETE FROM schema_migrations WHERE id = ?").run(
+      LAWFUL_INQUIRY_MIGRATION_ID,
+    );
+    runMigrations(db);
+
+    const sanitized = db
+      .prepare("SELECT code, title, description, price_text FROM products WHERE sort_order = 1")
+      .get();
+    const untouched = db
+      .prepare("SELECT code, title, description, price_text FROM products WHERE sort_order = 99")
+      .get();
+
+    assert.deepEqual(sanitized, {
+      code: "starter-pack",
+      title: "Стартовый пакет",
+      description: "Базовое решение для первичного запроса и консультации.",
+      price_text: "от 2 900 ₽",
+    });
+    assert.deepEqual(untouched, {
+      code: "custom-legacy",
+      title: "METH",
+      description: "Custom legacy row",
+      price_text: "custom",
+    });
   } finally {
     cleanup();
   }
