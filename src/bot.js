@@ -10,6 +10,7 @@ const {
 const { createLeadService } = require("./services/lead-service");
 const { createAdminService } = require("./services/admin-service");
 const { createCatalogService } = require("./services/catalog-service");
+const { createSessionService } = require("./services/session-service");
 const {
   registerAdminCommands,
   handleAdminStart,
@@ -36,6 +37,7 @@ function createBot({ db, repos }) {
     adminId: ADMIN_ID,
   });
   const admin = createAdminService({ repos });
+  const session = createSessionService({ repos });
   const lead = createLeadService({
     db,
     repos,
@@ -53,6 +55,7 @@ function createBot({ db, repos }) {
       catalog,
       conversation,
       admin,
+      session,
       lead,
     },
     adminId: ADMIN_ID,
@@ -77,6 +80,9 @@ function createBot({ db, repos }) {
   bot.help((ctx) => handleClientHelp(ctx, deps));
   bot.command("menu", (ctx) => handleClientMenu(ctx, deps));
   bot.command("status", (ctx) => handleClientStatus(ctx, deps));
+  bot.command("myid", (ctx) =>
+    ctx.reply(`Ваш Telegram ID: ${ctx.from.id}`),
+  );
 
   bot.action(/^(catalog|lead|contact|info|menu):.*$/, (ctx) =>
     handleClientAction(ctx, deps),

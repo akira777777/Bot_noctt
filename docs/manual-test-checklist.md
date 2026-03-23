@@ -3,10 +3,14 @@
 ## Preconditions
 
 - `npm test` passes.
+- `npm run test:coverage` passes.
 - `npm run build:web` was executed for Mini App checks.
+- `npm run smoke:api` passes.
 - Bot is running locally.
 - `ADMIN_ID` points to the admin account.
 - Client and admin are tested from different Telegram accounts.
+
+For rollback/recovery operations, use `docs/runbook.md`.
 
 ## Channel Entry
 

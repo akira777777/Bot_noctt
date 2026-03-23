@@ -3,6 +3,7 @@ const phase2ColumnsMigration = require("./002_phase2_columns");
 const isBlockedMigration = require("./003_is_blocked");
 const normalizeLeadStatusNewMigration = require("./004_normalize_lead_status_new");
 const addIndexesMigration = require("./005_add_indexes");
+const openLeadUniquenessMigration = require("./006_open_lead_uniqueness");
 
 const migrations = [
   initialMigration,
@@ -10,6 +11,7 @@ const migrations = [
   isBlockedMigration,
   normalizeLeadStatusNewMigration,
   addIndexesMigration,
+  openLeadUniquenessMigration,
 ];
 
 function ensureMigrationTable(db) {

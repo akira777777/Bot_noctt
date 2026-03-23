@@ -35,3 +35,10 @@ This gives a stable HTTPS address from Render and avoids `*.trycloudflare.com`.
   - Products
   - Users
   - Stats
+
+## 6) Post-deploy verification
+
+- Run API smoke locally (or in a debug shell with env vars):
+  - `npm run smoke:api`
+- Follow the operational checklist in:
+  - `docs/runbook.md`

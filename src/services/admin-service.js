@@ -44,6 +44,10 @@ function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
     return repos.leads.list(limit);
   }
 
+  function getLatestLeadByClient(clientId) {
+    return repos.leads.getLatestByClient(clientId);
+  }
+
   function takeLead(leadId) {
     return repos.leads.updateStatus(leadId, "in_progress");
   }
@@ -165,6 +169,39 @@ function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
     return { ok: true, csv, count: leads.length };
   }
 
+  function searchUser(query) {
+    const byId = Number(query);
+    if (byId && !isNaN(byId)) {
+      const user = repos.users.getById(byId);
+      return user ? { ok: true, user } : { ok: false, reason: "not_found" };
+    }
+    const user = repos.users.getByUsername(query);
+    return user ? { ok: true, user } : { ok: false, reason: "not_found" };
+  }
+
+  async function broadcastToClients(bot, text) {
+    const clients = repos.users.listClients();
+    let sent = 0;
+    let failed = 0;
+    for (const client of clients) {
+      try {
+        await bot.telegram.sendMessage(client.telegram_id, text);
+        sent++;
+      } catch (_) {
+        failed++;
+      }
+    }
+    return { total: clients.length, sent, failed };
+  }
+
+  function resolveConversation(clientTelegramId) {
+    const conversation = repos.conversations.getByClientId(clientTelegramId);
+    if (!conversation) return { ok: false, reason: "not_found" };
+    if (conversation.status === "closed") return { ok: false, reason: "already_closed" };
+    repos.conversations.close(clientTelegramId);
+    return { ok: true };
+  }
+
   function blockUser(telegramId) {
     const user = repos.users.getById(telegramId);
     if (!user) return { ok: false, reason: "not_found" };
@@ -188,6 +225,7 @@ function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
     clearSelectedClient,
     listRecentDialogs,
     listRecentLeads,
+    getLatestLeadByClient,
     takeLead,
     closeLead,
     markLeadCalledBack,
@@ -202,6 +240,9 @@ function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
     getClientHistory,
     getStats,
     exportLeadsCsv,
+    searchUser,
+    broadcastToClients,
+    resolveConversation,
     blockUser,
     unblockUser,
   };

@@ -2,6 +2,7 @@ const { adminLeadKeyboard } = require("../ui/keyboards");
 const { adminLeadCard } = require("../ui/messages");
 const { formatClientLabel } = require("../utils/formatters");
 const { safeSendMessage } = require("../utils/telegram");
+const { logError } = require("../utils/logger");
 
 function createLeadService({
   db,
@@ -190,14 +191,26 @@ function createLeadService({
       return result;
     });
 
-    const lead = transaction();
+    let lead;
+    try {
+      lead = transaction();
+    } catch (error) {
+      const isUniqueViolation =
+        typeof error?.message === "string" &&
+        error.message.includes("idx_leads_unique_open_client_product");
+      if (isUniqueViolation) {
+        const duplicate = repos.leads.getOpenByClientAndProduct(
+          client.id,
+          session.draft.productCode,
+        );
+        return { duplicate: true, existingLead: duplicate };
+      }
+      throw error;
+    }
     try {
       await notifyAdminAboutLead(lead, client, chatId);
     } catch (err) {
-      console.warn(
-        `[lead-service] notifyAdminAboutLead failed for lead #${lead.id}:`,
-        err.message,
-      );
+      logError(`notifyAdminAboutLead failed for lead #${lead.id}`, err);
     }
 
     return lead;

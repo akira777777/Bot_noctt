@@ -1,10 +1,7 @@
 const { Markup } = require("telegraf");
 
 function clientHomeReplyKeyboard() {
-  return Markup.keyboard([
-    ["Оставить заявку", "Каталог"],
-    ["Связаться с менеджером", "Как оформить заказ"],
-  ]).resize();
+  return Markup.keyboard([["💬 Что вас интересует?"]]).resize();
 }
 
 function removeReplyKeyboard() {

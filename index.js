@@ -71,6 +71,10 @@ async function teardown(resources, reason) {
     return;
   }
 
+  if (resources.sessionCleanupTimer) {
+    clearInterval(resources.sessionCleanupTimer);
+  }
+
   if (resources.botLaunched) {
     stopBot(resources.bot, reason);
   }
@@ -113,6 +117,20 @@ async function configureAdminMenu(bot) {
   }
 }
 
+const SESSION_CLEANUP_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
+
+function startSessionCleanup(repos) {
+  const timer = setInterval(() => {
+    try {
+      repos.sessions.clearExpired();
+    } catch (error) {
+      logError("Session cleanup failed", error);
+    }
+  }, SESSION_CLEANUP_INTERVAL_MS);
+  timer.unref();
+  return timer;
+}
+
 async function bootstrap() {
   const db = createDatabase();
   const repos = createRepositories(db);
@@ -132,6 +150,7 @@ async function bootstrap() {
     botLaunched: false,
     webServer,
     httpServer: null,
+    sessionCleanupTimer: null,
   };
 
   try {
@@ -142,7 +161,18 @@ async function bootstrap() {
     resources.botLaunched = true;
     logInfo("Bot started");
 
+    resources.sessionCleanupTimer = startSessionCleanup(repos);
+
     await configureAdminMenu(bot);
+
+    // Clean up expired sessions on startup, then every hour
+    repos.sessions.clearExpired();
+    const sessionCleanupTimer = setInterval(
+      () => repos.sessions.clearExpired(),
+      60 * 60 * 1000,
+    );
+    sessionCleanupTimer.unref();
+    resources.sessionCleanupTimer = sessionCleanupTimer;
 
     return resources;
   } catch (error) {

@@ -1,17 +1,21 @@
 const { Markup } = require("telegraf");
+const { ACTIONS, ACTION_PREFIXES, buildAction } = require("../utils/actions");
 
 function backToMainKeyboard() {
   return Markup.inlineKeyboard([
-    [Markup.button.callback("Главное меню", "menu:main")],
+    [Markup.button.callback("Главное меню", ACTIONS.MENU_MAIN)],
   ]);
 }
 
 function catalogKeyboard(products) {
   const rows = products.map((product) => [
-    Markup.button.callback(product.title, `catalog:product:${product.id}`),
+    Markup.button.callback(
+      product.title,
+      buildAction(ACTION_PREFIXES.CATALOG_PRODUCT, product.id),
+    ),
   ]);
 
-  rows.push([Markup.button.callback("Главное меню", "menu:main")]);
+  rows.push([Markup.button.callback("Главное меню", ACTIONS.MENU_MAIN)]);
   return Markup.inlineKeyboard(rows);
 }
 
@@ -20,41 +24,41 @@ function productCardKeyboard(productId) {
     [
       Markup.button.callback(
         "Оставить заявку на этот товар",
-        `lead:product:${productId}`,
+        buildAction(ACTION_PREFIXES.LEAD_PRODUCT, productId),
       ),
     ],
-    [Markup.button.callback("Назад в каталог", "catalog:root")],
-    [Markup.button.callback("Главное меню", "menu:main")],
+    [Markup.button.callback("Назад в каталог", ACTIONS.CATALOG_ROOT)],
+    [Markup.button.callback("Главное меню", ACTIONS.MENU_MAIN)],
   ]);
 }
 
 function quantityKeyboard() {
   return Markup.inlineKeyboard([
     [
-      Markup.button.callback("Назад", "lead:back"),
-      Markup.button.callback("Отмена", "lead:cancel"),
+      Markup.button.callback("Назад", ACTIONS.LEAD_BACK),
+      Markup.button.callback("Отмена", ACTIONS.LEAD_CANCEL),
     ],
-    [Markup.button.callback("Главное меню", "menu:main")],
+    [Markup.button.callback("Главное меню", ACTIONS.MENU_MAIN)],
   ]);
 }
 
 function commentKeyboard() {
   return Markup.inlineKeyboard([
-    [Markup.button.callback("Пропустить комментарий", "lead:skip_comment")],
+    [Markup.button.callback("Пропустить комментарий", ACTIONS.LEAD_SKIP_COMMENT)],
     [
-      Markup.button.callback("Назад", "lead:back"),
-      Markup.button.callback("Отмена", "lead:cancel"),
+      Markup.button.callback("Назад", ACTIONS.LEAD_BACK),
+      Markup.button.callback("Отмена", ACTIONS.LEAD_CANCEL),
     ],
   ]);
 }
 
 function contactKeyboard() {
   return Markup.inlineKeyboard([
-    [Markup.button.callback("Ответить в Telegram", "lead:contact_telegram")],
-    [Markup.button.callback("Указать другой контакт", "lead:contact_custom")],
+    [Markup.button.callback("Ответить в Telegram", ACTIONS.LEAD_CONTACT_TELEGRAM)],
+    [Markup.button.callback("Указать другой контакт", ACTIONS.LEAD_CONTACT_CUSTOM)],
     [
-      Markup.button.callback("Назад", "lead:back"),
-      Markup.button.callback("Отмена", "lead:cancel"),
+      Markup.button.callback("Назад", ACTIONS.LEAD_BACK),
+      Markup.button.callback("Отмена", ACTIONS.LEAD_CANCEL),
     ],
   ]);
 }
@@ -62,25 +66,31 @@ function contactKeyboard() {
 function customContactKeyboard() {
   return Markup.inlineKeyboard([
     [
-      Markup.button.callback("Назад", "lead:back"),
-      Markup.button.callback("Отмена", "lead:cancel"),
+      Markup.button.callback("Назад", ACTIONS.LEAD_BACK),
+      Markup.button.callback("Отмена", ACTIONS.LEAD_CANCEL),
     ],
   ]);
 }
 
 function confirmLeadKeyboard() {
   return Markup.inlineKeyboard([
-    [Markup.button.callback("Подтвердить заявку", "lead:confirm")],
-    [Markup.button.callback("Изменить контакт", "lead:back")],
-    [Markup.button.callback("Главное меню", "menu:main")],
+    [Markup.button.callback("Подтвердить заявку", ACTIONS.LEAD_CONFIRM)],
+    [Markup.button.callback("Изменить контакт", ACTIONS.LEAD_BACK)],
+    [Markup.button.callback("Главное меню", ACTIONS.MENU_MAIN)],
   ]);
 }
 
 function adminClientMessageKeyboard(clientId) {
   return Markup.inlineKeyboard([
     [
-      Markup.button.callback("Ответить", `admin:reply:${clientId}`),
-      Markup.button.callback("Открыть диалог", `admin:dialog:${clientId}`),
+      Markup.button.callback(
+        "Ответить",
+        buildAction(ACTION_PREFIXES.ADMIN_REPLY, clientId),
+      ),
+      Markup.button.callback(
+        "Открыть диалог",
+        buildAction(ACTION_PREFIXES.ADMIN_DIALOG, clientId),
+      ),
     ],
   ]);
 }
@@ -88,24 +98,36 @@ function adminClientMessageKeyboard(clientId) {
 function adminLeadKeyboard(leadId, clientId) {
   return Markup.inlineKeyboard([
     [
-      Markup.button.callback("Открыть диалог", `admin:dialog:${clientId}`),
-      Markup.button.callback("Взять в работу", `admin:lead_take:${leadId}`),
+      Markup.button.callback(
+        "Открыть диалог",
+        buildAction(ACTION_PREFIXES.ADMIN_DIALOG, clientId),
+      ),
+      Markup.button.callback(
+        "Взять в работу",
+        buildAction(ACTION_PREFIXES.ADMIN_LEAD_TAKE, leadId),
+      ),
     ],
     [
       Markup.button.callback(
         "📞 Перезвонили",
-        `admin:lead_called_back:${leadId}`,
+        buildAction(ACTION_PREFIXES.ADMIN_LEAD_CALLED_BACK, leadId),
       ),
       Markup.button.callback(
         "💳 Ждём оплату",
-        `admin:lead_awaiting_payment:${leadId}`,
+        buildAction(ACTION_PREFIXES.ADMIN_LEAD_AWAITING_PAYMENT, leadId),
       ),
     ],
     [
-      Markup.button.callback("✅ Выполнена", `admin:lead_fulfilled:${leadId}`),
-      Markup.button.callback("Закрыть заявку", `admin:lead_close:${leadId}`),
+      Markup.button.callback(
+        "✅ Выполнена",
+        buildAction(ACTION_PREFIXES.ADMIN_LEAD_FULFILLED, leadId),
+      ),
+      Markup.button.callback(
+        "Закрыть заявку",
+        buildAction(ACTION_PREFIXES.ADMIN_LEAD_CLOSE, leadId),
+      ),
     ],
-    [Markup.button.callback("Inbox", "admin:inbox")],
+    [Markup.button.callback("Inbox", ACTIONS.ADMIN_INBOX)],
   ]);
 }
 
@@ -120,8 +142,8 @@ function adminQuickReplyKeyboard(clientId) {
       Markup.button.callback("Доставка", `admin:template:delivery:${clientId}`),
     ],
     [
-      Markup.button.callback("Inbox", "admin:inbox"),
-      Markup.button.callback("Сбросить диалог", "admin:clear_dialog"),
+      Markup.button.callback("Inbox", ACTIONS.ADMIN_INBOX),
+      Markup.button.callback("Сбросить диалог", ACTIONS.ADMIN_CLEAR_DIALOG),
     ],
   ]);
 }
@@ -142,11 +164,11 @@ function adminInboxKeyboard(dialogs) {
     .map((dialog) => [
       Markup.button.callback(
         `Открыть ${_clientButtonLabel(dialog)}`,
-        `admin:dialog:${dialog.client_telegram_id}`,
+        buildAction(ACTION_PREFIXES.ADMIN_DIALOG, dialog.client_telegram_id),
       ),
     ]);
 
-  rows.push([Markup.button.callback("Обновить inbox", "admin:inbox")]);
+  rows.push([Markup.button.callback("Обновить inbox", ACTIONS.ADMIN_INBOX)]);
   return Markup.inlineKeyboard(rows);
 }
 
