@@ -20,14 +20,14 @@ Operational steps for safe deploy, quick incident triage, rollback, and data rec
    - `GET /healthz` returns `200` and `{ ok: true }`.
 4. Perform Telegram smoke:
    - admin `/start`
-   - open mini app
-   - create one lead and confirm admin notification.
+   - create one lead via Telegram flow (or via the web lead form)
+   - confirm that admin receives a lead notification.
 
 ## Post-Deploy Smoke Checklist
 
 - API:
-  - `/api/admin/me` works with valid init-data.
-  - `/api/leads` returns list for admin.
+  - `GET /api/catalog` returns `{ ok: true }` and a non-empty products list (when DB is seeded).
+  - `GET /api/admin/leads` works when the request includes `X-Api-Key` (if `API_SECRET` is configured) or via the web dashboard UI.
 - Bot:
   - client can open menu and send message to manager.
   - lead flow reaches `confirm` and successfully creates a lead.
@@ -68,7 +68,7 @@ Operational steps for safe deploy, quick incident triage, rollback, and data rec
 ### Recovery drill (staging/local)
 
 1. Stop app.
-2. Replace DB with backup copy.
+2. Replace DB file used by `DB_PATH` with the restored backup copy.
 3. Start app.
 4. Validate:
    - `/dialogs` shows historical conversations.

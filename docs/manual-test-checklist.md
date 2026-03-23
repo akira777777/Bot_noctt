@@ -4,7 +4,7 @@
 
 - `npm test` passes.
 - `npm run test:coverage` passes.
-- `npm run build:web` was executed for Mini App checks.
+- `npm run build:web` was executed for web dashboard checks.
 - `npm run smoke:api` passes.
 - Bot is running locally.
 - `ADMIN_ID` points to the admin account.

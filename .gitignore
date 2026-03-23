@@ -13,6 +13,9 @@ backups/
 web/.next/
 web/out/
 
+# Test coverage
+coverage/
+
 # Vercel
 .vercel/
 
