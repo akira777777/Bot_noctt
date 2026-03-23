@@ -6,7 +6,7 @@ const {
 const { formatClientLabel } = require("../utils/formatters");
 const { safeSendMessage } = require("../utils/telegram");
 
-function createConversationService({ repos, bot, adminId }) {
+function createConversationService({ repos, bot, adminId, aiService = null }) {
   function upsertTelegramUser(from, role) {
     repos.users.upsert({
       telegram_id: from.id,
@@ -36,6 +36,23 @@ function createConversationService({ repos, bot, adminId }) {
       adminClientCard(clientLabel, text, sourcePayload, msgCount),
       adminClientMessageKeyboard(client.id),
     );
+
+    // AI auto-reply: send an immediate response while admin reviews
+    if (aiService?.isEnabled) {
+      try {
+        const recentMessages = repos.messages.listByConversation(conversation.id, 6).reverse();
+        const products = repos.products.list();
+        const aiReply = await aiService.generateClientAutoReply({
+          products,
+          conversationMessages: recentMessages,
+          clientMessage: text,
+        });
+        if (aiReply) {
+          repos.messages.create(conversation.id, "admin", adminId, aiReply);
+          await safeSendMessage(bot, client.id, `🤖 ${aiReply}`);
+        }
+      } catch (_) {}
+    }
 
     return conversation;
   }

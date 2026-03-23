@@ -24,18 +24,21 @@ const {
   handleClientAction,
   handleClientMedia,
 } = require("./handlers/client");
+const { createAiService } = require("./services/ai-service");
 const { logError } = require("./utils/logger");
 
 function createBot({ db, repos, cacheService = null, queueService = null }) {
   const bot = new Telegraf(BOT_TOKEN);
 
   const catalog = createCatalogService({ repos });
+  const ai = createAiService({ repos });
   const conversation = createConversationService({
     repos,
     bot,
     adminId: ADMIN_ID,
     cacheService,
     queueService,
+    aiService: ai,
   });
   const admin = createAdminService({ repos });
   const session = createSessionService({ repos });
@@ -60,6 +63,7 @@ function createBot({ db, repos, cacheService = null, queueService = null }) {
       session,
       leadStatus,
       lead,
+      ai,
     },
     adminId: ADMIN_ID,
     webAppUrl: WEB_APP_URL,
