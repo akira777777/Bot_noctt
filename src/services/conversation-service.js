@@ -25,6 +25,13 @@ function createConversationService({ repos, bot, adminId, aiService = null }) {
 
   async function forwardClientMessage({ client, chatId, text, sourcePayload }) {
     const conversation = ensureConversation(client.id, sourcePayload);
+
+    // Fetch history before saving so the current message isn't included twice
+    // (ai-service appends clientMessage separately as the final user turn)
+    const recentMessagesForAi = aiService?.isEnabled
+      ? repos.messages.listByConversation(conversation.id, 6).reverse()
+      : null;
+
     repos.messages.create(conversation.id, "client", client.id, text);
     repos.leads.touchLastClientActivityByClient(client.id);
 
@@ -40,7 +47,7 @@ function createConversationService({ repos, bot, adminId, aiService = null }) {
     // AI auto-reply: send an immediate response while admin reviews
     if (aiService?.isEnabled) {
       try {
-        const recentMessages = repos.messages.listByConversation(conversation.id, 6).reverse();
+        const recentMessages = recentMessagesForAi;
         const products = repos.products.list();
         const aiReply = await aiService.generateClientAutoReply({
           products,

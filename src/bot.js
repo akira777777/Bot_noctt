@@ -32,11 +32,7 @@ function createBot({ db, repos, cacheService = null, queueService = null }) {
   const bot = new Telegraf(BOT_TOKEN);
 
   const catalog = createCatalogService({ repos });
-  const aiAgent = createAiAgentService({
-    repos,
-    catalogService: catalog,
-    config: { enabled: AI_ENABLED, aiModel: AI_MODEL },
-  });
+  const ai = createAiService({ repos });
   const conversation = createConversationService({
     repos,
     bot,
@@ -68,7 +64,7 @@ function createBot({ db, repos, cacheService = null, queueService = null }) {
       session,
       leadStatus,
       lead,
-      aiAgent,
+      ai,
     },
     adminId: ADMIN_ID,
     webAppUrl: WEB_APP_URL,
