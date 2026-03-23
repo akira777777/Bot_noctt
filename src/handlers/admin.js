@@ -8,6 +8,10 @@ const { formatConversationRow, formatLeadRow } = require("../utils/formatters");
 const { safeAnswerCbQuery, safeSendMessage } = require("../utils/telegram");
 const { parseActionId } = require("../utils/actions");
 
+// Ephemeral cache: stores AI suggestions shown to admin until they are sent or discarded.
+// Key: `${adminId}:${clientId}`, value: suggestion text string.
+const pendingSuggestions = new Map();
+
 function isAdmin(ctx, deps) {
   return ctx.from.id === deps.adminId;
 }
@@ -536,6 +540,8 @@ function registerAdminCommands(bot, deps) {
         return;
       }
 
+      pendingSuggestions.set(`${ctx.from.id}:${clientId}`, suggestion);
+
       const { Markup: M } = require("telegraf");
       await ctx.reply(
         `💡 Предложенный ответ:\n\n${suggestion}`,
@@ -833,28 +839,15 @@ async function handleAdminAction(ctx, deps) {
 
   if (action.startsWith("admin:ai_send:")) {
     const clientId = parseActionId(action);
-    if (!deps.services.ai?.isEnabled) {
-      await safeAnswerCbQuery(ctx, "AI не настроен");
-      return;
-    }
-
-    const history = deps.services.admin.getClientHistory(clientId, 10);
-    if (!history.ok || !history.messages.length) {
-      await safeAnswerCbQuery(ctx, "История пуста");
-      return;
-    }
-
-    const products = deps.repos.products.list();
-    const suggestion = await deps.services.ai.generateAdminSuggestedReply({
-      products,
-      conversationMessages: history.messages,
-    });
+    const cacheKey = `${adminId}:${clientId}`;
+    const suggestion = pendingSuggestions.get(cacheKey);
 
     if (!suggestion) {
-      await safeAnswerCbQuery(ctx, "Не удалось сгенерировать ответ");
+      await safeAnswerCbQuery(ctx, "Предложение устарело — запустите /suggest снова");
       return;
     }
 
+    pendingSuggestions.delete(cacheKey);
     deps.services.admin.selectClient(adminId, clientId);
     await safeAnswerCbQuery(ctx, "Отправляю...");
     await sendAdminReply(ctx, deps, clientId, suggestion);

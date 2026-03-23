@@ -9,7 +9,7 @@
     },
     {
       "name": "Web dashboard (dev:web)",
-      "runtimeExecutable": "/d/Nodejs/npm",
+      "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev:web"],
       "port": 3000,
       "autoPort": true

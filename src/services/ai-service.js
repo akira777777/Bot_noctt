@@ -5,7 +5,12 @@ const { logError } = require("../utils/logger");
 
 // AI Gateway model IDs (provider/model.version format)
 // Docs: https://vercel.com/docs/ai-gateway
-// Auth: VERCEL_OIDC_TOKEN (auto on Vercel) or AI_GATEWAY_API_KEY (standalone server)
+//
+// Auth (in priority order):
+//   1. VERCEL_OIDC_TOKEN — preferred; auto-provisioned on Vercel via `vercel env pull`.
+//      @ai-sdk/gateway picks this up automatically when no apiKey is passed.
+//      Tokens are short-lived and auto-rotated — no manual secret management needed.
+//   2. AI_GATEWAY_API_KEY — fallback for standalone/VPS deployments outside Vercel.
 const MODEL_FAST = "anthropic/claude-haiku-4.5";
 const MODEL_SMART = "anthropic/claude-sonnet-4.6";
 
@@ -31,7 +36,7 @@ function buildConversationHistory(messages) {
   }));
 }
 
-function createAiService({ repos }) {
+function createAiService() {
   if (!AI_ENABLED) {
     return {
       isEnabled: false,
