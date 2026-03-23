@@ -1,6 +1,8 @@
 const {
   clientLeadTakenMessage,
   clientLeadClosedMessage,
+  clientLeadOutOfStockMessage,
+  clientLeadNotRelevantMessage,
   clientLeadCalledBackMessage,
   clientLeadAwaitingPaymentMessage,
   clientLeadFulfilledMessage,
@@ -14,6 +16,11 @@ const STATUS_NOTIFICATIONS = Object.freeze({
   called_back: clientLeadCalledBackMessage,
   awaiting_payment: clientLeadAwaitingPaymentMessage,
   fulfilled: clientLeadFulfilledMessage,
+});
+
+const CLOSED_REASON_NOTIFICATIONS = Object.freeze({
+  out_of_stock: clientLeadOutOfStockMessage,
+  not_relevant: clientLeadNotRelevantMessage,
 });
 
 function createLeadStatusService({ repos, bot = null }) {
@@ -39,7 +46,11 @@ function createLeadStatusService({ repos, bot = null }) {
       });
     }
 
-    const notificationFactory = STATUS_NOTIFICATIONS[status];
+    const notificationFactory =
+      status === "closed" && lead.closed_reason
+        ? CLOSED_REASON_NOTIFICATIONS[lead.closed_reason] ||
+          STATUS_NOTIFICATIONS[status]
+        : STATUS_NOTIFICATIONS[status];
     if (
       options.notifyClient !== false &&
       notificationFactory &&

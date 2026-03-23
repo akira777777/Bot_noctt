@@ -154,6 +154,14 @@ function clientLeadClosedMessage() {
   return "Заявка закрыта. Если понадобится ещё что-то, просто напишите в этот чат.";
 }
 
+function clientLeadOutOfStockMessage() {
+  return "По этой заявке позиция сейчас недоступна. Если хотите, подберём альтернативу — просто ответьте в этот чат.";
+}
+
+function clientLeadNotRelevantMessage() {
+  return "Заявка закрыта как неактуальная. Если запрос снова станет актуален, напишите нам в этот чат — быстро продолжим.";
+}
+
 function clientLeadCalledBackMessage() {
   return "Менеджер свяжется с вами в ближайшее время. Ожидайте звонка или сообщения!";
 }
@@ -222,6 +230,8 @@ module.exports = {
   clientReceivedAdminMessage,
   clientLeadTakenMessage,
   clientLeadClosedMessage,
+  clientLeadOutOfStockMessage,
+  clientLeadNotRelevantMessage,
   clientLeadCalledBackMessage,
   clientLeadAwaitingPaymentMessage,
   clientLeadFulfilledMessage,

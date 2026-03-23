@@ -100,8 +100,15 @@ export function fetchStats() {
     stats: {
       total: number;
       newToday: number;
-      byStatus: Record<string, number>;
-      topProducts: { product_name: string; count: number }[];
+      byStatus: { status: string; cnt: number }[];
+      topProducts: { product_name: string; cnt: number }[];
+      dashboard?: {
+        last24Hours: {
+          draftsStarted: number;
+          confirmedLeads: number;
+        };
+        overdueLeads: number;
+      };
     };
   }>("/stats");
 }
@@ -109,7 +116,7 @@ export function fetchStats() {
 export function fetchDailyStats(days = 30) {
   return adminFetchJson<{
     ok: boolean;
-    daily: { date: string; count: number }[];
+    daily: { day: string; cnt: number }[];
   }>(`/stats/daily?days=${days}`);
 }
 
@@ -127,6 +134,7 @@ export interface Lead {
   id: number;
   status: string;
   status_label: string;
+  closed_reason?: string | null;
   product_code: string;
   product_name: string;
   quantity: number;
@@ -137,6 +145,8 @@ export interface Lead {
   first_name: string;
   last_name: string;
   source_payload: string;
+  first_admin_reply_at?: string | null;
+  next_follow_up_at?: string | null;
   created_at: string;
   updated_at: string;
 }

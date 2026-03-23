@@ -5,6 +5,7 @@ const SERVICE_MODULE_PATH = "../src/services/lead-status-service";
 const TELEGRAM_UTILS_PATH = "../src/utils/telegram";
 const {
   clientLeadTakenMessage,
+  clientLeadOutOfStockMessage,
 } = require("../src/ui/messages");
 
 function loadLeadStatusService({ safeSendMessageImpl } = {}) {
@@ -220,4 +221,43 @@ test("lead status service persists closed reason and follow-up timestamp metadat
       },
     },
   ]);
+});
+
+test("lead status service uses a specific client notification for out_of_stock closes", async () => {
+  const notifications = [];
+  const { createLeadStatusService } = loadLeadStatusService({
+    safeSendMessageImpl: async (...args) => {
+      notifications.push(args);
+      return { ok: true };
+    },
+  });
+
+  const service = createLeadStatusService({
+    repos: {
+      leads: {
+        updateStatus() {
+          return {
+            id: 77,
+            status: "closed",
+            closed_reason: "out_of_stock",
+            client_telegram_id: 501,
+          };
+        },
+      },
+      leadEvents: {
+        create() {},
+      },
+    },
+    bot: {
+      telegram: {
+        sendMessage() {},
+      },
+    },
+  });
+
+  await service.updateStatus(77, "closed", {
+    closedReason: "out_of_stock",
+  });
+
+  assert.equal(notifications[0][2], clientLeadOutOfStockMessage());
 });

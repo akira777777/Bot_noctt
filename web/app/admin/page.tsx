@@ -22,8 +22,15 @@ export default async function AdminDashboard() {
   ]);
 
   const { stats } = statsRes;
-  const { daily } = dailyRes;
+  const daily = dailyRes.daily.map((point) => ({
+    date: point.day,
+    count: point.cnt,
+  }));
   const recentLeads = recentRes.leads;
+  const statusCounts = Object.fromEntries(
+    stats.byStatus.map((row) => [row.status, row.cnt]),
+  ) as Record<string, number>;
+  const dashboard = stats.dashboard;
 
   return (
     <div className="space-y-8">
@@ -37,13 +44,29 @@ export default async function AdminDashboard() {
         <StatCard title="Новых сегодня" value={stats.newToday} />
         <StatCard
           title="В работе"
-          value={stats.byStatus.in_progress || 0}
+          value={statusCounts.in_progress || 0}
         />
         <StatCard
-          title="Выполнено"
-          value={stats.byStatus.fulfilled || 0}
+          title="Overdue SLA"
+          value={dashboard?.overdueLeads || 0}
+          subtitle="Новые без первого ответа и просроченные follow-up"
         />
       </div>
+
+      {dashboard && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <StatCard
+            title="Draft Started 24h"
+            value={dashboard.last24Hours.draftsStarted}
+            subtitle="Сколько пользователей начали оформление"
+          />
+          <StatCard
+            title="Confirmed 24h"
+            value={dashboard.last24Hours.confirmedLeads}
+            subtitle="Сколько заявок дошло до подтверждения"
+          />
+        </div>
+      )}
 
       <DailyChart data={daily} />
 
@@ -53,7 +76,7 @@ export default async function AdminDashboard() {
           <h3 className="text-sm font-medium text-muted-foreground mb-4">По статусам</h3>
           <div className="space-y-3">
             {Object.entries(STATUS_LABELS).map(([key, label]) => {
-              const count = stats.byStatus[key] || 0;
+              const count = statusCounts[key] || 0;
               return (
                 <div key={key} className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">{label}</span>
@@ -71,7 +94,7 @@ export default async function AdminDashboard() {
             {stats.topProducts.map((p, i) => (
               <div key={i} className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground truncate mr-4">{p.product_name}</span>
-                <span className="font-mono font-medium">{p.count}</span>
+                <span className="font-mono font-medium">{p.cnt}</span>
               </div>
             ))}
             {stats.topProducts.length === 0 && (
