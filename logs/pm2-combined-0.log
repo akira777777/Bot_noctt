@@ -232,3 +232,257 @@
 2026-03-23T14:19:45:     at afterConnectMultiple (node:net:1723:7)
 2026-03-23T14:19:45: {"level":"WARN","time":"2026-03-23T13:19:45.583Z","service":"telegram-bot","env":"production","msg":"Queue service initialization failed, continuing without queues","error":"Connection is closed."}
 2026-03-23T14:19:45: {"level":"INFO","time":"2026-03-23T13:19:45.589Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T14:31:27: {"level":"ERROR","time":"2026-03-23T13:31:27.347Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T14:31:27: {"level":"INFO","time":"2026-03-23T13:31:27.347Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T14:31:27: {"level":"INFO","time":"2026-03-23T13:31:27.348Z","service":"telegram-bot","env":"production","msg":"HTTP server closed"}
+2026-03-23T14:31:27: {"level":"INFO","time":"2026-03-23T13:31:27.348Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T14:31:27: {"level":"INFO","time":"2026-03-23T13:31:27.348Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T14:31:27: {"level":"INFO","time":"2026-03-23T13:31:27.348Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T14:31:27: {"level":"ERROR","time":"2026-03-23T13:31:27.348Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T14:31:32: [dotenv@17.3.1] injecting env (5) from .env.local -- tip: 🛡️ auth for agents: https://vestauth.com
+2026-03-23T14:31:32: [dotenv@17.3.1] injecting env (34) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+2026-03-23T14:31:33: {"level":"INFO","time":"2026-03-23T13:31:33.186Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T14:31:33: {"level":"INFO","time":"2026-03-23T13:31:33.196Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T14:31:33: {"level":"ERROR","time":"2026-03-23T13:31:33.210Z","service":"telegram-bot","env":"production","msg":"Redis client error","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1142:49)\n    at afterConnectMultiple (node:net:1723:7)","code":"ECONNREFUSED"}}
+2026-03-23T14:31:33: {"level":"WARN","time":"2026-03-23T13:31:33.210Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T14:31:33: {"level":"ERROR","time":"2026-03-23T13:31:33.319Z","service":"telegram-bot","env":"production","msg":"Redis client error","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1142:49)\n    at afterConnectMultiple (node:net:1723:7)","code":"ECONNREFUSED"}}
+2026-03-23T14:31:33: {"level":"WARN","time":"2026-03-23T13:31:33.319Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T14:31:33: {"level":"ERROR","time":"2026-03-23T13:31:33.535Z","service":"telegram-bot","env":"production","msg":"Redis client error","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1142:49)\n    at afterConnectMultiple (node:net:1723:7)","code":"ECONNREFUSED"}}
+2026-03-23T14:31:33: {"level":"WARN","time":"2026-03-23T13:31:33.536Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T14:31:33: {"level":"ERROR","time":"2026-03-23T13:31:33.846Z","service":"telegram-bot","env":"production","msg":"Redis client error","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1142:49)\n    at afterConnectMultiple (node:net:1723:7)","code":"ECONNREFUSED"}}
+2026-03-23T14:31:33: {"level":"ERROR","time":"2026-03-23T13:31:33.847Z","service":"telegram-bot","env":"production","msg":"Redis connection failed after 4 attempts","error":{}}
+2026-03-23T14:31:33: {"level":"WARN","time":"2026-03-23T13:31:33.847Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T14:31:33: {"level":"ERROR","time":"2026-03-23T13:31:33.848Z","service":"telegram-bot","env":"production","msg":"Failed to connect to Redis, falling back to in-memory cache","error":{"name":"Error","message":"Connection is closed.","stack":"Error: Connection is closed.\n    at close (C:\\Users\\fear7\\Desktop\\Bot_noct\\node_modules\\ioredis\\built\\redis\\event_handler.js:214:25)\n    at Socket.<anonymous> (C:\\Users\\fear7\\Desktop\\Bot_noct\\node_modules\\ioredis\\built\\redis\\event_handler.js:190:20)\n    at Object.onceWrapper (node:events:623:26)\n    at Socket.emit (node:events:508:28)\n    at TCP.<anonymous> (node:net:346:12)"}}
+2026-03-23T14:31:33: {"level":"INFO","time":"2026-03-23T13:31:33.848Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"memory"}
+2026-03-23T14:31:33: {"level":"INFO","time":"2026-03-23T13:31:33.848Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
+2026-03-23T14:31:33: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:31:33:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:31:33:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:31:33: {"level":"WARN","time":"2026-03-23T13:31:33.851Z","service":"telegram-bot","env":"production","msg":"Queue service initialization failed, continuing without queues","error":"Connection is closed."}
+2026-03-23T14:31:33: {"level":"INFO","time":"2026-03-23T13:31:33.866Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T14:31:50: {"level":"ERROR","time":"2026-03-23T13:31:50.325Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T14:31:50: {"level":"INFO","time":"2026-03-23T13:31:50.325Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T14:31:50: {"level":"INFO","time":"2026-03-23T13:31:50.326Z","service":"telegram-bot","env":"production","msg":"HTTP server closed"}
+2026-03-23T14:31:50: {"level":"INFO","time":"2026-03-23T13:31:50.326Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T14:31:50: {"level":"INFO","time":"2026-03-23T13:31:50.326Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T14:31:50: {"level":"INFO","time":"2026-03-23T13:31:50.326Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T14:31:50: {"level":"ERROR","time":"2026-03-23T13:31:50.326Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T14:31:54: [dotenv@17.3.1] injecting env (5) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+2026-03-23T14:31:54: [dotenv@17.3.1] injecting env (34) from .env -- tip: 🛡️ auth for agents: https://vestauth.com
+2026-03-23T14:31:55: {"level":"INFO","time":"2026-03-23T13:31:55.205Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T14:31:55: {"level":"INFO","time":"2026-03-23T13:31:55.215Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T14:31:55: {"level":"ERROR","time":"2026-03-23T13:31:55.229Z","service":"telegram-bot","env":"production","msg":"Redis client error","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1142:49)\n    at afterConnectMultiple (node:net:1723:7)","code":"ECONNREFUSED"}}
+2026-03-23T14:31:55: {"level":"WARN","time":"2026-03-23T13:31:55.229Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T14:31:55: {"level":"ERROR","time":"2026-03-23T13:31:55.346Z","service":"telegram-bot","env":"production","msg":"Redis client error","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1142:49)\n    at afterConnectMultiple (node:net:1723:7)","code":"ECONNREFUSED"}}
+2026-03-23T14:31:55: {"level":"WARN","time":"2026-03-23T13:31:55.346Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T14:31:55: {"level":"ERROR","time":"2026-03-23T13:31:55.562Z","service":"telegram-bot","env":"production","msg":"Redis client error","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1142:49)\n    at afterConnectMultiple (node:net:1723:7)","code":"ECONNREFUSED"}}
+2026-03-23T14:31:55: {"level":"WARN","time":"2026-03-23T13:31:55.563Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T14:31:55: {"level":"ERROR","time":"2026-03-23T13:31:55.877Z","service":"telegram-bot","env":"production","msg":"Redis client error","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1142:49)\n    at afterConnectMultiple (node:net:1723:7)","code":"ECONNREFUSED"}}
+2026-03-23T14:31:55: {"level":"ERROR","time":"2026-03-23T13:31:55.877Z","service":"telegram-bot","env":"production","msg":"Redis connection failed after 4 attempts","error":{}}
+2026-03-23T14:31:55: {"level":"WARN","time":"2026-03-23T13:31:55.877Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T14:31:55: {"level":"ERROR","time":"2026-03-23T13:31:55.877Z","service":"telegram-bot","env":"production","msg":"Failed to connect to Redis, falling back to in-memory cache","error":{"name":"Error","message":"Connection is closed.","stack":"Error: Connection is closed.\n    at close (C:\\Users\\fear7\\Desktop\\Bot_noct\\node_modules\\ioredis\\built\\redis\\event_handler.js:214:25)\n    at Socket.<anonymous> (C:\\Users\\fear7\\Desktop\\Bot_noct\\node_modules\\ioredis\\built\\redis\\event_handler.js:190:20)\n    at Object.onceWrapper (node:events:623:26)\n    at Socket.emit (node:events:508:28)\n    at TCP.<anonymous> (node:net:346:12)"}}
+2026-03-23T14:31:55: {"level":"INFO","time":"2026-03-23T13:31:55.877Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"memory"}
+2026-03-23T14:31:55: {"level":"INFO","time":"2026-03-23T13:31:55.878Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
+2026-03-23T14:31:55: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:31:55:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:31:55:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:31:55: {"level":"WARN","time":"2026-03-23T13:31:55.880Z","service":"telegram-bot","env":"production","msg":"Queue service initialization failed, continuing without queues","error":"Connection is closed."}
+2026-03-23T14:31:55: {"level":"INFO","time":"2026-03-23T13:31:55.889Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T14:31:55: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:31:55:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:31:55:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:31:56: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:31:56:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:31:56:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:31:56: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:31:56:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:31:56:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:31:56: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:31:56:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:31:56:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:31:56: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:31:56:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:31:56:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:31:56: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:31:56:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:31:56:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:31:57: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:31:57:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:31:57:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:31:57: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:31:57:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:31:57:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:31:58: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:31:58:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:31:58:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:31:58: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:31:58:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:31:58:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:31:59: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:31:59:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:31:59:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:31:59: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:31:59:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:31:59:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:00: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:00:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:00:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:01: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:01:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:01:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:01: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:01:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:01:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:02: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:02:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:02:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:03: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:03:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:03:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:04: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:04:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:04:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:05: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:05:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:05:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:06: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:06:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:06:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:07: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:07:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:07:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:08: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:08:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:08:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:09: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:09:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:09:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:11: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:11:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:11:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:12: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:12:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:12:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:13: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:13:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:13:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:14: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:14:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:14:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:16: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:16:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:16:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:17: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:17:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:17:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:19: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:19:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:19:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:20: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:20:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:20:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:22: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:22:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:22:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:24: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:24:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:24:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:25: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:25:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:25:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:27: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:27:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:27:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:29: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:29:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:29:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:31: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:31:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:31:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:33: [ioredis] Unhandled error event: AggregateError [ECONNREFUSED]: 
+2026-03-23T14:32:33:     at internalConnectMultiple (node:net:1142:49)
+2026-03-23T14:32:33:     at afterConnectMultiple (node:net:1723:7)
+2026-03-23T14:32:33: {"level":"ERROR","time":"2026-03-23T13:32:33.515Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T14:32:33: {"level":"INFO","time":"2026-03-23T13:32:33.515Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T14:32:33: {"level":"INFO","time":"2026-03-23T13:32:33.515Z","service":"telegram-bot","env":"production","msg":"HTTP server closed"}
+2026-03-23T14:32:33: {"level":"INFO","time":"2026-03-23T13:32:33.515Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T14:32:33: {"level":"INFO","time":"2026-03-23T13:32:33.516Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T14:32:33: {"level":"INFO","time":"2026-03-23T13:32:33.516Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T14:32:33: {"level":"ERROR","time":"2026-03-23T13:32:33.516Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T14:32:37: [dotenv@17.3.1] injecting env (5) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+2026-03-23T14:32:37: [dotenv@17.3.1] injecting env (34) from .env -- tip: ⚡️ secrets for agents: https://dotenvx.com/as2
+2026-03-23T14:32:38: {"level":"INFO","time":"2026-03-23T13:32:38.258Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T14:32:38: {"level":"INFO","time":"2026-03-23T13:32:38.266Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T14:32:38: {"level":"ERROR","time":"2026-03-23T13:32:38.277Z","service":"telegram-bot","env":"production","msg":"Redis client error","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1142:49)\n    at afterConnectMultiple (node:net:1723:7)","code":"ECONNREFUSED"}}
+2026-03-23T14:32:38: {"level":"WARN","time":"2026-03-23T13:32:38.278Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T14:32:38: {"level":"ERROR","time":"2026-03-23T13:32:38.394Z","service":"telegram-bot","env":"production","msg":"Redis client error","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1142:49)\n    at afterConnectMultiple (node:net:1723:7)","code":"ECONNREFUSED"}}
+2026-03-23T14:32:38: {"level":"WARN","time":"2026-03-23T13:32:38.394Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T14:32:38: {"level":"ERROR","time":"2026-03-23T13:32:38.598Z","service":"telegram-bot","env":"production","msg":"Redis client error","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1142:49)\n    at afterConnectMultiple (node:net:1723:7)","code":"ECONNREFUSED"}}
+2026-03-23T14:32:38: {"level":"WARN","time":"2026-03-23T13:32:38.598Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T14:32:38: {"level":"ERROR","time":"2026-03-23T13:32:38.908Z","service":"telegram-bot","env":"production","msg":"Redis client error","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1142:49)\n    at afterConnectMultiple (node:net:1723:7)","code":"ECONNREFUSED"}}
+2026-03-23T14:32:38: {"level":"ERROR","time":"2026-03-23T13:32:38.908Z","service":"telegram-bot","env":"production","msg":"Redis connection failed after 4 attempts","error":{}}
+2026-03-23T14:32:38: {"level":"WARN","time":"2026-03-23T13:32:38.908Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T14:32:38: {"level":"ERROR","time":"2026-03-23T13:32:38.909Z","service":"telegram-bot","env":"production","msg":"Failed to connect to Redis, falling back to in-memory cache","error":{"name":"Error","message":"Connection is closed.","stack":"Error: Connection is closed.\n    at close (C:\\Users\\fear7\\Desktop\\Bot_noct\\node_modules\\ioredis\\built\\redis\\event_handler.js:214:25)\n    at Socket.<anonymous> (C:\\Users\\fear7\\Desktop\\Bot_noct\\node_modules\\ioredis\\built\\redis\\event_handler.js:190:20)\n    at Object.onceWrapper (node:events:623:26)\n    at Socket.emit (node:events:508:28)\n    at TCP.<anonymous> (node:net:346:12)"}}
+2026-03-23T14:32:38: {"level":"INFO","time":"2026-03-23T13:32:38.909Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"memory"}
+2026-03-23T14:32:38: {"level":"INFO","time":"2026-03-23T13:32:38.909Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
+2026-03-23T14:32:38: {"level":"WARN","time":"2026-03-23T13:32:38.910Z","service":"telegram-bot","env":"production","msg":"Queue service initialization failed, continuing without queues","error":"Connection is closed."}
+2026-03-23T14:32:38: {"level":"INFO","time":"2026-03-23T13:32:38.918Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T14:33:00: {"level":"ERROR","time":"2026-03-23T13:33:00.336Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T14:33:00: {"level":"INFO","time":"2026-03-23T13:33:00.336Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T14:33:00: {"level":"INFO","time":"2026-03-23T13:33:00.336Z","service":"telegram-bot","env":"production","msg":"HTTP server closed"}
+2026-03-23T14:33:00: {"level":"INFO","time":"2026-03-23T13:33:00.336Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T14:33:00: {"level":"INFO","time":"2026-03-23T13:33:00.337Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T14:33:00: {"level":"INFO","time":"2026-03-23T13:33:00.337Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T14:33:00: {"level":"ERROR","time":"2026-03-23T13:33:00.337Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T14:33:04: [dotenv@17.3.1] injecting env (5) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+2026-03-23T14:33:04: [dotenv@17.3.1] injecting env (34) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+2026-03-23T14:33:05: {"level":"INFO","time":"2026-03-23T13:33:05.092Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T14:33:05: {"level":"INFO","time":"2026-03-23T13:33:05.100Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T14:33:05: {"level":"ERROR","time":"2026-03-23T13:33:05.111Z","service":"telegram-bot","env":"production","msg":"Redis client error","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1142:49)\n    at afterConnectMultiple (node:net:1723:7)","code":"ECONNREFUSED"}}
+2026-03-23T14:33:05: {"level":"WARN","time":"2026-03-23T13:33:05.113Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T14:33:05: {"level":"ERROR","time":"2026-03-23T13:33:05.222Z","service":"telegram-bot","env":"production","msg":"Redis client error","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1142:49)\n    at afterConnectMultiple (node:net:1723:7)","code":"ECONNREFUSED"}}
+2026-03-23T14:33:05: {"level":"WARN","time":"2026-03-23T13:33:05.222Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T14:33:05: {"level":"ERROR","time":"2026-03-23T13:33:05.423Z","service":"telegram-bot","env":"production","msg":"Redis client error","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1142:49)\n    at afterConnectMultiple (node:net:1723:7)","code":"ECONNREFUSED"}}
+2026-03-23T14:33:05: {"level":"WARN","time":"2026-03-23T13:33:05.423Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T14:33:05: {"level":"ERROR","time":"2026-03-23T13:33:05.734Z","service":"telegram-bot","env":"production","msg":"Redis client error","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1142:49)\n    at afterConnectMultiple (node:net:1723:7)","code":"ECONNREFUSED"}}
+2026-03-23T14:33:05: {"level":"ERROR","time":"2026-03-23T13:33:05.734Z","service":"telegram-bot","env":"production","msg":"Redis connection failed after 4 attempts","error":{}}
+2026-03-23T14:33:05: {"level":"WARN","time":"2026-03-23T13:33:05.735Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T14:33:05: {"level":"ERROR","time":"2026-03-23T13:33:05.735Z","service":"telegram-bot","env":"production","msg":"Failed to connect to Redis, falling back to in-memory cache","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1142:49)\n    at afterConnectMultiple (node:net:1723:7)","code":"ECONNREFUSED"}}
+2026-03-23T14:33:05: {"level":"INFO","time":"2026-03-23T13:33:05.735Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"memory"}
+2026-03-23T14:33:05: {"level":"INFO","time":"2026-03-23T13:33:05.735Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
+2026-03-23T14:33:05: {"level":"WARN","time":"2026-03-23T13:33:05.736Z","service":"telegram-bot","env":"production","msg":"Queue service initialization failed, continuing without queues","error":"Connection is closed."}
+2026-03-23T14:33:05: {"level":"INFO","time":"2026-03-23T13:33:05.742Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T14:33:36: {"level":"ERROR","time":"2026-03-23T13:33:36.405Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T14:33:36: {"level":"INFO","time":"2026-03-23T13:33:36.405Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T14:33:36: {"level":"INFO","time":"2026-03-23T13:33:36.406Z","service":"telegram-bot","env":"production","msg":"HTTP server closed"}
+2026-03-23T14:33:36: {"level":"INFO","time":"2026-03-23T13:33:36.406Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T14:33:36: {"level":"INFO","time":"2026-03-23T13:33:36.406Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T14:33:36: {"level":"INFO","time":"2026-03-23T13:33:36.406Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T14:33:36: {"level":"ERROR","time":"2026-03-23T13:33:36.406Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T14:33:40: [dotenv@17.3.1] injecting env (5) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+2026-03-23T14:33:40: [dotenv@17.3.1] injecting env (34) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+2026-03-23T14:33:41: {"level":"INFO","time":"2026-03-23T13:33:41.445Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T14:33:41: {"level":"INFO","time":"2026-03-23T13:33:41.456Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T14:33:41: {"level":"ERROR","time":"2026-03-23T13:33:41.468Z","service":"telegram-bot","env":"production","msg":"Failed to connect to Redis during cache initialization, using memory fallback","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1142:49)\n    at afterConnectMultiple (node:net:1723:7)","code":"ECONNREFUSED"}}
+2026-03-23T14:33:41: {"level":"WARN","time":"2026-03-23T13:33:41.469Z","service":"telegram-bot","env":"production","msg":"Redis not configured, using in-memory cache fallback"}
+2026-03-23T14:33:41: {"level":"INFO","time":"2026-03-23T13:33:41.469Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"memory"}
+2026-03-23T14:33:41: {"level":"INFO","time":"2026-03-23T13:33:41.469Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
+2026-03-23T14:33:41: {"level":"WARN","time":"2026-03-23T13:33:41.470Z","service":"telegram-bot","env":"production","msg":"Queue service initialization failed, continuing without queues","error":"Connection is closed."}
+2026-03-23T14:33:41: {"level":"INFO","time":"2026-03-23T13:33:41.476Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T14:33:59: {"level":"ERROR","time":"2026-03-23T13:33:59.109Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T14:33:59: {"level":"INFO","time":"2026-03-23T13:33:59.109Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T14:33:59: {"level":"INFO","time":"2026-03-23T13:33:59.110Z","service":"telegram-bot","env":"production","msg":"HTTP server closed"}
+2026-03-23T14:33:59: {"level":"INFO","time":"2026-03-23T13:33:59.110Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T14:33:59: {"level":"INFO","time":"2026-03-23T13:33:59.110Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T14:33:59: {"level":"INFO","time":"2026-03-23T13:33:59.110Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T14:33:59: {"level":"ERROR","time":"2026-03-23T13:33:59.110Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T14:34:03: [dotenv@17.3.1] injecting env (5) from .env.local -- tip: ⚡️ secrets for agents: https://dotenvx.com/as2
+2026-03-23T14:34:03: [dotenv@17.3.1] injecting env (34) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+2026-03-23T14:34:03: {"level":"INFO","time":"2026-03-23T13:34:03.968Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T14:34:03: {"level":"INFO","time":"2026-03-23T13:34:03.977Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T14:34:03: {"level":"ERROR","time":"2026-03-23T13:34:03.989Z","service":"telegram-bot","env":"production","msg":"Failed to connect to Redis during cache initialization, using memory fallback","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1142:49)\n    at afterConnectMultiple (node:net:1723:7)","code":"ECONNREFUSED"}}
+2026-03-23T14:34:03: {"level":"WARN","time":"2026-03-23T13:34:03.989Z","service":"telegram-bot","env":"production","msg":"Redis not configured, using in-memory cache fallback"}
+2026-03-23T14:34:03: {"level":"INFO","time":"2026-03-23T13:34:03.989Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"memory"}
+2026-03-23T14:34:03: {"level":"INFO","time":"2026-03-23T13:34:03.989Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
+2026-03-23T14:34:03: {"level":"WARN","time":"2026-03-23T13:34:03.993Z","service":"telegram-bot","env":"production","msg":"Queue service initialization failed, continuing without queues","error":""}
+2026-03-23T14:34:04: {"level":"INFO","time":"2026-03-23T13:34:04.000Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}

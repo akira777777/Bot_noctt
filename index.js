@@ -57,6 +57,7 @@ try {
 
 // Application resources
 let appResources = null;
+let teardownInProgress = false;
 
 function startHttpServer(app, port) {
   return new Promise((resolve, reject) => {
@@ -69,6 +70,13 @@ async function teardown(resources, reason) {
   if (!resources) {
     return;
   }
+
+  if (teardownInProgress) {
+    log.warn("Teardown already in progress", { reason });
+    return;
+  }
+
+  teardownInProgress = true;
 
   log.info("Starting application teardown", { reason });
 
@@ -138,6 +146,7 @@ async function teardown(resources, reason) {
   }
 
   log.info("Application teardown complete");
+  teardownInProgress = false;
 }
 
 const SESSION_CLEANUP_INTERVAL_MS = 60 * 60 * 1000;

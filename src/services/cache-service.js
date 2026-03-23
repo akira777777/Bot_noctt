@@ -48,17 +48,29 @@ class CacheService {
       return;
     }
 
+    let firstConnectionError = null;
+    const captureConnectionError = (error) => {
+      if (!firstConnectionError) {
+        firstConnectionError = error;
+      }
+    };
+
+    this.redis.on("error", captureConnectionError);
+
     try {
       await this.redis.ping();
       this.isConnected = true;
       log.info("Redis cache connected successfully");
     } catch (error) {
+      const rootCause = firstConnectionError || error;
       log.error(
         "Failed to connect to Redis, falling back to in-memory cache",
-        error,
+        rootCause,
       );
       this.fallbackToMemory = true;
       this.isConnected = false;
+    } finally {
+      this.redis.off("error", captureConnectionError);
     }
   }
 
@@ -481,39 +493,71 @@ async function initCacheService(redisConfig = null) {
   if (redisConfig) {
     const { host = "localhost", port = 6379, password, db = 0 } = redisConfig;
 
-    redisClient = new Redis({
+    let probeError = null;
+    const probeClient = new Redis({
       host,
       port,
       password,
       db,
-      maxRetriesPerRequest: 3,
-      retryStrategy: (times) => {
-        if (times > 3) {
-          log.error(`Redis connection failed after ${times} attempts`);
-          return null;
-        }
-        return Math.min(times * 100, 3000);
-      },
-      reconnectOnError: (err) => err.message.includes("READONLY"),
-      enableReadyCheck: true,
-      lazyConnect: false,
+      lazyConnect: true,
+      maxRetriesPerRequest: 1,
+      enableReadyCheck: false,
     });
 
-    redisClient.on("connect", () => {
-      log.info("Redis client connecting");
+    probeClient.on("error", (error) => {
+      if (!probeError) {
+        probeError = error;
+      }
     });
 
-    redisClient.on("ready", () => {
-      log.info("Redis client ready");
-    });
+    try {
+      await probeClient.connect();
+      await probeClient.ping();
 
-    redisClient.on("error", (error) => {
-      log.error("Redis client error", error);
-    });
+      redisClient = new Redis({
+        host,
+        port,
+        password,
+        db,
+        maxRetriesPerRequest: 3,
+        retryStrategy: (times) => {
+          if (times > 3) {
+            log.error(`Redis connection failed after ${times} attempts`);
+            return null;
+          }
+          return Math.min(times * 100, 3000);
+        },
+        reconnectOnError: (err) => err.message.includes("READONLY"),
+        enableReadyCheck: true,
+        lazyConnect: false,
+      });
 
-    redisClient.on("close", () => {
-      log.warn("Redis connection closed");
-    });
+      redisClient.on("connect", () => {
+        log.info("Redis client connecting");
+      });
+
+      redisClient.on("ready", () => {
+        log.info("Redis client ready");
+      });
+
+      redisClient.on("error", (error) => {
+        log.error("Redis client error", error);
+      });
+
+      redisClient.on("close", () => {
+        log.warn("Redis connection closed");
+      });
+    } catch (error) {
+      log.error(
+        "Failed to connect to Redis during cache initialization, using memory fallback",
+        probeError || error,
+      );
+      redisClient = null;
+    } finally {
+      if (probeClient.status !== "end") {
+        probeClient.disconnect();
+      }
+    }
   } else {
     redisClient = createRedisClient();
   }

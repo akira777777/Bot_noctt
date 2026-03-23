@@ -56,6 +56,8 @@ const RATE_LIMITS = {
 const queues = {};
 
 async function validateRedisConnection(redisConfig) {
+  let connected = false;
+  let firstConnectionError = null;
   const client = new Redis({
     host: redisConfig.host || "localhost",
     port: redisConfig.port || 6379,
@@ -66,11 +68,29 @@ async function validateRedisConnection(redisConfig) {
     enableReadyCheck: false,
   });
 
+  client.on("error", () => {
+    // no-op placeholder replaced below
+  });
+
+  client.removeAllListeners("error");
+  client.on("error", (error) => {
+    if (!firstConnectionError) {
+      firstConnectionError = error;
+    }
+    // Suppress unhandled ioredis error events for the short-lived probe client.
+    // The actual failure is surfaced through connect/ping rejection below.
+  });
+
   try {
     await client.connect();
+    connected = true;
     await client.ping();
+  } catch (error) {
+    throw firstConnectionError || error;
   } finally {
-    client.disconnect();
+    if (connected && client.status !== "end") {
+      client.disconnect();
+    }
   }
 }
 
@@ -518,10 +538,15 @@ async function clearQueue(queueName) {
 async function closeQueueService() {
   log.info("Closing queue service...");
 
-  const closePromises = Object.values(queues).map((queue) =>
-    queue.close().then(() => {
-      log.debug(`Queue ${queue.name} closed`);
-    }),
+  const closePromises = Object.entries(queues).map(([name, queue]) =>
+    queue
+      .close()
+      .then(() => {
+        log.debug(`Queue ${queue.name} closed`);
+      })
+      .finally(() => {
+        delete queues[name];
+      }),
   );
 
   await Promise.all(closePromises);
