@@ -406,6 +406,18 @@ async function handleClientText(ctx, deps) {
     return;
   }
 
+  // Try AI agent before falling back to admin forward
+  if (deps.services.aiAgent) {
+    const aiResult = await deps.services.aiAgent.runClientAgent({
+      clientId: ctx.from.id,
+      messageText: ctx.message.text,
+    });
+    if (aiResult.handled) {
+      await ctx.reply(aiResult.text, backToMainKeyboard());
+      return;
+    }
+  }
+
   const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
   await deps.services.conversation.forwardClientMessage({
     client: ctx.from,

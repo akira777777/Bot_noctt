@@ -504,88 +504,42 @@ function registerAdminCommands(bot, deps) {
   );
 
   bot.command(
-    "suggest",
+    "ai",
     adminOnly(async (ctx) => {
-      if (!deps.services.ai?.isEnabled) {
-        await ctx.reply("AI не настроен. Добавьте AI_GATEWAY_API_KEY в окружение.");
+      const prompt = ctx.message.text.replace(/^\/ai\s*/, "").trim();
+      if (!prompt) {
+        await ctx.reply(
+          "Использование: /ai <запрос>\n\n" +
+            "Примеры:\n" +
+            "  /ai покажи статистику воронки\n" +
+            "  /ai последние 5 заявок\n" +
+            "  /ai история диалога клиента 123456789",
+        );
         return;
       }
 
-      const clientId = deps.services.admin.getActiveClientId(ctx.from.id);
-      if (!clientId) {
-        await ctx.reply("Выберите клиента через /dialogs или /setclient <id>.");
+      if (!deps.services.aiAgent) {
+        await ctx.reply(
+          "AI-ассистент не активен.\n\n" +
+            "Для активации выполните:\n" +
+            "  vercel link && vercel env pull\n" +
+            "или задайте AI_ENABLED=false чтобы скрыть это сообщение.",
+        );
         return;
       }
 
-      await ctx.reply("⏳ Генерирую вариант ответа...");
-
-      const history = deps.services.admin.getClientHistory(clientId, 10);
-      if (!history.ok || !history.messages.length) {
-        await ctx.reply("История диалога пуста.");
-        return;
-      }
-
-      const products = deps.repos.products.list();
-      const suggestion = await deps.services.ai.generateAdminSuggestedReply({
-        products,
-        conversationMessages: history.messages,
+      await ctx.reply("⏳ Анализирую...");
+      const result = await deps.services.aiAgent.runAdminAgent({
+        prompt,
+        services: deps.services,
       });
 
-      if (!suggestion) {
-        await ctx.reply("Не удалось сгенерировать ответ. Попробуйте позже.");
+      if (!result.ok) {
+        await ctx.reply(`❌ Ошибка AI: ${result.error}`);
         return;
       }
 
-      const { Markup: M } = require("telegraf");
-      await ctx.reply(
-        `💡 Предложенный ответ:\n\n${suggestion}`,
-        M.inlineKeyboard([
-          [M.button.callback("✉️ Отправить клиенту", `admin:ai_send:${clientId}`)],
-          [M.button.callback("❌ Не отправлять", "admin:noop")],
-        ]),
-      );
-    }),
-  );
-
-  bot.command(
-    "summarize",
-    adminOnly(async (ctx) => {
-      if (!deps.services.ai?.isEnabled) {
-        await ctx.reply("AI не настроен. Добавьте AI_GATEWAY_API_KEY в окружение.");
-        return;
-      }
-
-      const args = ctx.message.text.split(" ").slice(1);
-      const clientId = resolveClientId(
-        args[0],
-        deps.services.admin.getActiveClientId(ctx.from.id),
-      );
-
-      if (!clientId) {
-        await ctx.reply("Укажите клиента: /summarize <telegram_id> или выберите через /dialogs.");
-        return;
-      }
-
-      await ctx.reply("⏳ Анализирую диалог...");
-
-      const history = deps.services.admin.getClientHistory(clientId, 20);
-      if (!history.ok || !history.messages.length) {
-        await ctx.reply("История диалога пуста.");
-        return;
-      }
-
-      const lead = deps.repos.leads.getLatestByClient(clientId);
-      const summary = await deps.services.ai.summarizeConversation({
-        conversationMessages: history.messages,
-        lead,
-      });
-
-      if (!summary) {
-        await ctx.reply("Не удалось составить резюме. Попробуйте позже.");
-        return;
-      }
-
-      await ctx.reply(`📋 Резюме диалога (клиент ${clientId}):\n\n${summary}`);
+      await ctx.reply(result.text);
     }),
   );
 
@@ -637,10 +591,8 @@ async function handleAdminStart(ctx, deps) {
     "/stats — статистика заявок\n" +
     "/exportleads — экспорт заявок в CSV\n" +
     "/blockuser <id> — заблокировать пользователя\n" +
-    "/unblockuser <id> — разблокировать пользователя\n\n" +
-    "🤖 AI-команды (требуют AI_GATEWAY_API_KEY):\n" +
-    "/suggest — предложить ответ для активного клиента\n" +
-    "/summarize [id] — резюме диалога с клиентом";
+    "/unblockuser <id> — разблокировать пользователя\n" +
+    "/ai <запрос> — AI-ассистент (статистика, заявки, история)";
   await ctx.reply(message);
 }
 
