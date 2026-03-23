@@ -1,14 +1,25 @@
 const { Markup } = require("telegraf");
 
-function clientHomeReplyKeyboard(webAppUrl = null) {
-  if (!webAppUrl) {
-    return Markup.keyboard([["💬 Что вас интересует?"]]).resize();
+function clientHomeReplyKeyboard(
+  webAppUrl = null,
+  { hasActiveLeadDraft = false } = {},
+) {
+  const rows = [];
+
+  if (hasActiveLeadDraft) {
+    rows.push(["▶️ Продолжить заявку"]);
   }
 
-  return Markup.keyboard([
-    [{ text: "📱 Открыть мини-приложение", web_app: { url: webAppUrl } }],
-    ["💬 Что вас интересует?"],
-  ]).resize();
+  rows.push(["🛍 Оставить заявку", "📚 Каталог"]);
+  rows.push(["💬 Что вас интересует?"]);
+
+  if (webAppUrl) {
+    rows.unshift([
+      { text: "📱 Открыть мини-приложение", web_app: { url: webAppUrl } },
+    ]);
+  }
+
+  return Markup.keyboard(rows).resize();
 }
 
 function removeReplyKeyboard() {

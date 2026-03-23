@@ -5,7 +5,10 @@ const Database = require("better-sqlite3");
 const { createRepositories } = require("../src/repositories");
 const { runMigrations } = require("../src/db/migrations");
 const { createLeadService } = require("../src/services/lead-service");
-const { handleClientText } = require("../src/handlers/client");
+const {
+  handleClientText,
+  handleClientMenu,
+} = require("../src/handlers/client");
 
 function createLeadServiceHarness() {
   const db = new Database(":memory:");
@@ -57,6 +60,70 @@ test("lead service validates quantity with actionable messages", () => {
   assert.match(tooBig.error, /до 10000/i);
 });
 
+test("fresh lead draft goes straight to confirm with default Telegram contact after quantity", () => {
+  const { repos, service } = createLeadServiceHarness();
+  const clientId = 703;
+  const product = { id: 1, code: "p1", title: "Товар" };
+
+  service.startLeadDraft({ clientId, product, sourcePayload: "quote_channel" });
+
+  const result = service.saveQuantity({
+    client: { id: clientId, username: "client703" },
+    clientId,
+    session: repos.sessions.get(clientId),
+    rawQuantity: "3",
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.nextStep, "confirm");
+  assert.equal(result.draft.quantity, 3);
+  assert.equal(result.draft.contactLabel, "Telegram: @client703");
+  assert.equal(repos.sessions.get(clientId).step, "confirm");
+});
+
+test("starting a draft for the same product resumes the existing draft instead of resetting it", () => {
+  const { repos, service } = createLeadServiceHarness();
+  const clientId = 704;
+  const product = { id: 1, code: "p1", title: "Товар" };
+
+  service.startLeadDraft({ clientId, product, sourcePayload: "quote_channel" });
+  service.saveQuantity({
+    client: { id: clientId, username: "client704" },
+    clientId,
+    session: repos.sessions.get(clientId),
+    rawQuantity: "6",
+  });
+
+  const resumed = service.startLeadDraft({
+    clientId,
+    product,
+    sourcePayload: "quote_channel",
+  });
+
+  assert.equal(resumed.resumed, true);
+  assert.equal(resumed.step, "confirm");
+  assert.equal(resumed.draft.quantity, 6);
+  assert.equal(repos.sessions.get(clientId).step, "confirm");
+});
+
+test("goBack from confirm returns user to quantity in adaptive lead flow", () => {
+  const { repos, service } = createLeadServiceHarness();
+  const clientId = 705;
+  const product = { id: 1, code: "p1", title: "Товар" };
+
+  service.startLeadDraft({ clientId, product, sourcePayload: "quote_channel" });
+  service.saveQuantity({
+    client: { id: clientId, username: "client705" },
+    clientId,
+    session: repos.sessions.get(clientId),
+    rawQuantity: "2",
+  });
+
+  const previousStep = service.goBack(clientId, repos.sessions.get(clientId));
+  assert.equal(previousStep, "quantity");
+  assert.equal(repos.sessions.get(clientId).step, "quantity");
+});
+
 test("confirm edit quantity returns user to confirm step", () => {
   const { repos, service } = createLeadServiceHarness();
   const clientId = 777;
@@ -65,6 +132,7 @@ test("confirm edit quantity returns user to confirm step", () => {
   service.startLeadDraft({ clientId, product, sourcePayload: "from_channel" });
   const quantitySession = service.getSession(clientId);
   service.saveQuantity({
+    client: { id: clientId, username: "user777" },
     clientId,
     session: quantitySession,
     rawQuantity: "2",
@@ -93,6 +161,7 @@ test("confirm edit quantity returns user to confirm step", () => {
   assert.equal(editSession.draft.isConfirmEditing, true);
 
   const saveEditedQuantity = service.saveQuantity({
+    client: { id: clientId, username: "user777" },
     clientId,
     session: editSession,
     rawQuantity: "5",
@@ -163,6 +232,37 @@ test("client text shortcut 'отмена' cancels lead flow", async () => {
   assert.match(replies[0], /оформление заявки отменено/i);
 });
 
+test("client menu keeps active draft intact and offers resume CTA", async () => {
+  const { repos } = createLeadServiceHarness();
+  const replies = [];
+
+  repos.sessions.set(901, "lead", "confirm", {
+    productId: 1,
+    productCode: "p1",
+    productName: "Товар",
+    quantity: 2,
+    contactLabel: "Telegram: @client901",
+    sourcePayload: "quote_channel",
+  });
+
+  const ctx = {
+    from: { id: 901 },
+    async reply(text, extra) {
+      replies.push({ text, extra });
+    },
+  };
+
+  await handleClientMenu(ctx, {
+    repos,
+    webAppUrl: "https://miniapp.example",
+  });
+
+  const session = repos.sessions.get(901);
+  assert.equal(session.flow, "lead");
+  assert.equal(session.step, "confirm");
+  assert.match(JSON.stringify(replies[0].extra), /Продолжить заявку/);
+});
+
 test("client text shortcut 'назад' returns to previous lead step", async () => {
   const replies = [];
   let goBackCalled = false;
@@ -221,6 +321,7 @@ test("confirm edit comment/contact returns to confirm step", () => {
 
   service.startLeadDraft({ clientId, product, sourcePayload: "from_channel" });
   service.saveQuantity({
+    client: { id: clientId, username: "user888" },
     clientId,
     session: service.getSession(clientId),
     rawQuantity: "3",
@@ -273,6 +374,7 @@ test("confirm edit contact_custom returns to confirm after manual contact", () =
 
   service.startLeadDraft({ clientId, product, sourcePayload: "from_channel" });
   service.saveQuantity({
+    client: { id: clientId, username: "user889" },
     clientId,
     session: service.getSession(clientId),
     rawQuantity: "4",
@@ -328,6 +430,7 @@ test("confirmLead creates a lead, records a system message and clears the sessio
   const product = { id: 1, code: "p1", title: "Товар" };
   service.startLeadDraft({ clientId, product, sourcePayload: "from_channel" });
   service.saveQuantity({
+    client: { id: clientId, username: "client901" },
     clientId,
     session: service.getSession(clientId),
     rawQuantity: "2",

@@ -19,10 +19,10 @@ function createLeadService({
   });
 
   const BACK_TRANSITIONS = Object.freeze({
-    comment: "quantity",
-    contact: "comment",
+    comment: "confirm",
+    contact: "confirm",
     contact_custom: "contact",
-    confirm: "contact",
+    confirm: "quantity",
   });
 
   function isConfirmEditing(session) {
@@ -66,7 +66,32 @@ function createLeadService({
     };
   }
 
+  function buildTelegramContactLabel(client, clientId) {
+    if (client?.username) {
+      return `Telegram: @${client.username}`;
+    }
+    return `Telegram: id ${client?.id || clientId}`;
+  }
+
   function startLeadDraft({ clientId, product, sourcePayload }) {
+    const existingSession = repos.sessions.get(clientId);
+    if (
+      existingSession?.flow === "lead" &&
+      existingSession?.draft?.productId === product.id
+    ) {
+      const draft = {
+        ...existingSession.draft,
+        sourcePayload:
+          existingSession.draft.sourcePayload || sourcePayload || null,
+      };
+      repos.sessions.set(clientId, "lead", existingSession.step, draft);
+      return {
+        resumed: true,
+        step: existingSession.step,
+        draft,
+      };
+    }
+
     const draft = {
       productId: product.id,
       productCode: product.code,
@@ -78,7 +103,11 @@ function createLeadService({
     };
 
     repos.sessions.set(clientId, "lead", "quantity", draft);
-    return draft;
+    return {
+      resumed: false,
+      step: "quantity",
+      draft,
+    };
   }
 
   function getOpenLeadByClientAndProduct(clientId, productCode) {
@@ -92,7 +121,7 @@ function createLeadService({
     );
   }
 
-  function saveQuantity({ clientId, session, rawQuantity }) {
+  function saveQuantity({ client, clientId, session, rawQuantity }) {
     const quantityText = normalizeText(rawQuantity);
     const quantity = Number(quantityText);
     if (!Number.isInteger(quantity) || quantity <= 0) {
@@ -109,9 +138,11 @@ function createLeadService({
       };
     }
 
-    const nextStep = getNextStep(session, "comment");
+    const nextStep = "confirm";
     return moveToStep(clientId, nextStep, session, {
       quantity,
+      contactLabel:
+        session?.draft?.contactLabel || buildTelegramContactLabel(client, clientId),
       isConfirmEditing: false,
     });
   }
@@ -131,7 +162,7 @@ function createLeadService({
         error: "Комментарий не должен превышать 500 символов.",
       };
     }
-    const nextStep = getNextStep(session, "contact");
+    const nextStep = "confirm";
     return moveToStep(clientId, nextStep, session, {
       comment: trimmed,
       isConfirmEditing: false,
@@ -139,7 +170,7 @@ function createLeadService({
   }
 
   function skipComment({ clientId, session }) {
-    const nextStep = getNextStep(session, "contact");
+    const nextStep = "confirm";
     return moveToStep(clientId, nextStep, session, {
       comment: "",
       isConfirmEditing: false,
@@ -147,9 +178,7 @@ function createLeadService({
   }
 
   function useTelegramContact({ client, session }) {
-    const contactLabel = client.username
-      ? `Telegram: @${client.username}`
-      : `Telegram: id ${client.id}`;
+    const contactLabel = buildTelegramContactLabel(client, client.id);
     return moveToStep(client.id, "confirm", session, {
       contactLabel,
       isConfirmEditing: false,
@@ -202,7 +231,10 @@ function createLeadService({
     if (!session) {
       return null;
     }
-    const previousStep = BACK_TRANSITIONS[session.step];
+    const previousStep =
+      session.step === "comment" && !isConfirmEditing(session)
+        ? "quantity"
+        : BACK_TRANSITIONS[session.step];
     if (!previousStep) {
       return null;
     }

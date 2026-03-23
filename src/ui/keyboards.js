@@ -53,7 +53,7 @@ function commentKeyboard() {
   return Markup.inlineKeyboard([
     [
       Markup.button.callback(
-        "Пропустить комментарий",
+        "Оставить без комментария",
         ACTIONS.LEAD_SKIP_COMMENT,
       ),
     ],
@@ -94,12 +94,16 @@ function customContactKeyboard() {
   ]);
 }
 
-function confirmLeadKeyboard() {
+function confirmLeadKeyboard(draft = {}) {
+  const commentButtonLabel = draft.comment
+    ? "Изменить комментарий"
+    : "Добавить комментарий";
+
   return Markup.inlineKeyboard([
     [Markup.button.callback("Подтвердить заявку", ACTIONS.LEAD_CONFIRM)],
     [
       Markup.button.callback("Изменить количество", ACTIONS.LEAD_EDIT_QUANTITY),
-      Markup.button.callback("Изменить комментарий", ACTIONS.LEAD_EDIT_COMMENT),
+      Markup.button.callback(commentButtonLabel, ACTIONS.LEAD_EDIT_COMMENT),
     ],
     [Markup.button.callback("Изменить контакт", ACTIONS.LEAD_EDIT_CONTACT)],
     [
@@ -107,6 +111,13 @@ function confirmLeadKeyboard() {
       Markup.button.callback("Отмена", ACTIONS.LEAD_CANCEL),
     ],
     [Markup.button.callback("Главное меню", ACTIONS.MENU_MAIN)],
+  ]);
+}
+
+function leadResumeKeyboard() {
+  return Markup.inlineKeyboard([
+    [Markup.button.callback("Продолжить заявку", ACTIONS.LEAD_RESUME)],
+    [Markup.button.callback("Написать менеджеру", ACTIONS.CONTACT_MANAGER)],
   ]);
 }
 
@@ -212,6 +223,7 @@ module.exports = {
   contactKeyboard,
   customContactKeyboard,
   confirmLeadKeyboard,
+  leadResumeKeyboard,
   adminClientMessageKeyboard,
   adminLeadKeyboard,
   adminQuickReplyKeyboard,

@@ -8,6 +8,7 @@ const {
   customContactKeyboard,
   confirmLeadKeyboard,
   clientMiniAppKeyboard,
+  leadResumeKeyboard,
 } = require("../ui/keyboards");
 const { clientHomeReplyKeyboard } = require("../ui/reply-keyboards");
 const {
@@ -28,10 +29,7 @@ const {
 const { buildCatalogIntro, buildProductCard } = require("../ui/catalog-view");
 const { safeAnswerCbQuery } = require("../utils/telegram");
 const { ACTIONS, parseActionId } = require("../utils/actions");
-const {
-  parseSourcePayload,
-  resolveStartAction,
-} = require("../utils/source-payload");
+const { parseSourcePayload } = require("../utils/source-payload");
 const { createRateLimiter } = require("../utils/rate-limiter");
 const { formatClientLabel } = require("../utils/formatters");
 
@@ -39,7 +37,10 @@ const { formatClientLabel } = require("../utils/formatters");
 const messageLimiter = createRateLimiter(5, 60 * 1000);
 
 const HOME_ACTION_LABELS = {
+  "🛍 Оставить заявку": "lead:start",
+  "📚 Каталог": "catalog:root",
   "💬 Что вас интересует?": "contact:manager",
+  "▶️ Продолжить заявку": "lead:resume",
   "📱 Открыть мини-приложение": "miniapp:open",
 };
 const LEAD_TEXT_COMMANDS = Object.freeze({
@@ -53,7 +54,15 @@ function getCurrentSourcePayload(repos, clientId, fallbackSource = null) {
   return session?.draft?.sourcePayload || fallbackSource || null;
 }
 
+function getActiveLeadDraft(repos, clientId) {
+  const session = repos.sessions.get(clientId);
+  return session?.flow === "lead" ? session : null;
+}
+
 function setHomeSession(repos, clientId, sourcePayload) {
+  if (getActiveLeadDraft(repos, clientId)) {
+    return;
+  }
   repos.sessions.set(clientId, "home", "menu", {
     sourcePayload: sourcePayload || null,
   });
@@ -70,7 +79,9 @@ async function showHomeScreen(ctx, deps, entry) {
   setHomeSession(deps.repos, ctx.from.id, entry.raw);
   await ctx.reply(
     welcomeMessage(entry),
-    clientHomeReplyKeyboard(deps.webAppUrl),
+    clientHomeReplyKeyboard(deps.webAppUrl, {
+      hasActiveLeadDraft: Boolean(getActiveLeadDraft(deps.repos, ctx.from.id)),
+    }),
   );
 }
 
@@ -102,6 +113,31 @@ async function showLeadEntry(ctx, deps) {
   );
 }
 
+async function showCurrentLeadStep(ctx, deps, session) {
+  if (!session || session.flow !== "lead") {
+    await showLeadEntry(ctx, deps);
+    return;
+  }
+
+  switch (session.step) {
+    case "quantity": {
+      const product = deps.services.lead.hydrateProductForLead(
+        session.draft.productId,
+      );
+      await showLeadStep(ctx, "quantity", { product });
+      return;
+    }
+    case "comment":
+    case "contact":
+    case "contact_custom":
+      await showLeadStep(ctx, session.step, { draft: session.draft });
+      return;
+    case "confirm":
+    default:
+      await showLeadStep(ctx, "confirm", { draft: session.draft });
+  }
+}
+
 async function showSupportEntry(ctx, deps) {
   const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
   setHomeSession(deps.repos, ctx.from.id, sourcePayload);
@@ -115,6 +151,13 @@ async function handleHomeAction(ctx, deps, action) {
       return true;
     case "lead:start":
       await showLeadEntry(ctx, deps);
+      return true;
+    case "lead:resume":
+      await showCurrentLeadStep(
+        ctx,
+        deps,
+        deps.services.lead.getSession(ctx.from.id),
+      );
       return true;
     case "contact:manager":
       await showSupportEntry(ctx, deps);
@@ -150,7 +193,10 @@ async function showLeadStep(ctx, step, payload = {}) {
       await ctx.reply(askCustomContactMessage(), customContactKeyboard());
       return;
     case "confirm":
-      await ctx.reply(leadSummaryMessage(payload.draft), confirmLeadKeyboard());
+      await ctx.reply(
+        leadSummaryMessage(payload.draft),
+        confirmLeadKeyboard(payload.draft),
+      );
       return;
   }
 }
@@ -200,6 +246,7 @@ async function handleLeadText(ctx, deps, session) {
 
   if (session.step === "quantity") {
     const result = deps.services.lead.saveQuantity({
+      client: ctx.from,
       clientId: ctx.from.id,
       session,
       rawQuantity: ctx.message.text,
@@ -210,7 +257,7 @@ async function handleLeadText(ctx, deps, session) {
       return true;
     }
 
-    await showLeadStep(ctx, "comment");
+    await showLeadStep(ctx, result.nextStep, result);
     return true;
   }
 
@@ -226,12 +273,7 @@ async function handleLeadText(ctx, deps, session) {
       return true;
     }
 
-    if (result.nextStep === "confirm") {
-      await showLeadStep(ctx, "confirm", result);
-      return true;
-    }
-
-    await showLeadStep(ctx, "contact", result);
+    await showLeadStep(ctx, result.nextStep, result);
     return true;
   }
 
@@ -259,7 +301,7 @@ async function handleLeadText(ctx, deps, session) {
   if (session.step === "confirm") {
     await ctx.reply(
       "Подтвердите заявку кнопкой ниже. Чтобы поправить данные, используйте кнопки «Изменить ...».",
-      confirmLeadKeyboard(),
+      confirmLeadKeyboard(session.draft),
     );
     return true;
   }
@@ -319,20 +361,6 @@ async function handleClientStart(ctx, deps) {
   const entry = parseSourcePayload(ctx.startPayload);
 
   await showHomeScreen(ctx, deps, entry);
-  const startAction = resolveStartAction(entry);
-  if (startAction === "catalog") {
-    await showCatalog(ctx, deps);
-    return;
-  }
-
-  if (startAction === "lead") {
-    await showLeadEntry(ctx, deps);
-    return;
-  }
-
-  if (startAction === "support") {
-    await showSupportEntry(ctx, deps);
-  }
 }
 
 async function handleClientHelp(ctx) {
@@ -428,6 +456,16 @@ async function handleClientAction(ctx, deps) {
     return;
   }
 
+  if (action === ACTIONS.LEAD_RESUME) {
+    await safeAnswerCbQuery(ctx);
+    await showCurrentLeadStep(
+      ctx,
+      deps,
+      deps.services.lead.getSession(ctx.from.id),
+    );
+    return;
+  }
+
   if (action.startsWith("lead:product:")) {
     const productId = parseActionId(action);
     const product = deps.services.lead.hydrateProductForLead(productId);
@@ -437,14 +475,22 @@ async function handleClientAction(ctx, deps) {
     }
 
     const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
-    deps.services.lead.startLeadDraft({
+    const draftState = deps.services.lead.startLeadDraft({
       clientId: ctx.from.id,
       product,
       sourcePayload,
     });
 
     await safeAnswerCbQuery(ctx);
-    await showLeadStep(ctx, "quantity", { product });
+    if (draftState.step === "quantity") {
+      await showLeadStep(ctx, "quantity", { product });
+      return;
+    }
+    await showCurrentLeadStep(
+      ctx,
+      deps,
+      deps.services.lead.getSession(ctx.from.id),
+    );
     return;
   }
 

@@ -235,6 +235,19 @@ function startSessionCleanup(repos) {
 function startScheduledTasks(scheduler) {
   const timers = [];
 
+  const draftReminderTimer = setInterval(
+    () => {
+      scheduler
+        .sendDraftReminders()
+        .catch((err) =>
+          log.error("Draft reminders check failed", { error: err.message }),
+        );
+    },
+    5 * 60 * 1000,
+  );
+  draftReminderTimer.unref();
+  timers.push(draftReminderTimer);
+
   // Check stale leads every 30 minutes
   const staleTimer = setInterval(
     () => {

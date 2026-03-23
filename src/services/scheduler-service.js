@@ -1,7 +1,43 @@
 const { getLeadStatusLabel } = require("../domain/lead-status");
 const { logInfo, logError } = require("../utils/logger");
+const { leadResumeKeyboard } = require("../ui/keyboards");
 
 function createSchedulerService({ repos, bot, adminId }) {
+  async function sendDraftReminders() {
+    const reminderConfigs = [
+      {
+        key: "15m",
+        text: (session) =>
+          `У вас осталась незавершённая заявка на "${session.draft.productName}".\n\nНажмите «Продолжить заявку», и бот вернёт вас к черновику.`,
+      },
+      {
+        key: "24h",
+        text: (session) =>
+          `Ваша заявка на "${session.draft.productName}" всё ещё ждёт подтверждения.\n\nЕсли запрос актуален, продолжите оформление в один тап.`,
+      },
+    ];
+
+    for (const reminder of reminderConfigs) {
+      const drafts = repos.sessions.listLeadDraftsPendingReminder(reminder.key);
+      for (const session of drafts) {
+        try {
+          await bot.telegram.sendMessage(
+            session.telegram_id,
+            reminder.text(session),
+            leadResumeKeyboard(),
+          );
+          repos.sessions.markReminderSent(session.telegram_id, reminder.key);
+          logInfo("draft_reminder_sent", {
+            telegramId: session.telegram_id,
+            reminderKey: reminder.key,
+          });
+        } catch (error) {
+          logError("Failed to send draft reminder", error);
+        }
+      }
+    }
+  }
+
   // Notify admin about leads stuck in "new" status for > 2 hours
   async function checkStaleLeads() {
     const staleLeads = repos.leads.listStale("new", 120, 10);
@@ -53,6 +89,7 @@ function createSchedulerService({ repos, bot, adminId }) {
   }
 
   return {
+    sendDraftReminders,
     checkStaleLeads,
     sendFollowUps,
   };

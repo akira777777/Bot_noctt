@@ -8,6 +8,7 @@ const ACTIONS = Object.freeze({
   LEAD_CONTACT_TELEGRAM: "lead:contact_telegram",
   LEAD_CONTACT_CUSTOM: "lead:contact_custom",
   LEAD_CONFIRM: "lead:confirm",
+  LEAD_RESUME: "lead:resume",
   LEAD_BACK: "lead:back",
   LEAD_CANCEL: "lead:cancel",
   LEAD_EDIT_QUANTITY: "lead:edit_quantity",

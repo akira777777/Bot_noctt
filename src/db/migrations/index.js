@@ -6,6 +6,7 @@ const addIndexesMigration = require("./005_add_indexes");
 const openLeadUniquenessMigration = require("./006_open_lead_uniqueness");
 const messageTypeMigration = require("./007_message_type");
 const leadTrackingTokenMigration = require("./008_lead_tracking_token");
+const leadWorkflowOpsMigration = require("./009_lead_workflow_ops");
 
 const migrations = [
   initialMigration,
@@ -16,6 +17,7 @@ const migrations = [
   openLeadUniquenessMigration,
   messageTypeMigration,
   leadTrackingTokenMigration,
+  leadWorkflowOpsMigration,
 ];
 
 function ensureMigrationTable(db) {
