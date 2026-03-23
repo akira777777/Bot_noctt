@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { fetchLeads } from "@/lib/api";
+import { fetchLeads } from "@/lib/admin-api";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +29,7 @@ export default async function LeadsPage({ searchParams }: Props) {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Заявки</h1>
         <a
-          href={`${process.env.API_URL || "http://localhost:3081"}/api/admin/export/leads`}
+          href="/api/admin/export/leads"
           className="rounded-lg bg-secondary px-4 py-2 text-xs font-medium text-secondary-foreground hover:bg-secondary/80 transition-colors"
         >
           Экспорт CSV

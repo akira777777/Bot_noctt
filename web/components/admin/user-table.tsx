@@ -1,14 +1,19 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { toggleUserBlock, type User } from "@/lib/api";
+import type { User } from "@/lib/admin-api";
 
 export function UserTable({ users }: { users: User[] }) {
   const router = useRouter();
 
   async function handleToggleBlock(id: number) {
     try {
-      await toggleUserBlock(id);
+      const response = await fetch(`/api/admin/users/${id}/block`, {
+        method: "PATCH",
+      });
+      if (!response.ok) {
+        throw new Error("Ошибка при изменении статуса пользователя");
+      }
       router.refresh();
     } catch {
       alert("Ошибка при изменении статуса пользователя");

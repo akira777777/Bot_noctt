@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { fetchLead } from "@/lib/api";
+import { fetchLead } from "@/lib/admin-api";
 import { LeadStatusActions } from "@/components/admin/lead-status-actions";
 
 export const dynamic = "force-dynamic";

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createProduct, toggleProduct, type Product } from "@/lib/api";
+import type { Product } from "@/lib/admin-api";
 
 export function ProductTable({ initialProducts }: { initialProducts: Product[] }) {
   const router = useRouter();
@@ -19,12 +19,20 @@ export function ProductTable({ initialProducts }: { initialProducts: Product[] }
 
     setLoading(true);
     try {
-      await createProduct({
-        code: code.trim(),
-        title: title.trim(),
-        description: description.trim(),
-        price_text: priceText.trim(),
+      const response = await fetch("/api/admin/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: code.trim(),
+          title: title.trim(),
+          description: description.trim(),
+          price_text: priceText.trim(),
+        }),
       });
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({ error: "Ошибка при создании товара" }));
+        throw new Error(body.error || "Ошибка при создании товара");
+      }
       setCode("");
       setTitle("");
       setDescription("");
@@ -40,7 +48,12 @@ export function ProductTable({ initialProducts }: { initialProducts: Product[] }
 
   async function handleToggle(id: number) {
     try {
-      await toggleProduct(id);
+      const response = await fetch(`/api/admin/products/${id}/toggle`, {
+        method: "PATCH",
+      });
+      if (!response.ok) {
+        throw new Error("Ошибка при изменении статуса товара");
+      }
       router.refresh();
     } catch {
       alert("Ошибка при изменении статуса товара");

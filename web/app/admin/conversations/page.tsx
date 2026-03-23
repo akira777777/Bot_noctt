@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { fetchConversations } from "@/lib/api";
+import { fetchConversations } from "@/lib/admin-api";
 
 export const dynamic = "force-dynamic";
 

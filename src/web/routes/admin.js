@@ -1,7 +1,12 @@
 const express = require("express");
 const { getLeadStatusLabel, isCanonicalLeadStatus } = require("../../domain/lead-status");
 
-function createAdminRoutes({ repos, conversationService, adminId }) {
+function createAdminRoutes({
+  repos,
+  conversationService,
+  adminId,
+  leadStatusService,
+}) {
   const router = express.Router();
 
   // --- Leads ---
@@ -46,13 +51,16 @@ function createAdminRoutes({ repos, conversationService, adminId }) {
     });
   });
 
-  router.patch("/leads/:id/status", (req, res) => {
+  router.patch("/leads/:id/status", async (req, res) => {
     const { status } = req.body;
     if (!status || !isCanonicalLeadStatus(status)) {
       return res.status(400).json({ ok: false, error: "Invalid status" });
     }
 
-    const lead = repos.leads.updateStatus(Number(req.params.id), status);
+    const lead = await leadStatusService.updateStatus(
+      Number(req.params.id),
+      status,
+    );
     if (!lead) {
       return res.status(404).json({ ok: false, error: "Lead not found" });
     }

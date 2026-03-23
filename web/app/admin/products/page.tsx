@@ -1,4 +1,4 @@
-import { fetchProducts } from "@/lib/api";
+import { fetchProducts } from "@/lib/admin-api";
 import { ProductTable } from "@/components/admin/product-table";
 
 export const dynamic = "force-dynamic";

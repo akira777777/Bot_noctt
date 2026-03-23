@@ -5,15 +5,21 @@
 const Redis = require("ioredis");
 const log = require("../utils/logger-enhanced");
 
+function readTtl(name, fallbackSeconds) {
+  const alias = process.env[`CACHE_TTL_${name}`];
+  const legacy = process.env[`REDIS_TTL_${name}`];
+  return parseInt(alias || legacy || String(fallbackSeconds), 10);
+}
+
 // Cache TTL configurations (in seconds)
 const CACHE_TTL = {
-  SESSION: parseInt(process.env.REDIS_TTL_SESSION || "3600", 10), // 1 hour
-  CATALOG: parseInt(process.env.REDIS_TTL_CATALOG || "300", 10), // 5 minutes
-  PRODUCT: parseInt(process.env.REDIS_TTL_PRODUCT || "600", 10), // 10 minutes
-  STATS: parseInt(process.env.REDIS_TTL_STATS || "60", 10), // 1 minute
-  USER: parseInt(process.env.REDIS_TTL_USER || "1800", 10), // 30 minutes
-  LEAD: parseInt(process.env.REDIS_TTL_LEAD || "300", 10), // 5 minutes
-  CONVERSATION: parseInt(process.env.REDIS_TTL_CONVERSATION || "900", 10), // 15 minutes
+  SESSION: readTtl("SESSION", 3600), // 1 hour
+  CATALOG: readTtl("CATALOG", 300), // 5 minutes
+  PRODUCT: readTtl("PRODUCT", 600), // 10 minutes
+  STATS: readTtl("STATS", 60), // 1 minute
+  USER: readTtl("USER", 1800), // 30 minutes
+  LEAD: readTtl("LEAD", 300), // 5 minutes
+  CONVERSATION: readTtl("CONVERSATION", 900), // 15 minutes
 };
 
 // Cache key prefixes for namespacing

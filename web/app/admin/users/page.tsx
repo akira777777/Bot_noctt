@@ -1,4 +1,4 @@
-import { fetchUsers } from "@/lib/api";
+import { fetchUsers } from "@/lib/admin-api";
 import { UserTable } from "@/components/admin/user-table";
 import Link from "next/link";
 

@@ -9,6 +9,7 @@ const compression = require("compression");
 
 const { createPublicRoutes } = require("./routes/public");
 const { createAdminRoutes } = require("./routes/admin");
+const { createLeadStatusService } = require("../services/lead-status-service");
 const {
   router: healthRouter,
   setDbCheckFunction,
@@ -38,6 +39,7 @@ function createWebServer({
 }) {
   const app = express();
   app.set("trust proxy", 1);
+  const leadStatusService = createLeadStatusService({ repos, bot });
 
   // ==========================================================================
   // Security Middleware
@@ -164,6 +166,7 @@ function createWebServer({
       repos,
       conversationService,
       adminId,
+      leadStatusService,
       cacheService,
       queueService,
     }),

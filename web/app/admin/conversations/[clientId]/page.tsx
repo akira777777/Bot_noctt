@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { fetchMessages } from "@/lib/api";
+import { fetchMessages } from "@/lib/admin-api";
 import { ReplyForm } from "@/components/admin/reply-form";
 
 export const dynamic = "force-dynamic";

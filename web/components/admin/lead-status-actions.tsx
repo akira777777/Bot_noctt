@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { updateLeadStatus } from "@/lib/api";
 
 const STATUSES = [
   { key: "new", label: "Новая" },
@@ -26,7 +25,14 @@ export function LeadStatusActions({ leadId, currentStatus }: Props) {
     if (status === currentStatus) return;
     setLoading(true);
     try {
-      await updateLeadStatus(leadId, status);
+      const response = await fetch(`/api/admin/leads/${leadId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update status");
+      }
       router.refresh();
     } catch (err) {
       alert("Ошибка при обновлении статуса");

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { fetchStats, fetchDailyStats, fetchLeads } from "@/lib/api";
+import { fetchStats, fetchDailyStats, fetchLeads } from "@/lib/admin-api";
 import { StatCard } from "@/components/admin/stat-card";
 import { DailyChart } from "@/components/admin/daily-chart";
 

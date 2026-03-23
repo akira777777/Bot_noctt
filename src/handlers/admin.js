@@ -1,15 +1,7 @@
-const {
-  adminQuickReplyKeyboard,
-  adminInboxKeyboard,
-} = require("../ui/keyboards");
+const { adminQuickReplyKeyboard, adminInboxKeyboard } = require("../ui/keyboards");
 const {
   adminSelectedClientMessage,
   adminNoClientSelectedMessage,
-  clientLeadTakenMessage,
-  clientLeadClosedMessage,
-  clientLeadCalledBackMessage,
-  clientLeadAwaitingPaymentMessage,
-  clientLeadFulfilledMessage,
   conversationResolvedMessage,
 } = require("../ui/messages");
 const { formatConversationRow, formatLeadRow } = require("../utils/formatters");
@@ -74,13 +66,12 @@ async function applyLeadStatusAction({
   ctx,
   deps,
   leadId,
-  updateLead,
+  status,
   cbSuccessText,
   buttonText,
-  clientMessage,
   adminReplyText,
 }) {
-  const lead = updateLead(leadId);
+  const lead = await deps.services.leadStatus.updateStatus(leadId, status);
   if (!lead) {
     await safeAnswerCbQuery(ctx, "Заявка не найдена");
     return false;
@@ -88,7 +79,6 @@ async function applyLeadStatusAction({
 
   await safeAnswerCbQuery(ctx, cbSuccessText);
   await replaceWithStatusButton(ctx, buttonText);
-  await safeSendMessage(deps.bot, lead.client_telegram_id, clientMessage());
   await ctx.reply(adminReplyText(leadId));
   return true;
 }
@@ -602,10 +592,9 @@ async function handleAdminAction(ctx, deps) {
       ctx,
       deps,
       leadId,
-      updateLead: deps.services.admin.takeLead,
+      status: "in_progress",
       cbSuccessText: "Заявка взята в работу",
       buttonText: "✅ Взята в работу",
-      clientMessage: clientLeadTakenMessage,
       adminReplyText: (id) =>
         `Заявка #${id} переведена в статус "in_progress".`,
     });
@@ -618,10 +607,9 @@ async function handleAdminAction(ctx, deps) {
       ctx,
       deps,
       leadId,
-      updateLead: deps.services.admin.closeLead,
+      status: "closed",
       cbSuccessText: "Заявка закрыта",
       buttonText: "✅ Заявка закрыта",
-      clientMessage: clientLeadClosedMessage,
       adminReplyText: (id) => `Заявка #${id} переведена в статус "closed".`,
     });
     return;
@@ -633,10 +621,9 @@ async function handleAdminAction(ctx, deps) {
       ctx,
       deps,
       leadId,
-      updateLead: deps.services.admin.markLeadCalledBack,
+      status: "called_back",
       cbSuccessText: "Статус: Перезвонили",
       buttonText: "✅ Перезвонили",
-      clientMessage: clientLeadCalledBackMessage,
       adminReplyText: (id) =>
         `Заявка #${id} переведена в статус "called_back".`,
     });
@@ -649,10 +636,9 @@ async function handleAdminAction(ctx, deps) {
       ctx,
       deps,
       leadId,
-      updateLead: deps.services.admin.markLeadAwaitingPayment,
+      status: "awaiting_payment",
       cbSuccessText: "Статус: Ждём оплату",
       buttonText: "✅ Ждём оплату",
-      clientMessage: clientLeadAwaitingPaymentMessage,
       adminReplyText: (id) =>
         `Заявка #${id} переведена в статус "awaiting_payment".`,
     });
@@ -665,10 +651,9 @@ async function handleAdminAction(ctx, deps) {
       ctx,
       deps,
       leadId,
-      updateLead: deps.services.admin.markLeadFulfilled,
+      status: "fulfilled",
       cbSuccessText: "Заявка выполнена ✅",
       buttonText: "✅ Выполнена",
-      clientMessage: clientLeadFulfilledMessage,
       adminReplyText: (id) => `Заявка #${id} переведена в статус "fulfilled".`,
     });
     return;

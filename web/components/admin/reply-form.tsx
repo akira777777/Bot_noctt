@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { sendReply } from "@/lib/api";
 
 export function ReplyForm({ clientId }: { clientId: number }) {
   const [text, setText] = useState("");
@@ -15,7 +14,14 @@ export function ReplyForm({ clientId }: { clientId: number }) {
 
     setLoading(true);
     try {
-      await sendReply(clientId, text.trim());
+      const response = await fetch(`/api/admin/conversations/${clientId}/reply`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: text.trim() }),
+      });
+      if (!response.ok) {
+        throw new Error("Не удалось отправить сообщение");
+      }
       setText("");
       router.refresh();
     } catch {

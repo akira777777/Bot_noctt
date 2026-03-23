@@ -7,6 +7,7 @@ const { createLeadService } = require("./services/lead-service");
 const { createAdminService } = require("./services/admin-service");
 const { createCatalogService } = require("./services/catalog-service");
 const { createSessionService } = require("./services/session-service");
+const { createLeadStatusService } = require("./services/lead-status-service");
 const {
   registerAdminCommands,
   handleAdminStart,
@@ -38,6 +39,7 @@ function createBot({ db, repos, cacheService = null, queueService = null }) {
   });
   const admin = createAdminService({ repos });
   const session = createSessionService({ repos });
+  const leadStatus = createLeadStatusService({ repos, bot });
   const lead = createLeadService({
     db,
     repos,
@@ -56,6 +58,7 @@ function createBot({ db, repos, cacheService = null, queueService = null }) {
       conversation,
       admin,
       session,
+      leadStatus,
       lead,
     },
     adminId: ADMIN_ID,
