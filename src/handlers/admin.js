@@ -8,6 +8,10 @@ const { formatConversationRow, formatLeadRow } = require("../utils/formatters");
 const { safeAnswerCbQuery, safeSendMessage } = require("../utils/telegram");
 const { parseActionId } = require("../utils/actions");
 
+// Ephemeral cache: stores AI suggestions shown to admin until they are sent or discarded.
+// Key: `${adminId}:${clientId}`, value: suggestion text string.
+const pendingSuggestions = new Map();
+
 function isAdmin(ctx, deps) {
   return ctx.from.id === deps.adminId;
 }
@@ -536,6 +540,8 @@ function registerAdminCommands(bot, deps) {
         return;
       }
 
+      pendingSuggestions.set(`${ctx.from.id}:${clientId}`, suggestion);
+
       const { Markup: M } = require("telegraf");
       await ctx.reply(
         `💡 Предложенный ответ:\n\n${suggestion}`,
@@ -590,6 +596,46 @@ function registerAdminCommands(bot, deps) {
   );
 
   bot.command(
+    "ai",
+    adminOnly(async (ctx) => {
+      const prompt = ctx.message.text.replace(/^\/ai\s*/, "").trim();
+      if (!prompt) {
+        await ctx.reply(
+          "Использование: /ai <запрос>\n\n" +
+            "Примеры:\n" +
+            "  /ai покажи статистику воронки\n" +
+            "  /ai последние 5 заявок\n" +
+            "  /ai история диалога клиента 123456789",
+        );
+        return;
+      }
+
+      if (!deps.services.aiAgent) {
+        await ctx.reply(
+          "AI-ассистент не активен.\n\n" +
+            "Для активации выполните:\n" +
+            "  vercel link && vercel env pull\n" +
+            "или задайте AI_ENABLED=false чтобы скрыть это сообщение.",
+        );
+        return;
+      }
+
+      await ctx.reply("⏳ Анализирую...");
+      const result = await deps.services.aiAgent.runAdminAgent({
+        prompt,
+        services: deps.services,
+      });
+
+      if (!result.ok) {
+        await ctx.reply(`❌ Ошибка AI: ${result.error}`);
+        return;
+      }
+
+      await ctx.reply(result.text);
+    }),
+  );
+
+  bot.command(
     "broadcast",
     adminOnly(async (ctx) => {
       const text = ctx.message.text.replace(/^\/broadcast\s*/, "").trim();
@@ -638,9 +684,10 @@ async function handleAdminStart(ctx, deps) {
     "/exportleads — экспорт заявок в CSV\n" +
     "/blockuser <id> — заблокировать пользователя\n" +
     "/unblockuser <id> — разблокировать пользователя\n\n" +
-    "🤖 AI-команды (требуют AI_GATEWAY_API_KEY):\n" +
+    "🤖 AI-команды:\n" +
     "/suggest — предложить ответ для активного клиента\n" +
-    "/summarize [id] — резюме диалога с клиентом";
+    "/summarize [id] — резюме диалога с клиентом\n" +
+    "/ai <запрос> — AI-ассистент (статистика, заявки, история)";
   await ctx.reply(message);
 }
 
@@ -833,28 +880,15 @@ async function handleAdminAction(ctx, deps) {
 
   if (action.startsWith("admin:ai_send:")) {
     const clientId = parseActionId(action);
-    if (!deps.services.ai?.isEnabled) {
-      await safeAnswerCbQuery(ctx, "AI не настроен");
-      return;
-    }
-
-    const history = deps.services.admin.getClientHistory(clientId, 10);
-    if (!history.ok || !history.messages.length) {
-      await safeAnswerCbQuery(ctx, "История пуста");
-      return;
-    }
-
-    const products = deps.repos.products.list();
-    const suggestion = await deps.services.ai.generateAdminSuggestedReply({
-      products,
-      conversationMessages: history.messages,
-    });
+    const cacheKey = `${adminId}:${clientId}`;
+    const suggestion = pendingSuggestions.get(cacheKey);
 
     if (!suggestion) {
-      await safeAnswerCbQuery(ctx, "Не удалось сгенерировать ответ");
+      await safeAnswerCbQuery(ctx, "Предложение устарело — запустите /suggest снова");
       return;
     }
 
+    pendingSuggestions.delete(cacheKey);
     deps.services.admin.selectClient(adminId, clientId);
     await safeAnswerCbQuery(ctx, "Отправляю...");
     await sendAdminReply(ctx, deps, clientId, suggestion);
