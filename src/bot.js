@@ -1,5 +1,4 @@
 const { Telegraf } = require("telegraf");
-const { BOT_TOKEN, ADMIN_ID, WEB_APP_URL } = require("./config/env");
 const {
   createConversationService,
 } = require("./services/conversation-service");
@@ -27,15 +26,23 @@ const {
 const { createAiService } = require("./services/ai-service");
 const { logError } = require("./utils/logger");
 
-function createBot({ db, repos, cacheService = null, queueService = null }) {
-  const bot = new Telegraf(BOT_TOKEN);
+function createBot({
+  db,
+  repos,
+  botToken,
+  adminId,
+  webAppUrl = null,
+  cacheService = null,
+  queueService = null,
+}) {
+  const bot = new Telegraf(botToken);
 
   const catalog = createCatalogService({ repos });
   const ai = createAiService({ repos });
   const conversation = createConversationService({
     repos,
     bot,
-    adminId: ADMIN_ID,
+    adminId,
     cacheService,
     queueService,
     aiService: ai,
@@ -47,7 +54,7 @@ function createBot({ db, repos, cacheService = null, queueService = null }) {
     db,
     repos,
     bot,
-    adminId: ADMIN_ID,
+    adminId,
     catalogService: catalog,
     conversationService: conversation,
   });
@@ -65,8 +72,8 @@ function createBot({ db, repos, cacheService = null, queueService = null }) {
       lead,
       ai,
     },
-    adminId: ADMIN_ID,
-    webAppUrl: WEB_APP_URL,
+    adminId,
+    webAppUrl,
   };
 
   bot.catch((error, ctx) => {

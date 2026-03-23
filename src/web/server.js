@@ -10,20 +10,21 @@ const compression = require("compression");
 const { createPublicRoutes } = require("./routes/public");
 const { createAdminRoutes } = require("./routes/admin");
 const { createLeadStatusService } = require("../services/lead-status-service");
-const {
-  router: healthRouter,
-  setDbCheckFunction,
-  setCacheCheckService,
-} = require("./routes/health");
+const { createHealthRouter } = require("./routes/health");
 const { createApiKeyAuth } = require("./middleware/api-key-auth");
 const { createRateLimiter } = require("./middleware/rate-limit");
 const {
-  errorHandler,
-  notFoundHandler,
-  requestLogger,
+  createErrorHandler,
+  createNotFoundHandler,
+  createRequestLogger,
   asyncHandler,
+  trustProxy,
 } = require("./middleware/error-handler");
-const log = require("../utils/logger-enhanced");
+const {
+  APP_VERSION,
+  MEMORY_LIMIT_WARN,
+  MEMORY_LIMIT_CRITICAL,
+} = require("../config/env");
 
 function createWebServer({
   repos,
@@ -36,9 +37,10 @@ function createWebServer({
   compressionEnabled = true,
   cacheService = null,
   queueService = null,
+  environment = isProduction ? "production" : "development",
 }) {
   const app = express();
-  app.set("trust proxy", 1);
+  app.set("trust proxy", trustProxy({ isProduction }));
   const leadStatusService = createLeadStatusService({ repos, bot });
 
   // ==========================================================================
@@ -100,30 +102,34 @@ function createWebServer({
   });
 
   // Request logging
-  app.use(requestLogger);
+  app.use(createRequestLogger());
 
   // ==========================================================================
   // Health & Monitoring Routes
   // ==========================================================================
 
-  // Set database check function for health routes
-  if (repos && repos.users && typeof repos.users.getById === "function") {
-    setDbCheckFunction(async () => {
-      try {
-        repos.users.getById(-1);
-        return { status: "ok" };
-      } catch (error) {
-        return { status: "error", message: error.message };
-      }
-    });
-  }
-
-  if (cacheService) {
-    setCacheCheckService(cacheService);
-  }
-
   // Mount health routes
-  app.use("/", healthRouter);
+  app.use(
+    "/",
+    createHealthRouter({
+      appVersion: APP_VERSION,
+      environment,
+      memoryLimitWarn: MEMORY_LIMIT_WARN,
+      memoryLimitCritical: MEMORY_LIMIT_CRITICAL,
+      dbCheck:
+        repos && repos.users && typeof repos.users.getById === "function"
+          ? async () => {
+              try {
+                repos.users.getById(-1);
+                return { status: "ok" };
+              } catch (error) {
+                return { status: "error", message: error.message };
+              }
+            }
+          : null,
+      cacheService,
+    }),
+  );
 
   // ==========================================================================
   // API Routes
@@ -267,10 +273,10 @@ function createWebServer({
   // ==========================================================================
 
   // 404 handler
-  app.use(notFoundHandler);
+  app.use(createNotFoundHandler());
 
   // Global error handler
-  app.use(errorHandler);
+  app.use(createErrorHandler({ isProduction }));
 
   return app;
 }

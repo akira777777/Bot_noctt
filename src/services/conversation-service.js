@@ -7,6 +7,14 @@ const { formatClientLabel } = require("../utils/formatters");
 const { safeSendMessage } = require("../utils/telegram");
 
 function createConversationService({ repos, bot, adminId, aiService = null }) {
+  function ensureTelegramDeliveryAvailable() {
+    if (!bot?.telegram?.sendMessage) {
+      const error = new Error("Telegram delivery is disabled");
+      error.code = "TELEGRAM_DELIVERY_DISABLED";
+      throw error;
+    }
+  }
+
   function upsertTelegramUser(from, role) {
     repos.users.upsert({
       telegram_id: from.id,
@@ -24,6 +32,7 @@ function createConversationService({ repos, bot, adminId, aiService = null }) {
   }
 
   async function forwardClientMessage({ client, chatId, text, sourcePayload }) {
+    ensureTelegramDeliveryAvailable();
     const conversation = ensureConversation(client.id, sourcePayload);
     repos.messages.create(conversation.id, "client", client.id, text);
     repos.leads.touchLastClientActivityByClient(client.id);
@@ -58,6 +67,7 @@ function createConversationService({ repos, bot, adminId, aiService = null }) {
   }
 
   async function sendAdminReply({ adminTelegramId, clientId, text }) {
+    ensureTelegramDeliveryAvailable();
     const conversation = ensureConversation(clientId);
     repos.messages.create(conversation.id, "admin", adminTelegramId, text);
     const firstReplyResult = repos.leads.recordFirstAdminReplyByClient(clientId);

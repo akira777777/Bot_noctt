@@ -7,8 +7,10 @@ const DEFAULT_QUICK_TEMPLATES = {
     "Чтобы не потерять заявку, пришлите удобный контакт для связи, если Telegram неудобен.",
   ack:
     "Заявка уже в работе. Я на связи и вернусь с апдейтом в рамках текущего окна ответа.",
+  proposal:
+    "Подготовлю предложение с условиями и пришлю его в этом чате.",
   payment:
-    "После подтверждения деталей пришлю доступные варианты оплаты.",
+    "Подготовлю предложение с условиями и пришлю его в этом чате.",
   delivery:
     "После подтверждения заявки подберём удобный вариант доставки.",
 };
@@ -68,8 +70,12 @@ function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
     return repos.leads.updateStatus(leadId, "called_back");
   }
 
+  function markLeadProposalSent(leadId) {
+    return repos.leads.updateStatus(leadId, "proposal_sent");
+  }
+
   function markLeadAwaitingPayment(leadId) {
-    return repos.leads.updateStatus(leadId, "awaiting_payment");
+    return markLeadProposalSent(leadId);
   }
 
   function markLeadFulfilled(leadId) {
@@ -291,6 +297,7 @@ function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
     takeLead,
     closeLead,
     markLeadCalledBack,
+    markLeadProposalSent,
     markLeadAwaitingPayment,
     markLeadFulfilled,
     getTemplate,

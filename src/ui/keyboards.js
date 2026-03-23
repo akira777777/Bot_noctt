@@ -168,8 +168,8 @@ function adminLeadKeyboard(leadId, clientId) {
         buildAction(ACTION_PREFIXES.ADMIN_LEAD_CALLED_BACK, leadId),
       ),
       Markup.button.callback(
-        "💳 Ждём оплату",
-        buildAction(ACTION_PREFIXES.ADMIN_LEAD_AWAITING_PAYMENT, leadId),
+        "📄 Предложение отправлено",
+        buildAction(ACTION_PREFIXES.ADMIN_LEAD_PROPOSAL_SENT, leadId),
       ),
     ],
     [
@@ -206,7 +206,10 @@ function adminQuickReplyKeyboard(clientId) {
       ),
     ],
     [
-      Markup.button.callback("Оплата", `admin:template:payment:${clientId}`),
+      Markup.button.callback(
+        "Предложение",
+        `admin:template:proposal:${clientId}`,
+      ),
       Markup.button.callback(
         "Доставка",
         `admin:template:delivery:${clientId}`,

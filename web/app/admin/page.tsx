@@ -9,7 +9,7 @@ const STATUS_LABELS: Record<string, string> = {
   new: "Новые",
   in_progress: "В работе",
   called_back: "Перезвонили",
-  awaiting_payment: "Ожидает оплаты",
+  proposal_sent: "Предложение отправлено",
   fulfilled: "Выполнены",
   closed: "Закрыты",
 };
@@ -36,7 +36,7 @@ export default async function AdminDashboard() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Дашборд</h1>
-        <p className="text-muted-foreground text-sm mt-1">Обзор заявок и статистика</p>
+        <p className="text-muted-foreground text-sm mt-1">Обзор запросов и ключевых показателей</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -47,7 +47,7 @@ export default async function AdminDashboard() {
           value={statusCounts.in_progress || 0}
         />
         <StatCard
-          title="Overdue SLA"
+          title="Просроченные SLA"
           value={dashboard?.overdueLeads || 0}
           subtitle="Новые без первого ответа и просроченные follow-up"
         />
@@ -56,14 +56,14 @@ export default async function AdminDashboard() {
       {dashboard && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <StatCard
-            title="Draft Started 24h"
+            title="Черновики за 24ч"
             value={dashboard.last24Hours.draftsStarted}
             subtitle="Сколько пользователей начали оформление"
           />
           <StatCard
-            title="Confirmed 24h"
+            title="Подтверждено за 24ч"
             value={dashboard.last24Hours.confirmedLeads}
-            subtitle="Сколько заявок дошло до подтверждения"
+            subtitle="Сколько запросов дошло до подтверждения"
           />
         </div>
       )}
@@ -89,7 +89,7 @@ export default async function AdminDashboard() {
 
         {/* Top products */}
         <div className="rounded-xl border border-border bg-card p-6">
-          <h3 className="text-sm font-medium text-muted-foreground mb-4">Популярные товары</h3>
+          <h3 className="text-sm font-medium text-muted-foreground mb-4">Популярные позиции</h3>
           <div className="space-y-3">
             {stats.topProducts.map((p, i) => (
               <div key={i} className="flex items-center justify-between text-sm">

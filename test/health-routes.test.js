@@ -61,8 +61,46 @@ test("health endpoints report healthy runtime details when dependencies are avai
   assert.equal(health.status, 200);
   const healthPayload = await health.json();
   assert.equal(healthPayload.status, "healthy");
-  assert.equal(healthPayload.environment, "production");
+  assert.equal(healthPayload.environment, "development");
   assert.equal(healthPayload.checks.cache.mode, "redis");
+});
+
+test("health endpoints report production runtime details when app runs in production mode", async (t) => {
+  const { db, cleanup } = createTempDb("bot-noct-health-");
+
+  const app = createWebServer({
+    repos: {
+      users: {
+        getById() {
+          return null;
+        },
+      },
+    },
+    conversationService: {},
+    bot: {},
+    adminId: 1,
+    apiSecret: "secret",
+    corsOrigin: null,
+    isProduction: true,
+    cacheService: {
+      async healthCheck() {
+        return { status: "healthy", mode: "redis" };
+      },
+    },
+  });
+
+  const server = await startServer(app);
+  t.after(async () => {
+    await stopServer(server);
+    cleanup();
+  });
+
+  const baseUrl = `http://127.0.0.1:${server.address().port}`;
+  const health = await fetch(`${baseUrl}/health`);
+  assert.equal(health.status, 200);
+
+  const payload = await health.json();
+  assert.equal(payload.environment, "production");
 });
 
 test("health endpoints degrade or fail when dependency checks fail", async (t) => {
