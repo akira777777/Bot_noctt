@@ -21,8 +21,7 @@ const TAB_COMPONENTS = {
 
 function AdminPanel() {
   const { telegram, admin, canUseApi, initError } = useAdmin();
-  const [activeTab, setActiveTab] = useState(null);
-  const activeTabLabel = TABS.find(([id]) => id === activeTab)?.[1];
+  const [activeTab, setActiveTab] = useState("leads");
 
   if (!telegram.ready) {
     return (
@@ -42,63 +41,34 @@ function AdminPanel() {
     );
   }
 
-  const ActiveTabComponent = activeTab ? TAB_COMPONENTS[activeTab] : null;
+  const ActiveTabComponent = TAB_COMPONENTS[activeTab];
 
   return (
     <div className="container">
-      <header className="header panel">
-        <div className="header-title">
-          <h1>Bot Noct Admin</h1>
-          <p className="subtle">
-            Управление заявками, товарами, пользователями и аналитикой.
-          </p>
-        </div>
+      <header className="header">
+        <h1>Bot Noct Admin</h1>
         <div className="subtle">
-          {admin ? (
-            <>
-              <strong>@{admin.username || "admin"}</strong>
-              <br />
-              ID: {admin.telegram_id}
-            </>
-          ) : (
-            "Загрузка профиля..."
-          )}
+          {admin
+            ? `@${admin.username || "admin"} (${admin.telegram_id})`
+            : "Загрузка профиля..."}
         </div>
       </header>
 
       {initError ? <div className="error" role="alert">{initError}</div> : null}
 
-      {activeTab === null ? (
-        <div className="menu-grid">
-          {TABS.map(([id, label]) => (
-            <button key={id} className="menu-card" onClick={() => setActiveTab(id)}>
-              {label}
-            </button>
-          ))}
-        </div>
-      ) : (
-        <>
-          <nav className="tabs">
-            <button className="tab-back" onClick={() => setActiveTab(null)}>
-              ← К разделам
-            </button>
-            {TABS.map(([id, label]) => (
-              <button
-                key={id}
-                className={activeTab === id ? "tab active" : "tab"}
-                onClick={() => setActiveTab(id)}
-              >
-                {label}
-              </button>
-            ))}
-          </nav>
-          <div className="section-header">
-            <h2>{activeTabLabel}</h2>
-            <span className="subtle">Операционный раздел</span>
-          </div>
-          <ActiveTabComponent />
-        </>
-      )}
+      <nav className="tabs" aria-label="Разделы админки">
+        {TABS.map(([id, label]) => (
+          <button
+            key={id}
+            className={activeTab === id ? "tab active" : "tab"}
+            onClick={() => setActiveTab(id)}
+          >
+            {label}
+          </button>
+        ))}
+      </nav>
+
+      <ActiveTabComponent />
     </div>
   );
 }

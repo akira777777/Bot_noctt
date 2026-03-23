@@ -31,65 +31,49 @@ export default function StatsTab() {
   }
 
   return (
-    <section className="section-stack">
+    <section>
       <ErrorBanner message={error} onDismiss={() => setError("")} />
 
       {!stats && !loading ? (
         <EmptyState message="Статистика недоступна" />
       ) : stats ? (
-        <>
-          <div className="stats-grid">
-            <div className="kpi-card">
-              <span className="kpi-label">Всего заявок</span>
-              <span className="kpi-value">{stats.total || 0}</span>
-            </div>
-            <div className="kpi-card">
-              <span className="kpi-label">Товаров в топе</span>
-              <span className="kpi-value">{(stats.topProducts || []).length}</span>
-            </div>
-          </div>
+        <div className="card">
+          <h2>Статистика</h2>
+          <p>Всего заявок: {stats.total || 0}</p>
 
-          <div className="card">
-            <h3>По статусам</h3>
-            <p className="subtle">Распределение заявок по текущим этапам.</p>
-            {(stats.byStatus || []).length === 0 ? (
-              <p className="subtle">Нет данных</p>
-            ) : (
-              <ul className="list-compact">
-                {stats.byStatus.map((item) => (
-                  <li key={item.status} className="list-item">
-                    <span>{getLeadStatusLabel(item.status)}</span>
-                    <span className="status-chip">{item.cnt}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          <h3>По статусам</h3>
+          {(stats.byStatus || []).length === 0 ? (
+            <p className="subtle">Нет данных</p>
+          ) : (
+            <ul>
+              {stats.byStatus.map((item) => (
+                <li key={item.status}>
+                  {getLeadStatusLabel(item.status)}: {item.cnt}
+                </li>
+              ))}
+            </ul>
+          )}
 
-          <div className="card">
-            <h3>Топ товары</h3>
-            <p className="subtle">Наиболее часто выбранные товары в заявках.</p>
-            {(stats.topProducts || []).length === 0 ? (
-              <p className="subtle">Нет данных</p>
-            ) : (
-              <ul className="list-compact">
-                {stats.topProducts.map((item) => (
-                  <li key={item.product_code} className="list-item">
-                    <span className="cell-wrap">
-                      {item.product_name}{" "}
-                      <span className="subtle">({item.product_code})</span>
-                    </span>
-                    <span className="status-chip">{item.cnt}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </>
+          <h3>Топ товары</h3>
+          {(stats.topProducts || []).length === 0 ? (
+            <p className="subtle">Нет данных</p>
+          ) : (
+            <ul>
+              {stats.topProducts.map((item) => (
+                <li key={item.product_code}>
+                  {item.product_name} ({item.product_code}): {item.cnt}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       ) : null}
 
       {loading && !initialLoad ? (
-        <div className="subtle">Обновляем статистику...</div>
+        <div className="subtle loading-inline">
+          <span className="dot-spinner" aria-hidden="true" />
+          Обновление данных...
+        </div>
       ) : null}
     </section>
   );
