@@ -21,7 +21,7 @@ const TAB_COMPONENTS = {
 
 function AdminPanel() {
   const { telegram, admin, canUseApi, initError } = useAdmin();
-  const [activeTab, setActiveTab] = useState("leads");
+  const [activeTab, setActiveTab] = useState(null);
 
   if (!telegram.ready) {
     return (
@@ -41,7 +41,7 @@ function AdminPanel() {
     );
   }
 
-  const ActiveTabComponent = TAB_COMPONENTS[activeTab];
+  const ActiveTabComponent = activeTab ? TAB_COMPONENTS[activeTab] : null;
 
   return (
     <div className="container">
@@ -56,19 +56,31 @@ function AdminPanel() {
 
       {initError ? <div className="error" role="alert">{initError}</div> : null}
 
-      <nav className="tabs">
-        {TABS.map(([id, label]) => (
-          <button
-            key={id}
-            className={activeTab === id ? "tab active" : "tab"}
-            onClick={() => setActiveTab(id)}
-          >
-            {label}
-          </button>
-        ))}
-      </nav>
-
-      <ActiveTabComponent />
+      {activeTab === null ? (
+        <div className="menu-grid">
+          {TABS.map(([id, label]) => (
+            <button key={id} className="menu-card" onClick={() => setActiveTab(id)}>
+              {label}
+            </button>
+          ))}
+        </div>
+      ) : (
+        <>
+          <nav className="tabs">
+            <button className="tab-back" onClick={() => setActiveTab(null)}>← Назад</button>
+            {TABS.map(([id, label]) => (
+              <button
+                key={id}
+                className={activeTab === id ? "tab active" : "tab"}
+                onClick={() => setActiveTab(id)}
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
+          <ActiveTabComponent />
+        </>
+      )}
     </div>
   );
 }
