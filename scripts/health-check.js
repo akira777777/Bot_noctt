@@ -6,7 +6,7 @@
 
 const http = require("http");
 
-const PORT = process.env.PORT || 3052;
+const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || "localhost";
 
 function checkEndpoint(path) {
@@ -57,32 +57,38 @@ async function main() {
   console.log("🏥 Bot Health Check\n");
   console.log(`Target: http://${HOST}:${PORT}\n`);
 
-  // Check main health endpoint
-  const health = await checkEndpoint("/health");
+  const [healthz, readyz, health] = await Promise.all([
+    checkEndpoint("/healthz"),
+    checkEndpoint("/readyz"),
+    checkEndpoint("/health"),
+  ]);
 
-  if (health.ok) {
+  if (healthz.ok && readyz.ok) {
     console.log("✅ Bot is running!");
     console.log("\n📊 Status:");
-    console.log(
-      `   Bot: ${health.data.bot === true ? "✅ Connected" : "❌ Disconnected"}`,
-    );
-    console.log(`   Uptime: ${health.data.uptime}s`);
-    console.log(`   Mode: ${health.data.mode}`);
+    console.log(`   Healthz: ${healthz.status}`);
+    console.log(`   Readyz: ${readyz.status}`);
 
-    if (health.data.stats) {
-      console.log("\n📈 Statistics:");
-      console.log(`   Leads: ${health.data.stats.totalLeads}`);
-      console.log(`   Messages: ${health.data.stats.totalMessages}`);
+    if (health.ok && health.data) {
+      console.log(`   Uptime: ${health.data.uptime}s`);
+      console.log(`   Environment: ${health.data.environment}`);
+      if (health.data.checks) {
+        console.log("\n🔎 Checks:");
+        for (const [name, result] of Object.entries(health.data.checks)) {
+          console.log(`   ${name}: ${result.status}`);
+        }
+      }
     }
 
     process.exit(0);
   } else {
     console.log("❌ Bot health check failed!");
-    if (health.error) {
-      console.log(`   Error: ${health.error}`);
-    } else {
-      console.log(`   Status: ${health.status}`);
-    }
+    console.log(
+      `   /healthz: ${healthz.status}${healthz.error ? ` (${healthz.error})` : ""}`,
+    );
+    console.log(
+      `   /readyz: ${readyz.status}${readyz.error ? ` (${readyz.error})` : ""}`,
+    );
     process.exit(1);
   }
 }

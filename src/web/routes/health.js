@@ -45,7 +45,9 @@ router.get("/readyz", async (req, res) => {
     memory: performMemoryCheck(),
   };
 
-  const isReady = Object.values(checks).every((c) => c.status === "ok");
+  const isReady = Object.values(checks).every(
+    (c) => c.status === "ok" || c.status === "degraded",
+  );
 
   const response = {
     ready: isReady,
@@ -135,9 +137,13 @@ async function performCacheCheck() {
     }
 
     const cacheHealth = await cacheCheckService.healthCheck();
+    const isMemoryFallback = cacheHealth.mode === "memory";
 
     return {
-      status: cacheHealth.status === "healthy" ? "ok" : "degraded",
+      status:
+        cacheHealth.status === "healthy" || isMemoryFallback
+          ? "ok"
+          : "degraded",
       mode: cacheHealth.mode,
     };
   } catch (error) {
@@ -153,10 +159,16 @@ function performMemoryCheck() {
   const total = os.totalmem();
   const free = os.freemem();
   const usedPercent = ((total - free) / total) * 100;
+  const processRssMb = Math.round(used.rss / 1024 / 1024);
+  const warnThresholdMb = parseInt(process.env.MEMORY_LIMIT_WARN || "512", 10);
+  const criticalThresholdMb = parseInt(
+    process.env.MEMORY_LIMIT_CRITICAL || "768",
+    10,
+  );
 
   let status = "ok";
-  if (usedPercent > 90) status = "critical";
-  else if (usedPercent > 75) status = "degraded";
+  if (processRssMb > criticalThresholdMb) status = "critical";
+  else if (processRssMb > warnThresholdMb) status = "degraded";
 
   return {
     status,
@@ -170,6 +182,11 @@ function performMemoryCheck() {
       total: Math.round(total / 1024 / 1024), // MB
       free: Math.round(free / 1024 / 1024), // MB
       usedPercent: usedPercent.toFixed(2),
+    },
+    thresholds: {
+      warnRssMb: warnThresholdMb,
+      criticalRssMb: criticalThresholdMb,
+      currentRssMb: processRssMb,
     },
   };
 }

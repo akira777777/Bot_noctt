@@ -105,10 +105,10 @@ function createWebServer({
   // ==========================================================================
 
   // Set database check function for health routes
-  if (repos?.db) {
+  if (repos && repos.users && typeof repos.users.getById === "function") {
     setDbCheckFunction(async () => {
       try {
-        await repos.db.get("SELECT 1");
+        repos.users.getById(-1);
         return { status: "ok" };
       } catch (error) {
         return { status: "error", message: error.message };
