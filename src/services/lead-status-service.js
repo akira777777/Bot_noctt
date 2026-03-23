@@ -30,7 +30,7 @@ function createLeadStatusService({ repos, bot = null }) {
     const notificationFactory = STATUS_NOTIFICATIONS[status];
     if (
       notificationFactory &&
-      bot &&
+      bot?.telegram?.sendMessage &&
       Number.isInteger(lead.client_telegram_id) &&
       lead.client_telegram_id > 0
     ) {

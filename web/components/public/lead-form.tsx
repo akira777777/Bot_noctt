@@ -5,6 +5,7 @@ import Link from "next/link";
 import { fetchCatalog, submitWebLead, type Product } from "@/lib/api";
 
 type Step = "product" | "details" | "contact" | "confirm" | "success";
+const canTrackLead = process.env.NODE_ENV !== "production";
 
 export function LeadForm({ preselectedProduct }: { preselectedProduct: string }) {
   const [step, setStep] = useState<Step>("product");
@@ -57,15 +58,21 @@ export function LeadForm({ preselectedProduct }: { preselectedProduct: string })
         <p className="text-muted-foreground">Номер заявки: <span className="font-mono">#{createdLeadId}</span></p>
         <p className="text-sm text-muted-foreground">Мы свяжемся с вами в ближайшее время.</p>
         <div className="flex gap-3 justify-center mt-4">
-          <Link
-            href={`/track/${createdLeadId}`}
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-          >
-            Отследить статус
-          </Link>
+          {canTrackLead && (
+            <Link
+              href={`/track/${createdLeadId}`}
+              className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              Отследить статус
+            </Link>
+          )}
           <Link
             href="/catalog"
-            className="rounded-lg bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground hover:bg-secondary/80 transition-colors"
+            className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+              canTrackLead
+                ? "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                : "bg-primary text-primary-foreground hover:bg-primary/90"
+            }`}
           >
             В каталог
           </Link>
