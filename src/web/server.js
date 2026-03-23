@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const express = require("express");
 const cors = require("cors");
 const { createApiRouter } = require("./routes/api");
@@ -7,6 +8,7 @@ const {
   createVerifyTelegramInitData,
 } = require("./middleware/verify-telegram-init-data");
 const { createRateLimiter } = require("./middleware/rate-limit");
+const { logInfo, logError } = require("../utils/logger");
 
 function createWebServer({
   repos,
@@ -16,6 +18,7 @@ function createWebServer({
   isProduction,
 }) {
   const app = express();
+  app.set("trust proxy", 1);
   const webappDistPath = path.join(process.cwd(), "webapp", "dist");
   const hasBuiltFrontend = fs.existsSync(
     path.join(webappDistPath, "index.html"),
@@ -32,6 +35,11 @@ function createWebServer({
     ),
   );
   app.use(express.json({ limit: "1mb" }));
+  app.use((req, res, next) => {
+    req.requestId = req.headers["x-request-id"] || crypto.randomUUID();
+    res.setHeader("X-Request-Id", req.requestId);
+    next();
+  });
 
   app.use((req, res, next) => {
     res.setHeader("X-Content-Type-Options", "nosniff");
@@ -51,18 +59,20 @@ function createWebServer({
     next();
   });
 
-  if (!isProduction) {
-    app.use((req, res, next) => {
-      const start = Date.now();
-      res.on("finish", () => {
-        // eslint-disable-next-line no-console
-        console.log(
-          `[${new Date().toISOString()}] ${req.method} ${req.originalUrl} ${res.statusCode} ${Date.now() - start}ms`,
-        );
+  app.use((req, res, next) => {
+    const start = Date.now();
+    res.on("finish", () => {
+      logInfo("http_request", {
+        requestId: req.requestId,
+        method: req.method,
+        path: req.originalUrl,
+        statusCode: res.statusCode,
+        durationMs: Date.now() - start,
+        ip: req.ip,
       });
-      next();
     });
-  }
+    next();
+  });
 
   app.get("/healthz", (_req, res) => {
     res.json({ ok: true, service: "bot_noct_web" });
@@ -82,7 +92,7 @@ function createWebServer({
     "/api",
     apiRateLimiter,
     verifyTelegramInitData,
-    createApiRouter({ repos, isProduction }),
+    createApiRouter({ repos }),
   );
 
   if (hasBuiltFrontend) {
@@ -102,9 +112,10 @@ function createWebServer({
     });
   }
 
-  app.use((err, _req, res, _next) => {
+  app.use((err, req, res, _next) => {
     const status = err.status ?? err.statusCode ?? 500;
     const message = isProduction ? "Internal server error" : err.message;
+    logError("unhandled_http_error", err, { requestId: req.requestId, status });
     if (!res.headersSent) {
       res.status(status).json({ ok: false, error: message });
     }

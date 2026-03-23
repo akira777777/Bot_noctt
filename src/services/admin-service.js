@@ -44,6 +44,10 @@ function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
     return repos.leads.list(limit);
   }
 
+  function getLatestLeadByClient(clientId) {
+    return repos.leads.getLatestByClient(clientId);
+  }
+
   function takeLead(leadId) {
     return repos.leads.updateStatus(leadId, "in_progress");
   }
@@ -188,6 +192,7 @@ function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
     clearSelectedClient,
     listRecentDialogs,
     listRecentLeads,
+    getLatestLeadByClient,
     takeLead,
     closeLead,
     markLeadCalledBack,

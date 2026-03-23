@@ -15,17 +15,14 @@ const {
 const { formatConversationRow, formatLeadRow } = require("../utils/formatters");
 const { safeAnswerCbQuery, safeSendMessage } = require("../utils/telegram");
 const { getLeadStatusLabel } = require("../domain/lead-status");
-const { parseActionId } = require("../utils/actions");
+const { ACTIONS, ACTION_PREFIXES, parseActionId } = require("../utils/actions");
 const { logError } = require("../utils/logger");
-
-function isAdmin(ctx, deps) {
-  return ctx.from.id === deps.adminId;
-}
+const { isAdmin } = require("./guards");
 
 async function replaceWithStatusButton(ctx, text) {
   try {
     await ctx.editMessageReplyMarkup({
-      inline_keyboard: [[{ text, callback_data: "admin:noop" }]],
+      inline_keyboard: [[{ text, callback_data: ACTIONS.ADMIN_NOOP }]],
     });
   } catch (error) {
     logError("Failed to replace status button on message", error);
@@ -458,26 +455,42 @@ async function handleAdminAction(ctx, deps) {
 
   deps.services.admin.upsertAdmin(ctx.from);
 
-  if (action === "admin:inbox") {
+  if (action === ACTIONS.ADMIN_INBOX) {
     await safeAnswerCbQuery(ctx);
     await showInbox(ctx, deps, "Inbox:");
     return;
   }
 
-  if (action === "admin:noop") {
+  if (action === ACTIONS.ADMIN_NOOP) {
     await safeAnswerCbQuery(ctx, "Уже обработано");
     return;
   }
 
-  if (action.startsWith("admin:reply:") || action.startsWith("admin:dialog:")) {
-    const clientId = parseActionId(action);
+  if (
+    action.startsWith(ACTION_PREFIXES.ADMIN_REPLY) ||
+    action.startsWith(ACTION_PREFIXES.ADMIN_DIALOG)
+  ) {
+    const prefix = action.startsWith(ACTION_PREFIXES.ADMIN_REPLY)
+      ? ACTION_PREFIXES.ADMIN_REPLY
+      : ACTION_PREFIXES.ADMIN_DIALOG;
+    const parsed = parseActionId(action, prefix);
+    if (!parsed.ok) {
+      await safeAnswerCbQuery(ctx, "Некорректные данные");
+      return;
+    }
+    const clientId = parsed.id;
     await safeAnswerCbQuery(ctx, "Диалог открыт");
     await selectClient(ctx, deps, clientId);
     return;
   }
 
-  if (action.startsWith("admin:lead_take:")) {
-    const leadId = parseActionId(action);
+  if (action.startsWith(ACTION_PREFIXES.ADMIN_LEAD_TAKE)) {
+    const parsed = parseActionId(action, ACTION_PREFIXES.ADMIN_LEAD_TAKE);
+    if (!parsed.ok) {
+      await safeAnswerCbQuery(ctx, "Некорректные данные");
+      return;
+    }
+    const leadId = parsed.id;
     const lead = deps.services.admin.takeLead(leadId);
     if (!lead) {
       await safeAnswerCbQuery(ctx, "Заявка не найдена");
@@ -494,8 +507,13 @@ async function handleAdminAction(ctx, deps) {
     return;
   }
 
-  if (action.startsWith("admin:lead_close:")) {
-    const leadId = parseActionId(action);
+  if (action.startsWith(ACTION_PREFIXES.ADMIN_LEAD_CLOSE)) {
+    const parsed = parseActionId(action, ACTION_PREFIXES.ADMIN_LEAD_CLOSE);
+    if (!parsed.ok) {
+      await safeAnswerCbQuery(ctx, "Некорректные данные");
+      return;
+    }
+    const leadId = parsed.id;
     const lead = deps.services.admin.closeLead(leadId);
     if (!lead) {
       await safeAnswerCbQuery(ctx, "Заявка не найдена");
@@ -512,8 +530,13 @@ async function handleAdminAction(ctx, deps) {
     return;
   }
 
-  if (action.startsWith("admin:lead_called_back:")) {
-    const leadId = parseActionId(action);
+  if (action.startsWith(ACTION_PREFIXES.ADMIN_LEAD_CALLED_BACK)) {
+    const parsed = parseActionId(action, ACTION_PREFIXES.ADMIN_LEAD_CALLED_BACK);
+    if (!parsed.ok) {
+      await safeAnswerCbQuery(ctx, "Некорректные данные");
+      return;
+    }
+    const leadId = parsed.id;
     const lead = deps.services.admin.markLeadCalledBack(leadId);
     if (!lead) {
       await safeAnswerCbQuery(ctx, "Заявка не найдена");
@@ -530,8 +553,16 @@ async function handleAdminAction(ctx, deps) {
     return;
   }
 
-  if (action.startsWith("admin:lead_awaiting_payment:")) {
-    const leadId = parseActionId(action);
+  if (action.startsWith(ACTION_PREFIXES.ADMIN_LEAD_AWAITING_PAYMENT)) {
+    const parsed = parseActionId(
+      action,
+      ACTION_PREFIXES.ADMIN_LEAD_AWAITING_PAYMENT,
+    );
+    if (!parsed.ok) {
+      await safeAnswerCbQuery(ctx, "Некорректные данные");
+      return;
+    }
+    const leadId = parsed.id;
     const lead = deps.services.admin.markLeadAwaitingPayment(leadId);
     if (!lead) {
       await safeAnswerCbQuery(ctx, "Заявка не найдена");
@@ -550,8 +581,13 @@ async function handleAdminAction(ctx, deps) {
     return;
   }
 
-  if (action.startsWith("admin:lead_fulfilled:")) {
-    const leadId = parseActionId(action);
+  if (action.startsWith(ACTION_PREFIXES.ADMIN_LEAD_FULFILLED)) {
+    const parsed = parseActionId(action, ACTION_PREFIXES.ADMIN_LEAD_FULFILLED);
+    if (!parsed.ok) {
+      await safeAnswerCbQuery(ctx, "Некорректные данные");
+      return;
+    }
+    const leadId = parsed.id;
     const lead = deps.services.admin.markLeadFulfilled(leadId);
     if (!lead) {
       await safeAnswerCbQuery(ctx, "Заявка не найдена");
@@ -568,7 +604,7 @@ async function handleAdminAction(ctx, deps) {
     return;
   }
 
-  if (action.startsWith("admin:template:")) {
+  if (action.startsWith(ACTION_PREFIXES.ADMIN_TEMPLATE)) {
     const [, , templateKey, rawClientId] = action.split(":");
     const clientId = Number(rawClientId);
     const text = deps.services.admin.getTemplate(templateKey);
@@ -583,7 +619,7 @@ async function handleAdminAction(ctx, deps) {
     return;
   }
 
-  if (action === "admin:clear_dialog") {
+  if (action === ACTIONS.ADMIN_CLEAR_DIALOG) {
     deps.services.admin.clearSelectedClient(adminId);
     await safeAnswerCbQuery(ctx, "Диалог сброшен");
     await ctx.reply("Активный диалог сброшен.");

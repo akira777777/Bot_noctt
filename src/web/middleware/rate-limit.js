@@ -8,6 +8,7 @@ function createRateLimiter({
   windowMs = 60 * 1000,
   max = 60,
   message = "Too many requests, please try again later.",
+  keyGenerator,
 } = {}) {
   // Map<key, { count, resetAt }>
   const store = new Map();
@@ -23,11 +24,15 @@ function createRateLimiter({
   }, windowMs);
   cleanup.unref();
 
+  function resolveKey(req) {
+    if (typeof keyGenerator === "function") {
+      return keyGenerator(req);
+    }
+    return req.ip || req.socket?.remoteAddress || "unknown";
+  }
+
   return function rateLimitMiddleware(req, res, next) {
-    const ip =
-      req.headers["x-forwarded-for"]?.split(",")[0].trim() ||
-      req.socket?.remoteAddress ||
-      "unknown";
+    const ip = resolveKey(req);
 
     const now = Date.now();
     let entry = store.get(ip);

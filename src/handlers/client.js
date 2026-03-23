@@ -30,29 +30,18 @@ const {
   parseSourcePayload,
   resolveStartAction,
 } = require("../utils/source-payload");
-const { parseActionId } = require("../utils/actions");
+const { ACTIONS, ACTION_PREFIXES, parseActionId } = require("../utils/actions");
+const { rejectBlocked, createClientAccessGuard } = require("./guards");
 
 const HOME_ACTION_LABELS = {
-  "Оставить заявку": "lead:start",
-  Каталог: "catalog:root",
-  "Связаться с менеджером": "contact:manager",
-  "Как оформить заказ": "info:how_to_order",
+  "Оставить заявку": ACTIONS.LEAD_START,
+  Каталог: ACTIONS.CATALOG_ROOT,
+  "Связаться с менеджером": ACTIONS.CONTACT_MANAGER,
+  "Как оформить заказ": ACTIONS.INFO_HOW_TO_ORDER,
 };
 
-function getCurrentSourcePayload(repos, clientId, fallbackSource = null) {
-  const session = repos.sessions.get(clientId);
-  return session?.draft?.sourcePayload || fallbackSource || null;
-}
-
-function setHomeSession(repos, clientId, sourcePayload) {
-  repos.sessions.set(clientId, "home", "menu", {
-    sourcePayload: sourcePayload || null,
-  });
-}
-
-
 async function showHomeScreen(ctx, deps, entry) {
-  setHomeSession(deps.repos, ctx.from.id, entry.raw);
+  deps.services.session.setHomeSession(ctx.from.id, entry.raw);
   await ctx.reply(welcomeMessage(entry), clientHomeReplyKeyboard());
 }
 
@@ -70,27 +59,29 @@ async function showLeadEntry(ctx, deps) {
 }
 
 async function showSupportEntry(ctx, deps) {
-  const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
-  setHomeSession(deps.repos, ctx.from.id, sourcePayload);
+  const sourcePayload = deps.services.session.getCurrentSourcePayload(ctx.from.id);
+  deps.services.session.setHomeSession(ctx.from.id, sourcePayload);
   await ctx.reply(contactManagerMessage(), backToMainKeyboard());
 }
 
 async function handleHomeAction(ctx, deps, action) {
   switch (action) {
-    case "catalog:root":
+    case ACTIONS.CATALOG_ROOT:
       await showCatalog(ctx, deps);
       return true;
-    case "lead:start":
+    case ACTIONS.LEAD_START:
       await showLeadEntry(ctx, deps);
       return true;
-    case "contact:manager":
+    case ACTIONS.CONTACT_MANAGER:
       await showSupportEntry(ctx, deps);
       return true;
-    case "info:how_to_order":
+    case ACTIONS.INFO_HOW_TO_ORDER:
       await ctx.reply(howToOrderMessage(), backToMainKeyboard());
       return true;
-    case "menu:main": {
-      const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
+    case ACTIONS.MENU_MAIN: {
+      const sourcePayload = deps.services.session.getCurrentSourcePayload(
+        ctx.from.id,
+      );
       await showHomeScreen(ctx, deps, parseSourcePayload(sourcePayload));
       return true;
     }
@@ -184,20 +175,10 @@ async function handleLeadText(ctx, deps, session) {
   return false;
 }
 
-function isUserBlocked(user) {
-  return user && user.is_blocked;
-}
-
-async function rejectBlocked(ctx) {
-  await ctx.reply("Ваш аккаунт заблокирован. Обратитесь к администратору.");
-}
-
 async function handleClientStart(ctx, deps) {
-  const user = deps.services.conversation.upsertTelegramUser(
-    ctx.from,
-    "client",
-  );
-  if (isUserBlocked(user)) {
+  const ensureClientAccess = createClientAccessGuard(deps);
+  const access = await ensureClientAccess(ctx);
+  if (!access.ok) {
     await rejectBlocked(ctx);
     return;
   }
@@ -234,29 +215,25 @@ async function handleClientHelp(ctx) {
 }
 
 async function handleClientMenu(ctx, deps) {
-  const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
+  const sourcePayload = deps.services.session.getCurrentSourcePayload(ctx.from.id);
   await showHomeScreen(ctx, deps, parseSourcePayload(sourcePayload));
 }
 
 async function handleClientStatus(ctx, deps) {
-  const user = deps.services.conversation.upsertTelegramUser(
-    ctx.from,
-    "client",
-  );
-  if (isUserBlocked(user)) {
+  const ensureClientAccess = createClientAccessGuard(deps);
+  const access = await ensureClientAccess(ctx);
+  if (!access.ok) {
     await rejectBlocked(ctx);
     return;
   }
-  const lead = deps.repos.leads.getLatestByClient(ctx.from.id);
+  const lead = deps.services.admin.getLatestLeadByClient(ctx.from.id);
   await ctx.reply(clientLeadStatusMessage(lead), backToMainKeyboard());
 }
 
 async function handleClientText(ctx, deps) {
-  const user = deps.services.conversation.upsertTelegramUser(
-    ctx.from,
-    "client",
-  );
-  if (isUserBlocked(user)) {
+  const ensureClientAccess = createClientAccessGuard(deps);
+  const access = await ensureClientAccess(ctx);
+  if (!access.ok) {
     await rejectBlocked(ctx);
     return;
   }
@@ -275,7 +252,7 @@ async function handleClientText(ctx, deps) {
     return;
   }
 
-  const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
+  const sourcePayload = deps.services.session.getCurrentSourcePayload(ctx.from.id);
   await deps.services.conversation.forwardClientMessage({
     client: ctx.from,
     chatId: ctx.chat.id,
@@ -286,31 +263,34 @@ async function handleClientText(ctx, deps) {
 }
 
 async function handleClientAction(ctx, deps) {
-  const user = deps.services.conversation.upsertTelegramUser(
-    ctx.from,
-    "client",
-  );
-  if (isUserBlocked(user)) {
+  const ensureClientAccess = createClientAccessGuard(deps);
+  const access = await ensureClientAccess(ctx);
+  if (!access.ok) {
     await ctx.answerCbQuery("Ваш аккаунт заблокирован.").catch(() => {});
     return;
   }
 
   const action = ctx.match[0];
   switch (action) {
-    case "menu:main":
+    case ACTIONS.MENU_MAIN:
       await safeAnswerCbQuery(ctx);
       await handleClientMenu(ctx, deps);
       return;
-    case "info:how_to_order":
-    case "contact:manager":
-    case "catalog:root":
+    case ACTIONS.INFO_HOW_TO_ORDER:
+    case ACTIONS.CONTACT_MANAGER:
+    case ACTIONS.CATALOG_ROOT:
       await safeAnswerCbQuery(ctx);
       await handleHomeAction(ctx, deps, action);
       return;
   }
 
-  if (action.startsWith("catalog:product:")) {
-    const productId = parseActionId(action);
+  if (action.startsWith(ACTION_PREFIXES.CATALOG_PRODUCT)) {
+    const parsed = parseActionId(action, ACTION_PREFIXES.CATALOG_PRODUCT);
+    if (!parsed.ok) {
+      await safeAnswerCbQuery(ctx, "Некорректные данные");
+      return;
+    }
+    const productId = parsed.id;
     const product = deps.services.catalog.getProductById(productId);
     if (!product) {
       await safeAnswerCbQuery(ctx, "Товар не найден");
@@ -322,21 +302,28 @@ async function handleClientAction(ctx, deps) {
     return;
   }
 
-  if (action === "lead:start") {
+  if (action === ACTIONS.LEAD_START) {
     await safeAnswerCbQuery(ctx);
     await showLeadEntry(ctx, deps);
     return;
   }
 
-  if (action.startsWith("lead:product:")) {
-    const productId = parseActionId(action);
+  if (action.startsWith(ACTION_PREFIXES.LEAD_PRODUCT)) {
+    const parsed = parseActionId(action, ACTION_PREFIXES.LEAD_PRODUCT);
+    if (!parsed.ok) {
+      await safeAnswerCbQuery(ctx, "Некорректные данные");
+      return;
+    }
+    const productId = parsed.id;
     const product = deps.services.lead.hydrateProductForLead(productId);
     if (!product) {
       await safeAnswerCbQuery(ctx, "Товар не найден");
       return;
     }
 
-    const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
+    const sourcePayload = deps.services.session.getCurrentSourcePayload(
+      ctx.from.id,
+    );
     deps.services.lead.startLeadDraft({
       clientId: ctx.from.id,
       product,
@@ -348,7 +335,7 @@ async function handleClientAction(ctx, deps) {
     return;
   }
 
-  if (action === "lead:skip_comment") {
+  if (action === ACTIONS.LEAD_SKIP_COMMENT) {
     const session = deps.services.lead.getSession(ctx.from.id);
     if (!session) {
       await safeAnswerCbQuery(ctx, "Сессия не найдена");
@@ -365,7 +352,7 @@ async function handleClientAction(ctx, deps) {
     return;
   }
 
-  if (action === "lead:contact_telegram") {
+  if (action === ACTIONS.LEAD_CONTACT_TELEGRAM) {
     const session = deps.services.lead.getSession(ctx.from.id);
     if (!session) {
       await safeAnswerCbQuery(ctx, "Сессия не найдена");
@@ -382,7 +369,7 @@ async function handleClientAction(ctx, deps) {
     return;
   }
 
-  if (action === "lead:contact_custom") {
+  if (action === ACTIONS.LEAD_CONTACT_CUSTOM) {
     const session = deps.services.lead.getSession(ctx.from.id);
     if (!session) {
       await safeAnswerCbQuery(ctx, "Сессия не найдена");
@@ -399,8 +386,10 @@ async function handleClientAction(ctx, deps) {
     return;
   }
 
-  if (action === "lead:confirm") {
-    const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
+  if (action === ACTIONS.LEAD_CONFIRM) {
+    const sourcePayload = deps.services.session.getCurrentSourcePayload(
+      ctx.from.id,
+    );
     await safeAnswerCbQuery(ctx);
     const lead = await deps.services.lead.confirmLead({
       client: ctx.from,
@@ -416,8 +405,8 @@ async function handleClientAction(ctx, deps) {
     }
 
     if (lead.duplicate) {
-      deps.repos.sessions.clear(ctx.from.id);
-      setHomeSession(deps.repos, ctx.from.id, sourcePayload);
+      deps.services.session.clearSession(ctx.from.id);
+      deps.services.session.setHomeSession(ctx.from.id, sourcePayload);
       await ctx.reply(
         `⚠️ У вас уже есть активная заявка на этот товар (#${lead.existingLead.id}). Дождитесь её обработки или свяжитесь с менеджером.`,
         backToMainKeyboard(),
@@ -425,12 +414,12 @@ async function handleClientAction(ctx, deps) {
       return;
     }
 
-    setHomeSession(deps.repos, ctx.from.id, sourcePayload);
+    deps.services.session.setHomeSession(ctx.from.id, sourcePayload);
     await ctx.reply(leadCreatedMessage(), backToMainKeyboard());
     return;
   }
 
-  if (action === "lead:back") {
+  if (action === ACTIONS.LEAD_BACK) {
     const session = deps.services.lead.getSession(ctx.from.id);
     const previousStep = deps.services.lead.goBack(ctx.from.id, session);
     await safeAnswerCbQuery(ctx);
@@ -459,10 +448,12 @@ async function handleClientAction(ctx, deps) {
     }
   }
 
-  if (action === "lead:cancel") {
-    const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
+  if (action === ACTIONS.LEAD_CANCEL) {
+    const sourcePayload = deps.services.session.getCurrentSourcePayload(
+      ctx.from.id,
+    );
     deps.services.lead.clearSession(ctx.from.id);
-    setHomeSession(deps.repos, ctx.from.id, sourcePayload);
+    deps.services.session.setHomeSession(ctx.from.id, sourcePayload);
     await safeAnswerCbQuery(ctx, "Заявка отменена");
     await ctx.reply("Оформление заявки отменено.", backToMainKeyboard());
   }

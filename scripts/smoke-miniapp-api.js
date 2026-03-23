@@ -55,8 +55,24 @@ async function main() {
       });
       const body = await response.text();
 
-      console.log("status", response.status);
-      console.log(body);
+      if (response.status !== 200) {
+        throw new Error(
+          `Smoke check failed for /api/admin/me: status=${response.status}, body=${body}`,
+        );
+      }
+
+      let parsed = null;
+      try {
+        parsed = JSON.parse(body);
+      } catch {
+        throw new Error("Smoke check failed: response is not valid JSON");
+      }
+
+      if (!parsed?.ok || !parsed?.user?.telegram_id) {
+        throw new Error("Smoke check failed: malformed admin/me payload");
+      }
+
+      console.log("smoke:api ok");
     } finally {
       server.close();
     }

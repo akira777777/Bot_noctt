@@ -191,7 +191,22 @@ function createLeadService({
       return result;
     });
 
-    const lead = transaction();
+    let lead;
+    try {
+      lead = transaction();
+    } catch (error) {
+      const isUniqueViolation =
+        typeof error?.message === "string" &&
+        error.message.includes("idx_leads_unique_open_client_product");
+      if (isUniqueViolation) {
+        const duplicate = repos.leads.getOpenByClientAndProduct(
+          client.id,
+          session.draft.productCode,
+        );
+        return { duplicate: true, existingLead: duplicate };
+      }
+      throw error;
+    }
     try {
       await notifyAdminAboutLead(lead, client, chatId);
     } catch (err) {
