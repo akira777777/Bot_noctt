@@ -2,7 +2,6 @@ const { Telegraf } = require("telegraf");
 const {
   BOT_TOKEN,
   ADMIN_ID,
-  WEBAPP_URL,
 } = require("./config/env");
 const {
   createConversationService,
@@ -59,7 +58,6 @@ function createBot({ db, repos }) {
       lead,
     },
     adminId: ADMIN_ID,
-    webappUrl: WEBAPP_URL,
   };
 
   bot.catch((error, ctx) => {

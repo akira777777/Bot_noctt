@@ -41,9 +41,6 @@ const BOT_TOKEN = requiredString("BOT_TOKEN", ["TELEGRAM_BOT_TOKEN"]);
 const ADMIN_ID = optionalInteger("ADMIN_ID", null);
 const DB_PATH = optionalString("DB_PATH") || path.join(process.cwd(), "data", "bot.sqlite");
 const PORT = optionalInteger("PORT", 3000);
-const WEBAPP_URL = optionalString("WEBAPP_URL", ["RENDER_EXTERNAL_URL"]);
-const WEBAPP_BOT_USERNAME = optionalString("WEBAPP_BOT_USERNAME");
-const CORS_ORIGIN = optionalString("CORS_ORIGIN");
 
 if (!ADMIN_ID || Number.isNaN(ADMIN_ID) || ADMIN_ID <= 0) {
   throw new Error("ADMIN_ID must be a positive integer");
@@ -54,12 +51,6 @@ if (Number.isNaN(PORT) || PORT <= 0) {
 
 const isProduction = NODE_ENV === "production";
 
-if (isProduction && !process.env.CORS_ORIGIN) {
-  logWarn(
-    "CORS_ORIGIN is not set in production; all origins are currently allowed",
-  );
-}
-
 module.exports = {
   NODE_ENV,
   isProduction,
@@ -67,7 +58,4 @@ module.exports = {
   ADMIN_ID,
   DB_PATH,
   PORT,
-  WEBAPP_URL,
-  WEBAPP_BOT_USERNAME,
-  CORS_ORIGIN,
 };

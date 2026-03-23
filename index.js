@@ -1,43 +1,11 @@
 const { createDatabase } = require("./src/db/sqlite");
 const { createRepositories } = require("./src/repositories");
 const { createBot } = require("./src/bot");
-const {
-  BOT_TOKEN,
-  ADMIN_ID,
-  PORT,
-  WEBAPP_URL,
-  CORS_ORIGIN,
-  isProduction,
-} = require("./src/config/env");
-const { createWebServer } = require("./src/web/server");
+const { isProduction } = require("./src/config/env");
 const { logError, logInfo } = require("./src/utils/logger");
 
 let appResources = null;
 let isShuttingDown = false;
-
-function startHttpServer(app, port) {
-  return new Promise((resolve, reject) => {
-    const server = app.listen(port, () => resolve(server));
-    server.once("error", reject);
-  });
-}
-
-function closeHttpServer(server) {
-  if (!server || !server.listening) {
-    return Promise.resolve();
-  }
-
-  return new Promise((resolve, reject) => {
-    server.close((error) => {
-      if (error) {
-        reject(error);
-        return;
-      }
-
-      resolve();
-    });
-  });
-}
 
 function stopBot(bot, signal) {
   if (!bot) {
@@ -79,34 +47,7 @@ async function teardown(resources, reason) {
     stopBot(resources.bot, reason);
   }
 
-  if (resources.httpServer) {
-    try {
-      await closeHttpServer(resources.httpServer);
-    } catch (error) {
-      logError("Failed to close HTTP server", error);
-    }
-  }
-
   closeDatabase(resources.db);
-}
-
-async function configureAdminMenu(bot) {
-  if (!WEBAPP_URL) {
-    return;
-  }
-
-  try {
-    await bot.telegram.setChatMenuButton({
-      chat_id: ADMIN_ID,
-      menu_button: {
-        type: "web_app",
-        text: "Админ-панель",
-        web_app: { url: WEBAPP_URL },
-      },
-    });
-  } catch (error) {
-    logError("Failed to configure admin menu button", error);
-  }
 }
 
 const SESSION_CLEANUP_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
@@ -127,47 +68,21 @@ async function bootstrap() {
   const db = createDatabase();
   const repos = createRepositories(db);
   const bot = createBot({ db, repos });
-  const webServer = createWebServer({
-    repos,
-    botToken: BOT_TOKEN,
-    adminId: ADMIN_ID,
-    corsOrigin: CORS_ORIGIN,
-    isProduction,
-  });
 
   const resources = {
     db,
     repos,
     bot,
     botLaunched: false,
-    webServer,
-    httpServer: null,
     sessionCleanupTimer: null,
   };
 
   try {
-    resources.httpServer = await startHttpServer(webServer, PORT);
-    logInfo(`Web server started on port ${PORT}`);
-
-    try {
-      await bot.launch();
-      resources.botLaunched = true;
-      logInfo("Bot started");
-    } catch (error) {
-      if (isProduction) {
-        throw error;
-      }
-      logError(
-        "Bot launch failed; continuing in web-only mode for local development",
-        error,
-      );
-    }
+    await bot.launch();
+    resources.botLaunched = true;
+    logInfo("Bot started");
 
     resources.sessionCleanupTimer = startSessionCleanup(repos);
-
-    if (resources.botLaunched) {
-      await configureAdminMenu(bot);
-    }
 
     // Clean up expired sessions on startup (hourly timer already set above)
     repos.sessions.clearExpired();

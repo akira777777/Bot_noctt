@@ -1,4 +1,3 @@
-const { Markup } = require("telegraf");
 const {
   adminQuickReplyKeyboard,
   adminInboxKeyboard,
@@ -520,13 +519,7 @@ async function handleAdminStart(ctx, deps) {
     "/exportleads — экспорт заявок в CSV\n" +
     "/blockuser <id> — заблокировать пользователя\n" +
     "/unblockuser <id> — разблокировать пользователя";
-  const webAppKeyboard = deps.webappUrl
-    ? Markup.inlineKeyboard([
-        [Markup.button.webApp("Открыть Mini App админки", deps.webappUrl)],
-      ])
-    : undefined;
-
-  await ctx.reply(message, webAppKeyboard);
+  await ctx.reply(message);
 }
 
 async function handleAdminText(ctx, deps) {
