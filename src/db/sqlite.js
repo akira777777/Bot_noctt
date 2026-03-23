@@ -13,9 +13,12 @@ function createDatabase() {
   ensureDbDirectory();
 
   const db = new Database(DB_PATH);
-  db.pragma("foreign_keys = ON");
   db.pragma("journal_mode = WAL");
   db.pragma("synchronous = NORMAL");
+  db.pragma("foreign_keys = ON");
+  db.pragma("busy_timeout = 5000");
+  db.pragma("cache_size = -16000");
+  db.pragma("temp_store = MEMORY");
 
   runMigrations(db);
 

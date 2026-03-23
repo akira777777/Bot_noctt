@@ -80,6 +80,9 @@ function createBot({ db, repos }) {
   bot.help((ctx) => handleClientHelp(ctx, deps));
   bot.command("menu", (ctx) => handleClientMenu(ctx, deps));
   bot.command("status", (ctx) => handleClientStatus(ctx, deps));
+  bot.command("myid", (ctx) =>
+    ctx.reply(`Ваш Telegram ID: ${ctx.from.id}`),
+  );
 
   bot.action(/^(catalog|lead|contact|info|menu):.*$/, (ctx) =>
     handleClientAction(ctx, deps),

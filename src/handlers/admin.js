@@ -11,22 +11,26 @@ const {
   clientLeadCalledBackMessage,
   clientLeadAwaitingPaymentMessage,
   clientLeadFulfilledMessage,
+  conversationResolvedMessage,
 } = require("../ui/messages");
 const { formatConversationRow, formatLeadRow } = require("../utils/formatters");
 const { safeAnswerCbQuery, safeSendMessage } = require("../utils/telegram");
 const { getLeadStatusLabel } = require("../domain/lead-status");
-const { ACTIONS, ACTION_PREFIXES, parseActionId } = require("../utils/actions");
-const { logError } = require("../utils/logger");
-const { isAdmin } = require("./guards");
+
+function isAdmin(ctx, deps) {
+  return ctx.from.id === deps.adminId;
+}
+
+function parseActionId(action) {
+  return Number(action.split(":")[2]);
+}
 
 async function replaceWithStatusButton(ctx, text) {
   try {
     await ctx.editMessageReplyMarkup({
-      inline_keyboard: [[{ text, callback_data: ACTIONS.ADMIN_NOOP }]],
+      inline_keyboard: [[{ text, callback_data: "admin:noop" }]],
     });
-  } catch (error) {
-    logError("Failed to replace status button on message", error);
-  }
+  } catch (_) {}
 }
 
 async function selectClient(ctx, deps, clientId) {
@@ -394,6 +398,107 @@ function registerAdminCommands(bot, deps) {
 
     await ctx.reply(`Пользователь ${telegramId} разблокирован.`);
   });
+
+  bot.command("search", async (ctx) => {
+    if (!isAdmin(ctx, deps)) return;
+
+    const query = ctx.message.text.split(" ").slice(1).join(" ").trim();
+    if (!query) {
+      await ctx.reply("Использование: /search @username или /search <telegram_id>");
+      return;
+    }
+
+    const result = deps.services.admin.searchUser(query);
+    if (!result.ok) {
+      await ctx.reply(`Пользователь "${query}" не найден.`);
+      return;
+    }
+
+    const u = result.user;
+    const name = [u.first_name, u.last_name].filter(Boolean).join(" ") || "—";
+    const username = u.username ? `@${u.username}` : "—";
+    const blocked = u.is_blocked ? "🚫 Заблокирован" : "✅ Активен";
+    const text =
+      `👤 Найден пользователь\n\n` +
+      `ID: ${u.telegram_id}\n` +
+      `Имя: ${name}\n` +
+      `Username: ${username}\n` +
+      `Роль: ${u.role}\n` +
+      `Статус: ${blocked}\n` +
+      `Зарегистрирован: ${u.created_at.slice(0, 10)}`;
+
+    const { Markup: M } = require("telegraf");
+    await ctx.reply(
+      text,
+      M.inlineKeyboard([
+        [M.button.callback("Открыть диалог", `admin:dialog:${u.telegram_id}`)],
+      ]),
+    );
+  });
+
+  bot.command("resolve", async (ctx) => {
+    if (!isAdmin(ctx, deps)) return;
+
+    const args = ctx.message.text.split(" ").slice(1);
+    let clientId = args[0] ? Number(args[0]) : null;
+
+    if (!clientId) {
+      clientId = deps.services.admin.getActiveClientId(ctx.from.id);
+    }
+
+    if (!clientId) {
+      await ctx.reply(
+        "Укажите клиента: /resolve <telegram_id> или выберите диалог через /dialogs",
+      );
+      return;
+    }
+
+    const result = deps.services.admin.resolveConversation(clientId);
+    if (!result.ok) {
+      if (result.reason === "not_found") {
+        await ctx.reply(`Диалог с клиентом ${clientId} не найден.`);
+      } else if (result.reason === "already_closed") {
+        await ctx.reply(`Диалог с клиентом ${clientId} уже закрыт.`);
+      }
+      return;
+    }
+
+    await deps.services.conversation.sendAdminReply({
+      adminTelegramId: ctx.from.id,
+      clientId,
+      text: conversationResolvedMessage(),
+    });
+
+    deps.services.admin.clearSelectedClient(ctx.from.id);
+    await ctx.reply(`✅ Диалог с клиентом ${clientId} закрыт. Клиент уведомлён.`);
+  });
+
+  bot.command("broadcast", async (ctx) => {
+    if (!isAdmin(ctx, deps)) return;
+
+    const text = ctx.message.text.replace(/^\/broadcast\s*/, "").trim();
+    if (!text) {
+      await ctx.reply(
+        "Использование: /broadcast <текст сообщения>\n\n" +
+          "Сообщение будет отправлено всем активным клиентам.",
+      );
+      return;
+    }
+
+    await ctx.reply("Отправляю рассылку...");
+
+    const { sent, failed, total } = await deps.services.admin.broadcastToClients(
+      deps.bot,
+      text,
+    );
+
+    await ctx.reply(
+      `📢 Рассылка завершена\n\n` +
+        `Всего клиентов: ${total}\n` +
+        `Доставлено: ${sent}\n` +
+        `Не доставлено: ${failed}`,
+    );
+  });
 }
 
 async function handleAdminStart(ctx, deps) {
@@ -404,23 +509,18 @@ async function handleAdminStart(ctx, deps) {
     : "Сейчас активный диалог не выбран.\n\n";
   const message =
     selectedText +
-    "Команды администратора:\n\n" +
-    "📋 Клиенты и диалоги:\n" +
+    "Команды администратора:\n" +
     "/clients — последние клиенты\n" +
     "/dialogs — последние диалоги\n" +
-    "/history [id] — история диалога с клиентом\n" +
-    "/setclient <id> — выбрать клиента вручную\n" +
-    "/stop — сбросить активный диалог\n\n" +
-    "📦 Заявки:\n" +
     "/leads — последние заявки\n" +
-    "/stats — статистика по заявкам\n" +
-    "/exportleads — экспорт заявок в CSV\n\n" +
-    "🛍 Товары:\n" +
-    "/products — список всех товаров\n" +
-    "/addproduct <код> | <название> | <описание> | <цена> — добавить товар\n" +
-    "/editproduct <id> | <название> | <описание> | <цена> — редактировать товар\n" +
-    "/toggleproduct <id> — включить/выключить товар\n\n" +
-    "🔒 Пользователи:\n" +
+    "/setclient <id> — выбрать клиента вручную\n" +
+    "/stop — сбросить активный диалог\n" +
+    "/search @username|id — найти клиента\n" +
+    "/resolve [id] — закрыть диалог (активный или по id)\n" +
+    "/broadcast <текст> — рассылка всем клиентам\n" +
+    "/history [id] — история диалога\n" +
+    "/stats — статистика заявок\n" +
+    "/exportleads — экспорт заявок в CSV\n" +
     "/blockuser <id> — заблокировать пользователя\n" +
     "/unblockuser <id> — разблокировать пользователя";
   const webAppKeyboard = deps.webappUrl
@@ -455,42 +555,26 @@ async function handleAdminAction(ctx, deps) {
 
   deps.services.admin.upsertAdmin(ctx.from);
 
-  if (action === ACTIONS.ADMIN_INBOX) {
+  if (action === "admin:inbox") {
     await safeAnswerCbQuery(ctx);
     await showInbox(ctx, deps, "Inbox:");
     return;
   }
 
-  if (action === ACTIONS.ADMIN_NOOP) {
+  if (action === "admin:noop") {
     await safeAnswerCbQuery(ctx, "Уже обработано");
     return;
   }
 
-  if (
-    action.startsWith(ACTION_PREFIXES.ADMIN_REPLY) ||
-    action.startsWith(ACTION_PREFIXES.ADMIN_DIALOG)
-  ) {
-    const prefix = action.startsWith(ACTION_PREFIXES.ADMIN_REPLY)
-      ? ACTION_PREFIXES.ADMIN_REPLY
-      : ACTION_PREFIXES.ADMIN_DIALOG;
-    const parsed = parseActionId(action, prefix);
-    if (!parsed.ok) {
-      await safeAnswerCbQuery(ctx, "Некорректные данные");
-      return;
-    }
-    const clientId = parsed.id;
+  if (action.startsWith("admin:reply:") || action.startsWith("admin:dialog:")) {
+    const clientId = parseActionId(action);
     await safeAnswerCbQuery(ctx, "Диалог открыт");
     await selectClient(ctx, deps, clientId);
     return;
   }
 
-  if (action.startsWith(ACTION_PREFIXES.ADMIN_LEAD_TAKE)) {
-    const parsed = parseActionId(action, ACTION_PREFIXES.ADMIN_LEAD_TAKE);
-    if (!parsed.ok) {
-      await safeAnswerCbQuery(ctx, "Некорректные данные");
-      return;
-    }
-    const leadId = parsed.id;
+  if (action.startsWith("admin:lead_take:")) {
+    const leadId = parseActionId(action);
     const lead = deps.services.admin.takeLead(leadId);
     if (!lead) {
       await safeAnswerCbQuery(ctx, "Заявка не найдена");
@@ -507,13 +591,8 @@ async function handleAdminAction(ctx, deps) {
     return;
   }
 
-  if (action.startsWith(ACTION_PREFIXES.ADMIN_LEAD_CLOSE)) {
-    const parsed = parseActionId(action, ACTION_PREFIXES.ADMIN_LEAD_CLOSE);
-    if (!parsed.ok) {
-      await safeAnswerCbQuery(ctx, "Некорректные данные");
-      return;
-    }
-    const leadId = parsed.id;
+  if (action.startsWith("admin:lead_close:")) {
+    const leadId = parseActionId(action);
     const lead = deps.services.admin.closeLead(leadId);
     if (!lead) {
       await safeAnswerCbQuery(ctx, "Заявка не найдена");
@@ -530,13 +609,8 @@ async function handleAdminAction(ctx, deps) {
     return;
   }
 
-  if (action.startsWith(ACTION_PREFIXES.ADMIN_LEAD_CALLED_BACK)) {
-    const parsed = parseActionId(action, ACTION_PREFIXES.ADMIN_LEAD_CALLED_BACK);
-    if (!parsed.ok) {
-      await safeAnswerCbQuery(ctx, "Некорректные данные");
-      return;
-    }
-    const leadId = parsed.id;
+  if (action.startsWith("admin:lead_called_back:")) {
+    const leadId = parseActionId(action);
     const lead = deps.services.admin.markLeadCalledBack(leadId);
     if (!lead) {
       await safeAnswerCbQuery(ctx, "Заявка не найдена");
@@ -553,16 +627,8 @@ async function handleAdminAction(ctx, deps) {
     return;
   }
 
-  if (action.startsWith(ACTION_PREFIXES.ADMIN_LEAD_AWAITING_PAYMENT)) {
-    const parsed = parseActionId(
-      action,
-      ACTION_PREFIXES.ADMIN_LEAD_AWAITING_PAYMENT,
-    );
-    if (!parsed.ok) {
-      await safeAnswerCbQuery(ctx, "Некорректные данные");
-      return;
-    }
-    const leadId = parsed.id;
+  if (action.startsWith("admin:lead_awaiting_payment:")) {
+    const leadId = parseActionId(action);
     const lead = deps.services.admin.markLeadAwaitingPayment(leadId);
     if (!lead) {
       await safeAnswerCbQuery(ctx, "Заявка не найдена");
@@ -581,13 +647,8 @@ async function handleAdminAction(ctx, deps) {
     return;
   }
 
-  if (action.startsWith(ACTION_PREFIXES.ADMIN_LEAD_FULFILLED)) {
-    const parsed = parseActionId(action, ACTION_PREFIXES.ADMIN_LEAD_FULFILLED);
-    if (!parsed.ok) {
-      await safeAnswerCbQuery(ctx, "Некорректные данные");
-      return;
-    }
-    const leadId = parsed.id;
+  if (action.startsWith("admin:lead_fulfilled:")) {
+    const leadId = parseActionId(action);
     const lead = deps.services.admin.markLeadFulfilled(leadId);
     if (!lead) {
       await safeAnswerCbQuery(ctx, "Заявка не найдена");
@@ -604,7 +665,7 @@ async function handleAdminAction(ctx, deps) {
     return;
   }
 
-  if (action.startsWith(ACTION_PREFIXES.ADMIN_TEMPLATE)) {
+  if (action.startsWith("admin:template:")) {
     const [, , templateKey, rawClientId] = action.split(":");
     const clientId = Number(rawClientId);
     const text = deps.services.admin.getTemplate(templateKey);
@@ -619,7 +680,7 @@ async function handleAdminAction(ctx, deps) {
     return;
   }
 
-  if (action === ACTIONS.ADMIN_CLEAR_DIALOG) {
+  if (action === "admin:clear_dialog") {
     deps.services.admin.clearSelectedClient(adminId);
     await safeAnswerCbQuery(ctx, "Диалог сброшен");
     await ctx.reply("Активный диалог сброшен.");

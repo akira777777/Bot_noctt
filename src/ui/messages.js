@@ -2,14 +2,14 @@ const { formatSourceLabel } = require("../utils/formatters");
 const { getLeadStatusLabel } = require("../domain/lead-status");
 
 function welcomeMessage(entry) {
+  const tagline =
+    "Просто напишите, что вас интересует — мы найдём и сообщим цену.";
+
   if (entry?.source === "channel") {
-    return (
-      `${entry.title}.\n\n` +
-      "Здесь можно быстро открыть каталог, оставить заявку или сразу написать менеджеру."
-    );
+    return `${entry.title}.\n\n${tagline}`;
   }
 
-  return "Здравствуйте. Это бот для заявок, каталога и связи с менеджером.";
+  return `Здравствуйте! Мы можем найти для вас всё что угодно.\n\n${tagline}`;
 }
 
 function helpMessage() {
@@ -88,8 +88,8 @@ function leadCreatedMessage() {
 
 function contactManagerMessage() {
   return (
-    "Вы в режиме связи с менеджером.\n" +
-    "Напишите сообщение, и администратор получит его в рабочем чате."
+    "Напишите, что вас интересует — любой товар или услуга.\n\n" +
+    "Мы подберём вариант и сообщим цену в ответном сообщении."
   );
 }
 
@@ -111,12 +111,14 @@ function adminNoClientSelectedMessage() {
   );
 }
 
-function adminClientCard(clientLabel, text, sourcePayload) {
+function adminClientCard(clientLabel, text, sourcePayload, msgCount = null) {
   const source = formatSourceLabel(sourcePayload);
+  const countLine = msgCount !== null ? `Сообщений в диалоге: ${msgCount}\n` : "";
   return (
-    "Новое сообщение от клиента:\n" +
+    "💬 Новое сообщение от клиента:\n" +
     `${clientLabel}\n` +
-    `${source}\n\n` +
+    `${source}\n` +
+    `${countLine}\n` +
     `Текст:\n${text}`
   );
 }
@@ -163,6 +165,14 @@ function clientLeadFulfilledMessage() {
   return "Ваша заявка выполнена. Спасибо за покупку! Будем рады снова помочь 🎉";
 }
 
+function conversationResolvedMessage() {
+  return "Ваш запрос обработан и закрыт. Если появятся новые вопросы — просто напишите, и мы снова на связи!";
+}
+
+function rateLimitMessage() {
+  return "Вы отправляете сообщения слишком часто. Пожалуйста, подождите немного.";
+}
+
 function clientLeadStatusMessage(lead) {
   if (!lead) {
     return "У вас пока нет ни одной заявки. Оформить можно через главное меню.";
@@ -193,6 +203,8 @@ function clientLeadStatusMessage(lead) {
 }
 
 module.exports = {
+  conversationResolvedMessage,
+  rateLimitMessage,
   welcomeMessage,
   helpMessage,
   howToOrderMessage,

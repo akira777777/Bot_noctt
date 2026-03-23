@@ -165,6 +165,15 @@ async function bootstrap() {
 
     await configureAdminMenu(bot);
 
+    // Clean up expired sessions on startup, then every hour
+    repos.sessions.clearExpired();
+    const sessionCleanupTimer = setInterval(
+      () => repos.sessions.clearExpired(),
+      60 * 60 * 1000,
+    );
+    sessionCleanupTimer.unref();
+    resources.sessionCleanupTimer = sessionCleanupTimer;
+
     return resources;
   } catch (error) {
     await teardown(resources, "bootstrap_failed");

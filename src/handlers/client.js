@@ -23,6 +23,7 @@ const {
   contactManagerMessage,
   clientMessageDelivered,
   clientLeadStatusMessage,
+  rateLimitMessage,
 } = require("../ui/messages");
 const { buildCatalogIntro, buildProductCard } = require("../ui/catalog-view");
 const { safeAnswerCbQuery } = require("../utils/telegram");
@@ -30,18 +31,32 @@ const {
   parseSourcePayload,
   resolveStartAction,
 } = require("../utils/source-payload");
-const { ACTIONS, ACTION_PREFIXES, parseActionId } = require("../utils/actions");
-const { rejectBlocked, createClientAccessGuard } = require("./guards");
+const { createRateLimiter } = require("../utils/rate-limiter");
+
+// 5 messages per 60 seconds per user
+const messageLimiter = createRateLimiter(5, 60 * 1000);
 
 const HOME_ACTION_LABELS = {
-  "Оставить заявку": ACTIONS.LEAD_START,
-  Каталог: ACTIONS.CATALOG_ROOT,
-  "Связаться с менеджером": ACTIONS.CONTACT_MANAGER,
-  "Как оформить заказ": ACTIONS.INFO_HOW_TO_ORDER,
+  "💬 Что вас интересует?": "contact:manager",
 };
 
+function getCurrentSourcePayload(repos, clientId, fallbackSource = null) {
+  const session = repos.sessions.get(clientId);
+  return session?.draft?.sourcePayload || fallbackSource || null;
+}
+
+function setHomeSession(repos, clientId, sourcePayload) {
+  repos.sessions.set(clientId, "home", "menu", {
+    sourcePayload: sourcePayload || null,
+  });
+}
+
+function parseActionId(action) {
+  return Number(action.split(":")[2]);
+}
+
 async function showHomeScreen(ctx, deps, entry) {
-  deps.services.session.setHomeSession(ctx.from.id, entry.raw);
+  setHomeSession(deps.repos, ctx.from.id, entry.raw);
   await ctx.reply(welcomeMessage(entry), clientHomeReplyKeyboard());
 }
 
@@ -59,29 +74,27 @@ async function showLeadEntry(ctx, deps) {
 }
 
 async function showSupportEntry(ctx, deps) {
-  const sourcePayload = deps.services.session.getCurrentSourcePayload(ctx.from.id);
-  deps.services.session.setHomeSession(ctx.from.id, sourcePayload);
+  const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
+  setHomeSession(deps.repos, ctx.from.id, sourcePayload);
   await ctx.reply(contactManagerMessage(), backToMainKeyboard());
 }
 
 async function handleHomeAction(ctx, deps, action) {
   switch (action) {
-    case ACTIONS.CATALOG_ROOT:
+    case "catalog:root":
       await showCatalog(ctx, deps);
       return true;
-    case ACTIONS.LEAD_START:
+    case "lead:start":
       await showLeadEntry(ctx, deps);
       return true;
-    case ACTIONS.CONTACT_MANAGER:
+    case "contact:manager":
       await showSupportEntry(ctx, deps);
       return true;
-    case ACTIONS.INFO_HOW_TO_ORDER:
+    case "info:how_to_order":
       await ctx.reply(howToOrderMessage(), backToMainKeyboard());
       return true;
-    case ACTIONS.MENU_MAIN: {
-      const sourcePayload = deps.services.session.getCurrentSourcePayload(
-        ctx.from.id,
-      );
+    case "menu:main": {
+      const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
       await showHomeScreen(ctx, deps, parseSourcePayload(sourcePayload));
       return true;
     }
@@ -134,11 +147,6 @@ async function handleLeadText(ctx, deps, session) {
       comment: ctx.message.text,
     });
 
-    if (!result.ok) {
-      await ctx.reply(result.error, commentKeyboard());
-      return true;
-    }
-
     await showLeadStep(ctx, "contact", result);
     return true;
   }
@@ -175,10 +183,20 @@ async function handleLeadText(ctx, deps, session) {
   return false;
 }
 
+function isUserBlocked(user) {
+  return user && user.is_blocked;
+}
+
+async function rejectBlocked(ctx) {
+  await ctx.reply("Ваш аккаунт заблокирован. Обратитесь к администратору.");
+}
+
 async function handleClientStart(ctx, deps) {
-  const ensureClientAccess = createClientAccessGuard(deps);
-  const access = await ensureClientAccess(ctx);
-  if (!access.ok) {
+  const user = deps.services.conversation.upsertTelegramUser(
+    ctx.from,
+    "client",
+  );
+  if (isUserBlocked(user)) {
     await rejectBlocked(ctx);
     return;
   }
@@ -186,6 +204,18 @@ async function handleClientStart(ctx, deps) {
 
   await showHomeScreen(ctx, deps, entry);
   if (deps.webappUrl) {
+    try {
+      await deps.bot.telegram.setChatMenuButton({
+        chat_id: ctx.from.id,
+        menu_button: {
+          type: "web_app",
+          text: "Mini App",
+          web_app: { url: deps.webappUrl },
+        },
+      });
+    } catch (error) {
+      // setChatMenuButton failed silently — non-critical
+    }
     await ctx.reply(
       "Открыть Mini App:",
       Markup.inlineKeyboard([
@@ -215,25 +245,34 @@ async function handleClientHelp(ctx) {
 }
 
 async function handleClientMenu(ctx, deps) {
-  const sourcePayload = deps.services.session.getCurrentSourcePayload(ctx.from.id);
+  const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
   await showHomeScreen(ctx, deps, parseSourcePayload(sourcePayload));
 }
 
 async function handleClientStatus(ctx, deps) {
-  const ensureClientAccess = createClientAccessGuard(deps);
-  const access = await ensureClientAccess(ctx);
-  if (!access.ok) {
+  const user = deps.services.conversation.upsertTelegramUser(
+    ctx.from,
+    "client",
+  );
+  if (isUserBlocked(user)) {
     await rejectBlocked(ctx);
     return;
   }
-  const lead = deps.services.admin.getLatestLeadByClient(ctx.from.id);
+  const lead = deps.repos.leads.getLatestByClient(ctx.from.id);
   await ctx.reply(clientLeadStatusMessage(lead), backToMainKeyboard());
 }
 
 async function handleClientText(ctx, deps) {
-  const ensureClientAccess = createClientAccessGuard(deps);
-  const access = await ensureClientAccess(ctx);
-  if (!access.ok) {
+  if (!messageLimiter.isAllowed(ctx.from.id)) {
+    await ctx.reply(rateLimitMessage());
+    return;
+  }
+
+  const user = deps.services.conversation.upsertTelegramUser(
+    ctx.from,
+    "client",
+  );
+  if (isUserBlocked(user)) {
     await rejectBlocked(ctx);
     return;
   }
@@ -252,7 +291,7 @@ async function handleClientText(ctx, deps) {
     return;
   }
 
-  const sourcePayload = deps.services.session.getCurrentSourcePayload(ctx.from.id);
+  const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
   await deps.services.conversation.forwardClientMessage({
     client: ctx.from,
     chatId: ctx.chat.id,
@@ -263,34 +302,31 @@ async function handleClientText(ctx, deps) {
 }
 
 async function handleClientAction(ctx, deps) {
-  const ensureClientAccess = createClientAccessGuard(deps);
-  const access = await ensureClientAccess(ctx);
-  if (!access.ok) {
+  const user = deps.services.conversation.upsertTelegramUser(
+    ctx.from,
+    "client",
+  );
+  if (isUserBlocked(user)) {
     await ctx.answerCbQuery("Ваш аккаунт заблокирован.").catch(() => {});
     return;
   }
 
   const action = ctx.match[0];
   switch (action) {
-    case ACTIONS.MENU_MAIN:
+    case "menu:main":
       await safeAnswerCbQuery(ctx);
       await handleClientMenu(ctx, deps);
       return;
-    case ACTIONS.INFO_HOW_TO_ORDER:
-    case ACTIONS.CONTACT_MANAGER:
-    case ACTIONS.CATALOG_ROOT:
+    case "info:how_to_order":
+    case "contact:manager":
+    case "catalog:root":
       await safeAnswerCbQuery(ctx);
       await handleHomeAction(ctx, deps, action);
       return;
   }
 
-  if (action.startsWith(ACTION_PREFIXES.CATALOG_PRODUCT)) {
-    const parsed = parseActionId(action, ACTION_PREFIXES.CATALOG_PRODUCT);
-    if (!parsed.ok) {
-      await safeAnswerCbQuery(ctx, "Некорректные данные");
-      return;
-    }
-    const productId = parsed.id;
+  if (action.startsWith("catalog:product:")) {
+    const productId = parseActionId(action);
     const product = deps.services.catalog.getProductById(productId);
     if (!product) {
       await safeAnswerCbQuery(ctx, "Товар не найден");
@@ -302,28 +338,21 @@ async function handleClientAction(ctx, deps) {
     return;
   }
 
-  if (action === ACTIONS.LEAD_START) {
+  if (action === "lead:start") {
     await safeAnswerCbQuery(ctx);
     await showLeadEntry(ctx, deps);
     return;
   }
 
-  if (action.startsWith(ACTION_PREFIXES.LEAD_PRODUCT)) {
-    const parsed = parseActionId(action, ACTION_PREFIXES.LEAD_PRODUCT);
-    if (!parsed.ok) {
-      await safeAnswerCbQuery(ctx, "Некорректные данные");
-      return;
-    }
-    const productId = parsed.id;
+  if (action.startsWith("lead:product:")) {
+    const productId = parseActionId(action);
     const product = deps.services.lead.hydrateProductForLead(productId);
     if (!product) {
       await safeAnswerCbQuery(ctx, "Товар не найден");
       return;
     }
 
-    const sourcePayload = deps.services.session.getCurrentSourcePayload(
-      ctx.from.id,
-    );
+    const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
     deps.services.lead.startLeadDraft({
       clientId: ctx.from.id,
       product,
@@ -335,7 +364,7 @@ async function handleClientAction(ctx, deps) {
     return;
   }
 
-  if (action === ACTIONS.LEAD_SKIP_COMMENT) {
+  if (action === "lead:skip_comment") {
     const session = deps.services.lead.getSession(ctx.from.id);
     if (!session) {
       await safeAnswerCbQuery(ctx, "Сессия не найдена");
@@ -352,7 +381,7 @@ async function handleClientAction(ctx, deps) {
     return;
   }
 
-  if (action === ACTIONS.LEAD_CONTACT_TELEGRAM) {
+  if (action === "lead:contact_telegram") {
     const session = deps.services.lead.getSession(ctx.from.id);
     if (!session) {
       await safeAnswerCbQuery(ctx, "Сессия не найдена");
@@ -369,7 +398,7 @@ async function handleClientAction(ctx, deps) {
     return;
   }
 
-  if (action === ACTIONS.LEAD_CONTACT_CUSTOM) {
+  if (action === "lead:contact_custom") {
     const session = deps.services.lead.getSession(ctx.from.id);
     if (!session) {
       await safeAnswerCbQuery(ctx, "Сессия не найдена");
@@ -386,10 +415,8 @@ async function handleClientAction(ctx, deps) {
     return;
   }
 
-  if (action === ACTIONS.LEAD_CONFIRM) {
-    const sourcePayload = deps.services.session.getCurrentSourcePayload(
-      ctx.from.id,
-    );
+  if (action === "lead:confirm") {
+    const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
     await safeAnswerCbQuery(ctx);
     const lead = await deps.services.lead.confirmLead({
       client: ctx.from,
@@ -405,8 +432,8 @@ async function handleClientAction(ctx, deps) {
     }
 
     if (lead.duplicate) {
-      deps.services.session.clearSession(ctx.from.id);
-      deps.services.session.setHomeSession(ctx.from.id, sourcePayload);
+      deps.repos.sessions.clear(ctx.from.id);
+      setHomeSession(deps.repos, ctx.from.id, sourcePayload);
       await ctx.reply(
         `⚠️ У вас уже есть активная заявка на этот товар (#${lead.existingLead.id}). Дождитесь её обработки или свяжитесь с менеджером.`,
         backToMainKeyboard(),
@@ -414,12 +441,12 @@ async function handleClientAction(ctx, deps) {
       return;
     }
 
-    deps.services.session.setHomeSession(ctx.from.id, sourcePayload);
+    setHomeSession(deps.repos, ctx.from.id, sourcePayload);
     await ctx.reply(leadCreatedMessage(), backToMainKeyboard());
     return;
   }
 
-  if (action === ACTIONS.LEAD_BACK) {
+  if (action === "lead:back") {
     const session = deps.services.lead.getSession(ctx.from.id);
     const previousStep = deps.services.lead.goBack(ctx.from.id, session);
     await safeAnswerCbQuery(ctx);
@@ -448,12 +475,10 @@ async function handleClientAction(ctx, deps) {
     }
   }
 
-  if (action === ACTIONS.LEAD_CANCEL) {
-    const sourcePayload = deps.services.session.getCurrentSourcePayload(
-      ctx.from.id,
-    );
+  if (action === "lead:cancel") {
+    const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
     deps.services.lead.clearSession(ctx.from.id);
-    deps.services.session.setHomeSession(ctx.from.id, sourcePayload);
+    setHomeSession(deps.repos, ctx.from.id, sourcePayload);
     await safeAnswerCbQuery(ctx, "Заявка отменена");
     await ctx.reply("Оформление заявки отменено.", backToMainKeyboard());
   }
