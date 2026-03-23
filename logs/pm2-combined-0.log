@@ -7569,3 +7569,309 @@
 2026-03-23T18:54:21: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
 2026-03-23T18:54:21: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
 2026-03-23T18:54:21: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:54:36: {"level":"ERROR","time":"2026-03-23T17:54:36.674Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T18:54:36: {"level":"INFO","time":"2026-03-23T17:54:36.674Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T18:54:36: {"level":"INFO","time":"2026-03-23T17:54:36.674Z","service":"telegram-bot","env":"production","msg":"HTTP server closed"}
+2026-03-23T18:54:36: {"level":"INFO","time":"2026-03-23T17:54:36.674Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T18:54:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:54:37: {"level":"INFO","time":"2026-03-23T17:54:37.190Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:54:37: {"level":"INFO","time":"2026-03-23T17:54:37.190Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:54:37: {"level":"INFO","time":"2026-03-23T17:54:37.191Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T18:54:37: {"level":"INFO","time":"2026-03-23T17:54:37.191Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T18:54:37: {"level":"INFO","time":"2026-03-23T17:54:37.191Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T18:54:37: {"level":"INFO","time":"2026-03-23T17:54:37.191Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T18:54:37: {"level":"ERROR","time":"2026-03-23T17:54:37.191Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T18:54:41: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+2026-03-23T18:54:41: [dotenv@17.3.1] injecting env (10) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+2026-03-23T18:54:41: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:54:41: {"level":"INFO","time":"2026-03-23T17:54:41.860Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T18:54:41: {"level":"INFO","time":"2026-03-23T17:54:41.868Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T18:54:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:54:41: {"level":"INFO","time":"2026-03-23T17:54:41.891Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T18:54:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:54:41: {"level":"INFO","time":"2026-03-23T17:54:41.895Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T18:54:41: {"level":"INFO","time":"2026-03-23T17:54:41.895Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T18:54:41: {"level":"INFO","time":"2026-03-23T17:54:41.896Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T18:54:41: {"level":"INFO","time":"2026-03-23T17:54:41.896Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":true}}
+2026-03-23T18:54:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:54:41: {"level":"INFO","time":"2026-03-23T17:54:41.903Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T18:54:41: {"level":"INFO","time":"2026-03-23T17:54:41.903Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T18:54:41: {"level":"INFO","time":"2026-03-23T17:54:41.903Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T18:54:41: {"level":"WARN","time":"2026-03-23T17:54:41.904Z","service":"telegram-bot","env":"production","msg":"Webhook mode requested but domain is not usable; using polling","webhookDomain":null}
+2026-03-23T18:54:41: {"level":"INFO","time":"2026-03-23T17:54:41.904Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"webhook","effectiveMode":"polling"}
+2026-03-23T18:54:41: {"level":"INFO","time":"2026-03-23T17:54:41.926Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3060"}
+2026-03-23T18:54:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:54:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:54:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:54:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:54:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:54:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:54:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:54:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:54:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:54:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:54:41: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:54:57: {"level":"ERROR","time":"2026-03-23T17:54:57.034Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T18:54:57: {"level":"INFO","time":"2026-03-23T17:54:57.034Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T18:54:57: {"level":"INFO","time":"2026-03-23T17:54:57.034Z","service":"telegram-bot","env":"production","msg":"HTTP server closed"}
+2026-03-23T18:54:57: {"level":"INFO","time":"2026-03-23T17:54:57.034Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T18:54:57: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:54:57: {"level":"INFO","time":"2026-03-23T17:54:57.551Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:54:57: {"level":"INFO","time":"2026-03-23T17:54:57.551Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:54:57: {"level":"INFO","time":"2026-03-23T17:54:57.552Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T18:54:57: {"level":"INFO","time":"2026-03-23T17:54:57.552Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T18:54:57: {"level":"INFO","time":"2026-03-23T17:54:57.552Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T18:54:57: {"level":"INFO","time":"2026-03-23T17:54:57.552Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T18:54:57: {"level":"ERROR","time":"2026-03-23T17:54:57.553Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T18:55:01: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+2026-03-23T18:55:01: [dotenv@17.3.1] injecting env (10) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+2026-03-23T18:55:01: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:55:02: {"level":"INFO","time":"2026-03-23T17:55:02.386Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T18:55:02: {"level":"INFO","time":"2026-03-23T17:55:02.394Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T18:55:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:02: {"level":"INFO","time":"2026-03-23T17:55:02.412Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T18:55:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:02: {"level":"INFO","time":"2026-03-23T17:55:02.414Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T18:55:02: {"level":"INFO","time":"2026-03-23T17:55:02.415Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T18:55:02: {"level":"INFO","time":"2026-03-23T17:55:02.415Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T18:55:02: {"level":"INFO","time":"2026-03-23T17:55:02.415Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":true}}
+2026-03-23T18:55:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:02: {"level":"INFO","time":"2026-03-23T17:55:02.421Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T18:55:02: {"level":"INFO","time":"2026-03-23T17:55:02.421Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T18:55:02: {"level":"INFO","time":"2026-03-23T17:55:02.421Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T18:55:02: {"level":"WARN","time":"2026-03-23T17:55:02.423Z","service":"telegram-bot","env":"production","msg":"Webhook mode requested but domain is not usable; using polling","webhookDomain":null}
+2026-03-23T18:55:02: {"level":"INFO","time":"2026-03-23T17:55:02.423Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"webhook","effectiveMode":"polling"}
+2026-03-23T18:55:02: {"level":"INFO","time":"2026-03-23T17:55:02.445Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3060"}
+2026-03-23T18:55:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:17: {"level":"ERROR","time":"2026-03-23T17:55:17.546Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T18:55:17: {"level":"INFO","time":"2026-03-23T17:55:17.546Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T18:55:17: {"level":"INFO","time":"2026-03-23T17:55:17.547Z","service":"telegram-bot","env":"production","msg":"HTTP server closed"}
+2026-03-23T18:55:17: {"level":"INFO","time":"2026-03-23T17:55:17.547Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T18:55:18: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:18: {"level":"INFO","time":"2026-03-23T17:55:18.075Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:55:18: {"level":"INFO","time":"2026-03-23T17:55:18.076Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:55:18: {"level":"INFO","time":"2026-03-23T17:55:18.077Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T18:55:18: {"level":"INFO","time":"2026-03-23T17:55:18.077Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T18:55:18: {"level":"INFO","time":"2026-03-23T17:55:18.077Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T18:55:18: {"level":"INFO","time":"2026-03-23T17:55:18.077Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T18:55:18: {"level":"ERROR","time":"2026-03-23T17:55:18.077Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T18:55:22: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+2026-03-23T18:55:22: [dotenv@17.3.1] injecting env (10) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+2026-03-23T18:55:22: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:55:23: {"level":"INFO","time":"2026-03-23T17:55:23.004Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T18:55:23: {"level":"INFO","time":"2026-03-23T17:55:23.012Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T18:55:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:23: {"level":"INFO","time":"2026-03-23T17:55:23.034Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T18:55:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:23: {"level":"INFO","time":"2026-03-23T17:55:23.036Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T18:55:23: {"level":"INFO","time":"2026-03-23T17:55:23.037Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T18:55:23: {"level":"INFO","time":"2026-03-23T17:55:23.037Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T18:55:23: {"level":"INFO","time":"2026-03-23T17:55:23.037Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":true}}
+2026-03-23T18:55:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:23: {"level":"INFO","time":"2026-03-23T17:55:23.046Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T18:55:23: {"level":"INFO","time":"2026-03-23T17:55:23.046Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T18:55:23: {"level":"INFO","time":"2026-03-23T17:55:23.046Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T18:55:23: {"level":"WARN","time":"2026-03-23T17:55:23.048Z","service":"telegram-bot","env":"production","msg":"Webhook mode requested but domain is not usable; using polling","webhookDomain":null}
+2026-03-23T18:55:23: {"level":"INFO","time":"2026-03-23T17:55:23.048Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"webhook","effectiveMode":"polling"}
+2026-03-23T18:55:23: {"level":"INFO","time":"2026-03-23T17:55:23.075Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3060"}
+2026-03-23T18:55:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:38: {"level":"ERROR","time":"2026-03-23T17:55:38.170Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T18:55:38: {"level":"INFO","time":"2026-03-23T17:55:38.170Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T18:55:38: {"level":"INFO","time":"2026-03-23T17:55:38.171Z","service":"telegram-bot","env":"production","msg":"HTTP server closed"}
+2026-03-23T18:55:38: {"level":"INFO","time":"2026-03-23T17:55:38.171Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T18:55:38: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:38: {"level":"INFO","time":"2026-03-23T17:55:38.686Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:55:38: {"level":"INFO","time":"2026-03-23T17:55:38.686Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:55:38: {"level":"INFO","time":"2026-03-23T17:55:38.687Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T18:55:38: {"level":"INFO","time":"2026-03-23T17:55:38.687Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T18:55:38: {"level":"INFO","time":"2026-03-23T17:55:38.688Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T18:55:38: {"level":"INFO","time":"2026-03-23T17:55:38.688Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T18:55:38: {"level":"ERROR","time":"2026-03-23T17:55:38.688Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T18:55:42: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+2026-03-23T18:55:42: [dotenv@17.3.1] injecting env (10) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+2026-03-23T18:55:42: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:55:43: {"level":"INFO","time":"2026-03-23T17:55:43.427Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T18:55:43: {"level":"INFO","time":"2026-03-23T17:55:43.435Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T18:55:43: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:43: {"level":"INFO","time":"2026-03-23T17:55:43.454Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T18:55:43: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:43: {"level":"INFO","time":"2026-03-23T17:55:43.456Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T18:55:43: {"level":"INFO","time":"2026-03-23T17:55:43.457Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T18:55:43: {"level":"INFO","time":"2026-03-23T17:55:43.457Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T18:55:43: {"level":"INFO","time":"2026-03-23T17:55:43.457Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":true}}
+2026-03-23T18:55:43: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:43: {"level":"INFO","time":"2026-03-23T17:55:43.464Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T18:55:43: {"level":"INFO","time":"2026-03-23T17:55:43.464Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T18:55:43: {"level":"INFO","time":"2026-03-23T17:55:43.464Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T18:55:43: {"level":"WARN","time":"2026-03-23T17:55:43.466Z","service":"telegram-bot","env":"production","msg":"Webhook mode requested but domain is not usable; using polling","webhookDomain":null}
+2026-03-23T18:55:43: {"level":"INFO","time":"2026-03-23T17:55:43.466Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"webhook","effectiveMode":"polling"}
+2026-03-23T18:55:43: {"level":"INFO","time":"2026-03-23T17:55:43.487Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3060"}
+2026-03-23T18:55:43: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:43: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:43: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:43: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:43: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:43: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:43: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:43: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:43: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:43: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:43: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:58: {"level":"ERROR","time":"2026-03-23T17:55:58.596Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T18:55:58: {"level":"INFO","time":"2026-03-23T17:55:58.596Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T18:55:58: {"level":"INFO","time":"2026-03-23T17:55:58.597Z","service":"telegram-bot","env":"production","msg":"HTTP server closed"}
+2026-03-23T18:55:58: {"level":"INFO","time":"2026-03-23T17:55:58.597Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T18:55:59: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:55:59: {"level":"INFO","time":"2026-03-23T17:55:59.111Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:55:59: {"level":"INFO","time":"2026-03-23T17:55:59.111Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:55:59: {"level":"INFO","time":"2026-03-23T17:55:59.112Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T18:55:59: {"level":"INFO","time":"2026-03-23T17:55:59.112Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T18:55:59: {"level":"INFO","time":"2026-03-23T17:55:59.113Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T18:55:59: {"level":"INFO","time":"2026-03-23T17:55:59.113Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T18:55:59: {"level":"ERROR","time":"2026-03-23T17:55:59.113Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T18:56:03: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: 🛡️ auth for agents: https://vestauth.com
+2026-03-23T18:56:03: [dotenv@17.3.1] injecting env (10) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+2026-03-23T18:56:03: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:56:03: {"level":"INFO","time":"2026-03-23T17:56:03.779Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T18:56:03: {"level":"INFO","time":"2026-03-23T17:56:03.786Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T18:56:03: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:03: {"level":"INFO","time":"2026-03-23T17:56:03.806Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T18:56:03: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:03: {"level":"INFO","time":"2026-03-23T17:56:03.808Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T18:56:03: {"level":"INFO","time":"2026-03-23T17:56:03.809Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T18:56:03: {"level":"INFO","time":"2026-03-23T17:56:03.809Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T18:56:03: {"level":"INFO","time":"2026-03-23T17:56:03.809Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":true}}
+2026-03-23T18:56:03: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:03: {"level":"INFO","time":"2026-03-23T17:56:03.816Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T18:56:03: {"level":"INFO","time":"2026-03-23T17:56:03.816Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T18:56:03: {"level":"INFO","time":"2026-03-23T17:56:03.816Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T18:56:03: {"level":"WARN","time":"2026-03-23T17:56:03.817Z","service":"telegram-bot","env":"production","msg":"Webhook mode requested but domain is not usable; using polling","webhookDomain":null}
+2026-03-23T18:56:03: {"level":"INFO","time":"2026-03-23T17:56:03.817Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"webhook","effectiveMode":"polling"}
+2026-03-23T18:56:03: {"level":"INFO","time":"2026-03-23T17:56:03.838Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3060"}
+2026-03-23T18:56:03: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:03: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:03: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:03: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:03: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:03: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:03: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:03: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:03: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:03: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:03: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:18: {"level":"ERROR","time":"2026-03-23T17:56:18.934Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T18:56:18: {"level":"INFO","time":"2026-03-23T17:56:18.934Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T18:56:18: {"level":"INFO","time":"2026-03-23T17:56:18.935Z","service":"telegram-bot","env":"production","msg":"HTTP server closed"}
+2026-03-23T18:56:18: {"level":"INFO","time":"2026-03-23T17:56:18.935Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T18:56:19: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:19: {"level":"INFO","time":"2026-03-23T17:56:19.450Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:56:19: {"level":"INFO","time":"2026-03-23T17:56:19.450Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:56:19: {"level":"INFO","time":"2026-03-23T17:56:19.451Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T18:56:19: {"level":"INFO","time":"2026-03-23T17:56:19.451Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T18:56:19: {"level":"INFO","time":"2026-03-23T17:56:19.452Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T18:56:19: {"level":"INFO","time":"2026-03-23T17:56:19.452Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T18:56:19: {"level":"ERROR","time":"2026-03-23T17:56:19.452Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T18:56:23: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+2026-03-23T18:56:23: [dotenv@17.3.1] injecting env (10) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+2026-03-23T18:56:23: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:56:24: {"level":"INFO","time":"2026-03-23T17:56:24.134Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T18:56:24: {"level":"INFO","time":"2026-03-23T17:56:24.142Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T18:56:24: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:24: {"level":"INFO","time":"2026-03-23T17:56:24.158Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T18:56:24: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:24: {"level":"INFO","time":"2026-03-23T17:56:24.161Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T18:56:24: {"level":"INFO","time":"2026-03-23T17:56:24.161Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T18:56:24: {"level":"INFO","time":"2026-03-23T17:56:24.161Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T18:56:24: {"level":"INFO","time":"2026-03-23T17:56:24.161Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":true}}
+2026-03-23T18:56:24: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:24: {"level":"INFO","time":"2026-03-23T17:56:24.168Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T18:56:24: {"level":"INFO","time":"2026-03-23T17:56:24.168Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T18:56:24: {"level":"INFO","time":"2026-03-23T17:56:24.168Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T18:56:24: {"level":"WARN","time":"2026-03-23T17:56:24.170Z","service":"telegram-bot","env":"production","msg":"Webhook mode requested but domain is not usable; using polling","webhookDomain":null}
+2026-03-23T18:56:24: {"level":"INFO","time":"2026-03-23T17:56:24.170Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"webhook","effectiveMode":"polling"}
+2026-03-23T18:56:24: {"level":"INFO","time":"2026-03-23T17:56:24.191Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3060"}
+2026-03-23T18:56:24: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:24: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:24: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:24: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:24: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:24: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:24: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:24: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:24: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:24: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:24: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:39: {"level":"ERROR","time":"2026-03-23T17:56:39.292Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T18:56:39: {"level":"INFO","time":"2026-03-23T17:56:39.293Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T18:56:39: {"level":"INFO","time":"2026-03-23T17:56:39.293Z","service":"telegram-bot","env":"production","msg":"HTTP server closed"}
+2026-03-23T18:56:39: {"level":"INFO","time":"2026-03-23T17:56:39.293Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T18:56:39: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:39: {"level":"INFO","time":"2026-03-23T17:56:39.801Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:56:39: {"level":"INFO","time":"2026-03-23T17:56:39.801Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:56:39: {"level":"INFO","time":"2026-03-23T17:56:39.802Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T18:56:39: {"level":"INFO","time":"2026-03-23T17:56:39.802Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T18:56:39: {"level":"INFO","time":"2026-03-23T17:56:39.803Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T18:56:39: {"level":"INFO","time":"2026-03-23T17:56:39.803Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T18:56:39: {"level":"ERROR","time":"2026-03-23T17:56:39.803Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T18:56:44: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+2026-03-23T18:56:44: [dotenv@17.3.1] injecting env (10) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+2026-03-23T18:56:44: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:56:44: {"level":"INFO","time":"2026-03-23T17:56:44.505Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T18:56:44: {"level":"INFO","time":"2026-03-23T17:56:44.513Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T18:56:44: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:44: {"level":"INFO","time":"2026-03-23T17:56:44.531Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T18:56:44: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:44: {"level":"INFO","time":"2026-03-23T17:56:44.533Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T18:56:44: {"level":"INFO","time":"2026-03-23T17:56:44.533Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T18:56:44: {"level":"INFO","time":"2026-03-23T17:56:44.533Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T18:56:44: {"level":"INFO","time":"2026-03-23T17:56:44.534Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":true}}
+2026-03-23T18:56:44: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:44: {"level":"INFO","time":"2026-03-23T17:56:44.540Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T18:56:44: {"level":"INFO","time":"2026-03-23T17:56:44.540Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T18:56:44: {"level":"INFO","time":"2026-03-23T17:56:44.540Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T18:56:44: {"level":"WARN","time":"2026-03-23T17:56:44.542Z","service":"telegram-bot","env":"production","msg":"Webhook mode requested but domain is not usable; using polling","webhookDomain":null}
+2026-03-23T18:56:44: {"level":"INFO","time":"2026-03-23T17:56:44.542Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"webhook","effectiveMode":"polling"}
+2026-03-23T18:56:44: {"level":"INFO","time":"2026-03-23T17:56:44.562Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3060"}
+2026-03-23T18:56:44: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:44: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:44: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:44: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:44: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:44: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:44: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:44: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:44: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:44: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:44: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:56:59: {"level":"ERROR","time":"2026-03-23T17:56:59.664Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T18:56:59: {"level":"INFO","time":"2026-03-23T17:56:59.665Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T18:56:59: {"level":"INFO","time":"2026-03-23T17:56:59.665Z","service":"telegram-bot","env":"production","msg":"HTTP server closed"}
+2026-03-23T18:56:59: {"level":"INFO","time":"2026-03-23T17:56:59.665Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T18:57:00: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:57:00: {"level":"INFO","time":"2026-03-23T17:57:00.180Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:57:00: {"level":"INFO","time":"2026-03-23T17:57:00.180Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:57:00: {"level":"INFO","time":"2026-03-23T17:57:00.181Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T18:57:00: {"level":"INFO","time":"2026-03-23T17:57:00.181Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T18:57:00: {"level":"INFO","time":"2026-03-23T17:57:00.182Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T18:57:00: {"level":"INFO","time":"2026-03-23T17:57:00.182Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T18:57:00: {"level":"ERROR","time":"2026-03-23T17:57:00.182Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
