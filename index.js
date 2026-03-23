@@ -1,3 +1,7 @@
+/**
+ * Bot_noct - Telegram Bot Application
+ * Enhanced version with Redis caching, Bull queues, and advanced monitoring
+ */
 const { createDatabase } = require("./src/db/sqlite");
 const { createRepositories } = require("./src/repositories");
 const { createBot } = require("./src/bot");
@@ -15,10 +19,24 @@ const {
   createConversationService,
 } = require("./src/services/conversation-service");
 const { createSchedulerService } = require("./src/services/scheduler-service");
-const { logError, logInfo } = require("./src/utils/logger");
+const {
+  initCacheService,
+  getCacheService,
+} = require("./src/services/cache-service");
+const {
+  initQueueService,
+  closeQueueService,
+  processMessageJobs,
+  processWebhookJobs,
+} = require("./src/services/queue-service");
+const {
+  createShutdownHandler,
+  createMemoryMonitor,
+} = require("./src/utils/graceful-shutdown");
+const { log } = require("./src/utils/logger-enhanced");
 
+// Application resources
 let appResources = null;
-let isShuttingDown = false;
 
 function startHttpServer(app, port) {
   return new Promise((resolve, reject) => {
@@ -27,48 +45,14 @@ function startHttpServer(app, port) {
   });
 }
 
-function closeHttpServer(server) {
-  if (!server || !server.listening) {
-    return Promise.resolve();
-  }
-
-  return new Promise((resolve, reject) => {
-    server.close((error) => (error ? reject(error) : resolve()));
-  });
-}
-
-function stopBot(bot, signal) {
-  if (!bot) {
-    return;
-  }
-
-  try {
-    bot.stop(signal);
-  } catch (error) {
-    if (/bot is not running/i.test(error?.message || "")) {
-      return;
-    }
-    logError(`Failed to stop bot during ${signal}`, error);
-  }
-}
-
-function closeDatabase(db) {
-  if (!db) {
-    return;
-  }
-
-  try {
-    db.close();
-  } catch (error) {
-    logError("Failed to close database", error);
-  }
-}
-
 async function teardown(resources, reason) {
   if (!resources) {
     return;
   }
 
+  log.info("Starting application teardown", { reason });
+
+  // Clear timers
   if (resources.sessionCleanupTimer) {
     clearInterval(resources.sessionCleanupTimer);
   }
@@ -76,19 +60,64 @@ async function teardown(resources, reason) {
     resources.schedulerTimers.forEach((t) => clearInterval(t));
   }
 
-  if (resources.botLaunched) {
-    stopBot(resources.bot, reason);
+  // Stop memory monitor
+  if (resources.memoryMonitor) {
+    resources.memoryMonitor.stop();
   }
 
-  if (resources.httpServer) {
+  // Stop bot
+  if (resources.botLaunched && resources.bot) {
     try {
-      await closeHttpServer(resources.httpServer);
+      resources.bot.stop(reason);
+      log.info("Bot stopped");
     } catch (error) {
-      logError("Failed to close HTTP server", error);
+      log.error("Error stopping bot", { error: error.message });
     }
   }
 
-  closeDatabase(resources.db);
+  // Close HTTP server
+  if (resources.httpServer) {
+    try {
+      await new Promise((resolve, reject) => {
+        resources.httpServer.close((err) => (err ? reject(err) : resolve()));
+      });
+      log.info("HTTP server closed");
+    } catch (error) {
+      log.error("Error closing HTTP server", { error: error.message });
+    }
+  }
+
+  // Close queue service
+  if (resources.queueService) {
+    try {
+      await closeQueueService();
+      log.info("Queue service closed");
+    } catch (error) {
+      log.error("Error closing queue service", { error: error.message });
+    }
+  }
+
+  // Close cache service
+  if (resources.cacheService) {
+    try {
+      await resources.cacheService.disconnect();
+      log.info("Cache service closed");
+    } catch (error) {
+      log.error("Error closing cache service", { error: error.message });
+    }
+  }
+
+  // Close database
+  if (resources.db) {
+    try {
+      resources.db.close();
+      log.info("Database closed");
+    } catch (error) {
+      log.error("Error closing database", { error: error.message });
+    }
+  }
+
+  log.info("Application teardown complete");
 }
 
 const SESSION_CLEANUP_INTERVAL_MS = 60 * 60 * 1000;
@@ -97,8 +126,9 @@ function startSessionCleanup(repos) {
   const timer = setInterval(() => {
     try {
       repos.sessions.clearExpired();
+      log.debug("Session cleanup completed");
     } catch (error) {
-      logError("Session cleanup failed", error);
+      log.error("Session cleanup failed", { error: error.message });
     }
   }, SESSION_CLEANUP_INTERVAL_MS);
   timer.unref();
@@ -106,36 +136,129 @@ function startSessionCleanup(repos) {
 }
 
 function startScheduledTasks(scheduler) {
-  const staleTimer = setInterval(() => {
-    scheduler.checkStaleLeads().catch((err) => logError("Stale leads check failed", err));
-  }, 30 * 60 * 1000);
+  const timers = [];
+
+  // Check stale leads every 30 minutes
+  const staleTimer = setInterval(
+    () => {
+      scheduler
+        .checkStaleLeads()
+        .catch((err) =>
+          log.error("Stale leads check failed", { error: err.message }),
+        );
+    },
+    30 * 60 * 1000,
+  );
   staleTimer.unref();
+  timers.push(staleTimer);
 
-  const followUpTimer = setInterval(() => {
-    scheduler.sendFollowUps().catch((err) => logError("Follow-ups check failed", err));
-  }, 60 * 60 * 1000);
+  // Send follow-ups every hour
+  const followUpTimer = setInterval(
+    () => {
+      scheduler
+        .sendFollowUps()
+        .catch((err) =>
+          log.error("Follow-ups check failed", { error: err.message }),
+        );
+    },
+    60 * 60 * 1000,
+  );
   followUpTimer.unref();
+  timers.push(followUpTimer);
 
-  return [staleTimer, followUpTimer];
+  return timers;
 }
 
 async function bootstrap() {
-  const db = createDatabase();
-  const repos = createRepositories(db);
-  const bot = createBot({ db, repos });
+  log.info("Starting application bootstrap", {
+    environment: process.env.NODE_ENV || "development",
+    nodeVersion: process.version,
+  });
 
+  // Initialize database
+  const db = createDatabase();
+  log.info("Database initialized");
+
+  // Initialize repositories
+  const repos = createRepositories(db);
+
+  // Initialize cache service (Redis with in-memory fallback)
+  let cacheService = null;
+  try {
+    cacheService = await initCacheService({
+      host: process.env.REDIS_HOST || "localhost",
+      port: parseInt(process.env.REDIS_PORT || "6379"),
+      password: process.env.REDIS_PASSWORD || undefined,
+      db: parseInt(process.env.REDIS_DB || "0"),
+    });
+    log.info("Cache service initialized", {
+      mode: cacheService.getMode(),
+    });
+  } catch (error) {
+    log.warn("Cache service initialization failed, continuing without cache", {
+      error: error.message,
+    });
+  }
+
+  // Initialize queue service (Bull)
+  let queueService = null;
+  try {
+    await initQueueService({
+      host: process.env.REDIS_HOST || "localhost",
+      port: parseInt(process.env.REDIS_PORT || "6379"),
+      password: process.env.REDIS_PASSWORD || undefined,
+      db: parseInt(process.env.REDIS_DB || "0"),
+    });
+    queueService = require("./src/services/queue-service");
+    log.info("Queue service initialized");
+
+    // Setup message queue processor
+    if (repos.bot) {
+      // Bot will be set after bot creation
+    }
+  } catch (error) {
+    log.warn("Queue service initialization failed, continuing without queues", {
+      error: error.message,
+    });
+  }
+
+  // Create bot
+  const bot = createBot({ db, repos, cacheService, queueService });
+
+  // Setup queue processors with bot instance
+  if (queueService) {
+    // Process outgoing messages from queue
+    processMessageJobs(async (chatId, text, options) => {
+      try {
+        await bot.telegram.sendMessage(chatId, text, options);
+        return { success: true };
+      } catch (error) {
+        log.error("Failed to send queued message", {
+          chatId,
+          error: error.message,
+        });
+        throw error;
+      }
+    });
+  }
+
+  // Create services
   const conversationService = createConversationService({
     repos,
     bot,
     adminId: ADMIN_ID,
+    cacheService,
+    queueService,
   });
 
   const scheduler = createSchedulerService({
     repos,
     bot,
     adminId: ADMIN_ID,
+    cacheService,
   });
 
+  // Create web server
   const webServer = createWebServer({
     repos,
     conversationService,
@@ -144,14 +267,19 @@ async function bootstrap() {
     apiSecret: API_SECRET,
     corsOrigin: CORS_ORIGIN,
     isProduction,
+    compressionEnabled: process.env.API_COMPRESSION !== "false",
+    cacheService,
+    queueService,
   });
 
   // Mount webhook handler if using webhook mode
   if (WEBHOOK_DOMAIN) {
     const webhookPath = `/webhook/${BOT_TOKEN}`;
     webServer.use(bot.webhookCallback(webhookPath));
+    log.info("Webhook handler mounted", { path: webhookPath });
   }
 
+  // Initialize resources
   const resources = {
     db,
     repos,
@@ -160,11 +288,15 @@ async function bootstrap() {
     httpServer: null,
     sessionCleanupTimer: null,
     schedulerTimers: null,
+    memoryMonitor: null,
+    cacheService,
+    queueService,
   };
 
   try {
+    // Start HTTP server
     resources.httpServer = await startHttpServer(webServer, PORT);
-    logInfo(`API server started on port ${PORT}`);
+    log.info(`HTTP server started on port ${PORT}`);
 
     // Launch bot
     try {
@@ -172,56 +304,74 @@ async function bootstrap() {
         const webhookUrl = `${WEBHOOK_DOMAIN}/webhook/${BOT_TOKEN}`;
         await bot.telegram.setWebhook(webhookUrl);
         resources.botLaunched = true;
-        logInfo(`Bot started in webhook mode: ${WEBHOOK_DOMAIN}`);
+        log.info("Bot started in webhook mode", { webhookUrl });
       } else {
         await bot.launch();
         resources.botLaunched = true;
-        logInfo("Bot started in polling mode");
+        log.info("Bot started in polling mode");
       }
     } catch (error) {
       if (isProduction) {
         throw error;
       }
-      logError("Bot launch failed; continuing in API-only mode", error);
+      log.warn("Bot launch failed; continuing in API-only mode", {
+        error: error.message,
+      });
     }
 
+    // Start session cleanup
     resources.sessionCleanupTimer = startSessionCleanup(repos);
-    resources.schedulerTimers = startScheduledTasks(scheduler);
     repos.sessions.clearExpired();
+
+    // Start scheduled tasks
+    resources.schedulerTimers = startScheduledTasks(scheduler);
+
+    // Start memory monitor
+    const memoryLimitWarn =
+      parseInt(process.env.MEMORY_LIMIT_WARN || "512") * 1024 * 1024;
+    const memoryLimitCritical =
+      parseInt(process.env.MEMORY_LIMIT_CRITICAL || "768") * 1024 * 1024;
+
+    resources.memoryMonitor = createMemoryMonitor({
+      warnThreshold: memoryLimitWarn,
+      criticalThreshold: memoryLimitCritical,
+      checkInterval: 30000,
+    });
+    resources.memoryMonitor.start();
+
+    // Setup graceful shutdown
+    const shutdownHandler = createShutdownHandler({
+      bot: resources.bot,
+      cache: resources.cacheService,
+      queue: resources.queueService,
+      db: resources.db,
+      server: resources.httpServer,
+    });
+    shutdownHandler.registerShutdownHandlers();
+
+    log.info("Application bootstrap completed successfully", {
+      uptime: process.uptime(),
+    });
 
     return resources;
   } catch (error) {
+    log.error("Application bootstrap failed", {
+      error: error.message,
+      stack: error.stack,
+    });
     await teardown(resources, "bootstrap_failed");
     throw error;
   }
 }
 
-async function shutdown(signal) {
-  if (isShuttingDown) {
-    return;
-  }
-
-  isShuttingDown = true;
-  await teardown(appResources, signal);
-}
-
-async function handleFatalError(type, error) {
-  logError(`${type} detected`, error);
-  process.exitCode = 1;
-  await shutdown(type);
-  process.exit(1);
-}
-
-process.once("SIGINT", () => {
-  void shutdown("SIGINT");
-});
-
-process.once("SIGTERM", () => {
-  void shutdown("SIGTERM");
-});
-
+// Handle fatal errors
 process.on("uncaughtException", (error) => {
-  void handleFatalError("uncaughtException", error);
+  log.error("Uncaught exception", error, {
+    stack: error.stack,
+  });
+  teardown(appResources, "uncaughtException").then(() => {
+    process.exit(1);
+  });
 });
 
 process.on("unhandledRejection", (reason) => {
@@ -229,15 +379,27 @@ process.on("unhandledRejection", (reason) => {
     reason instanceof Error
       ? reason
       : new Error(`Unhandled rejection: ${reason}`);
-  void handleFatalError("unhandledRejection", error);
+  log.error("Unhandled rejection", error, {
+    stack: error.stack,
+  });
+  teardown(appResources, "unhandledRejection").then(() => {
+    process.exit(1);
+  });
 });
 
+// Bootstrap application
 bootstrap()
   .then((resources) => {
     appResources = resources;
+    log.info("Application is ready", {
+      uptime: process.uptime(),
+      pid: process.pid,
+    });
   })
-  .catch(async (error) => {
-    logError("Application bootstrap failed", error);
-    process.exitCode = 1;
+  .catch((error) => {
+    log.error("Application failed to start", {
+      error: error.message,
+      stack: error.stack,
+    });
     process.exit(1);
   });
