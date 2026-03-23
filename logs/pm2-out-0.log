@@ -327,3 +327,12 @@
 2026-03-23T14:35:20: {"level":"ERROR","time":"2026-03-23T13:35:20.424Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
 2026-03-23T14:35:24: [dotenv@17.3.1] injecting env (5) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
 2026-03-23T14:35:24: [dotenv@17.3.1] injecting env (34) from .env -- tip: 🤖 agentic secret storage: https://dotenvx.com/as2
+2026-03-23T14:35:25: {"level":"INFO","time":"2026-03-23T13:35:25.257Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T14:35:25: {"level":"INFO","time":"2026-03-23T13:35:25.265Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T14:35:25: {"level":"ERROR","time":"2026-03-23T13:35:25.275Z","service":"telegram-bot","env":"production","msg":"Failed to connect to Redis during cache initialization, using memory fallback","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1142:49)\n    at afterConnectMultiple (node:net:1723:7)","code":"ECONNREFUSED"}}
+2026-03-23T14:35:25: {"level":"WARN","time":"2026-03-23T13:35:25.276Z","service":"telegram-bot","env":"production","msg":"Redis not configured, using in-memory cache fallback"}
+2026-03-23T14:35:25: {"level":"INFO","time":"2026-03-23T13:35:25.276Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"memory"}
+2026-03-23T14:35:25: {"level":"INFO","time":"2026-03-23T13:35:25.276Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":false}}
+2026-03-23T14:35:25: {"level":"WARN","time":"2026-03-23T13:35:25.278Z","service":"telegram-bot","env":"production","msg":"Queue service initialization failed, continuing without queues","error":"AggregateError"}
+2026-03-23T14:35:25: {"level":"INFO","time":"2026-03-23T13:35:25.284Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3052"}
+2026-03-23T14:35:35: {"level":"WARN","time":"2026-03-23T13:35:35.300Z","service":"telegram-bot","env":"production","msg":"Request completed with error","method":"GET","path":"/health","statusCode":503,"duration":"4ms","ip":"::ffff:127.0.0.1"}
