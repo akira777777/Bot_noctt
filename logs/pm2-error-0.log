@@ -2340,3 +2340,19 @@
 2026-03-23T18:42:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
 2026-03-23T18:42:02: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
 2026-03-23T18:42:18: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:22: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:42:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:23: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:42:39: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
