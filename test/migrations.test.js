@@ -103,3 +103,36 @@ test("runMigrations normalizes legacy lead open status without changing conversa
     cleanup();
   }
 });
+
+test("runMigrations adds lead workflow ops columns and lead events table", () => {
+  const { db, cleanup } = createTempDb();
+
+  try {
+    runMigrations(db);
+
+    const leadColumns = db.prepare("PRAGMA table_info(leads)").all();
+    const sessionColumns = db.prepare("PRAGMA table_info(sessions)").all();
+    const leadEventsColumns = db.prepare("PRAGMA table_info(lead_events)").all();
+
+    assert.ok(
+      leadColumns.some((column) => column.name === "first_admin_reply_at"),
+    );
+    assert.ok(
+      leadColumns.some((column) => column.name === "closed_reason"),
+    );
+    assert.ok(
+      leadColumns.some((column) => column.name === "next_follow_up_at"),
+    );
+    assert.ok(
+      sessionColumns.some((column) => column.name === "last_interaction_at"),
+    );
+    assert.ok(
+      sessionColumns.some((column) => column.name === "reminder_15_sent_at"),
+    );
+    assert.ok(
+      leadEventsColumns.some((column) => column.name === "event_type"),
+    );
+  } finally {
+    cleanup();
+  }
+});

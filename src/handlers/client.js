@@ -59,8 +59,8 @@ function getActiveLeadDraft(repos, clientId) {
   return session?.flow === "lead" ? session : null;
 }
 
-function setHomeSession(repos, clientId, sourcePayload) {
-  if (getActiveLeadDraft(repos, clientId)) {
+function setHomeSession(repos, clientId, sourcePayload, { force = false } = {}) {
+  if (!force && getActiveLeadDraft(repos, clientId)) {
     return;
   }
   repos.sessions.set(clientId, "home", "menu", {
@@ -227,7 +227,7 @@ async function showPreviousLeadStep(ctx, deps, session) {
 async function cancelLeadFlow(ctx, deps) {
   const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
   deps.services.lead.clearSession(ctx.from.id);
-  setHomeSession(deps.repos, ctx.from.id, sourcePayload);
+  setHomeSession(deps.repos, ctx.from.id, sourcePayload, { force: true });
   await ctx.reply("Оформление заявки отменено.", backToMainKeyboard());
 }
 

@@ -175,3 +175,49 @@ test("lead status service skips notification when client chat id is invalid", as
   assert.equal(result, lead);
   assert.deepEqual(notifications, []);
 });
+
+test("lead status service persists closed reason and follow-up timestamp metadata", async () => {
+  const { createLeadStatusService } = loadLeadStatusService();
+  const updates = [];
+
+  const service = createLeadStatusService({
+    repos: {
+      leads: {
+        updateStatus(leadId, status, metadata) {
+          updates.push({ leadId, status, metadata });
+          return {
+            id: leadId,
+            status,
+            closed_reason: metadata.closedReason || null,
+            next_follow_up_at: metadata.nextFollowUpAt || null,
+            client_telegram_id: 123,
+          };
+        },
+      },
+      leadEvents: {
+        create() {},
+      },
+    },
+  });
+
+  const followUpAt = "2026-03-24T09:30:00.000Z";
+  const result = await service.updateStatus(55, "closed", {
+    closedReason: "out_of_stock",
+    nextFollowUpAt: followUpAt,
+    notifyClient: false,
+  });
+
+  assert.equal(result.closed_reason, "out_of_stock");
+  assert.equal(result.next_follow_up_at, followUpAt);
+  assert.deepEqual(updates, [
+    {
+      leadId: 55,
+      status: "closed",
+      metadata: {
+        closedReason: "out_of_stock",
+        nextFollowUpAt: followUpAt,
+        notifyClient: false,
+      },
+    },
+  ]);
+});
