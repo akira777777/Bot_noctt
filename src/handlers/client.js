@@ -8,7 +8,6 @@ const {
   customContactKeyboard,
   confirmLeadKeyboard,
   clientMiniAppKeyboard,
-  leadResumeKeyboard,
 } = require("../ui/keyboards");
 const { clientHomeReplyKeyboard } = require("../ui/reply-keyboards");
 const {
@@ -226,7 +225,7 @@ async function showPreviousLeadStep(ctx, deps, session) {
 
 async function cancelLeadFlow(ctx, deps) {
   const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
-  deps.services.lead.clearSession(ctx.from.id);
+  deps.services.lead.cancelLeadDraft(ctx.from.id);
   setHomeSession(deps.repos, ctx.from.id, sourcePayload, { force: true });
   await ctx.reply("Оформление заявки отменено.", backToMainKeyboard());
 }

@@ -26,6 +26,7 @@ function createConversationService({ repos, bot, adminId }) {
   async function forwardClientMessage({ client, chatId, text, sourcePayload }) {
     const conversation = ensureConversation(client.id, sourcePayload);
     repos.messages.create(conversation.id, "client", client.id, text);
+    repos.leads.touchLastClientActivityByClient(client.id);
 
     const msgCount = repos.messages.countByConversation(conversation.id);
     const clientLabel = formatClientLabel(client, chatId);
@@ -42,6 +43,15 @@ function createConversationService({ repos, bot, adminId }) {
   async function sendAdminReply({ adminTelegramId, clientId, text }) {
     const conversation = ensureConversation(clientId);
     repos.messages.create(conversation.id, "admin", adminTelegramId, text);
+    const firstReplyResult = repos.leads.recordFirstAdminReplyByClient(clientId);
+    if (firstReplyResult.updated && repos.leadEvents) {
+      repos.leadEvents.create({
+        leadId: firstReplyResult.lead.id,
+        clientTelegramId: clientId,
+        eventType: "admin_first_reply",
+        sourcePayload: firstReplyResult.lead.source_payload || null,
+      });
+    }
     await safeSendMessage(bot, clientId, clientReceivedAdminMessage(text));
     return conversation;
   }

@@ -5094,3 +5094,428 @@
 2026-03-23T18:36:39:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
 2026-03-23T18:36:39:   ]
 2026-03-23T18:36:39: }
+2026-03-23T18:36:43: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+2026-03-23T18:36:43: [dotenv@17.3.1] injecting env (10) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+2026-03-23T18:36:43: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:36:43: Error: Cannot find module './leads'
+2026-03-23T18:36:43: Require stack:
+2026-03-23T18:36:43: - C:\Users\fear7\Desktop\Bot_noct\src\repositories\index.js
+2026-03-23T18:36:43: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:36:43:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:36:43:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:36:43:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:36:43:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\repositories\index.js:4:29)
+2026-03-23T18:36:43:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:36:43:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:36:43:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:36:43:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:36:43:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:36:43:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:36:43:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:36:43:   requireStack: [
+2026-03-23T18:36:43:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\repositories\\index.js',
+2026-03-23T18:36:43:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:36:43:   ]
+2026-03-23T18:36:43: }
+2026-03-23T18:36:47: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+2026-03-23T18:36:47: [dotenv@17.3.1] injecting env (10) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+2026-03-23T18:36:47: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:36:47: Error: Cannot find module './leads'
+2026-03-23T18:36:47: Require stack:
+2026-03-23T18:36:47: - C:\Users\fear7\Desktop\Bot_noct\src\repositories\index.js
+2026-03-23T18:36:47: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:36:47:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:36:47:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:36:47:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:36:47:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\repositories\index.js:4:29)
+2026-03-23T18:36:47:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:36:47:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:36:47:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:36:47:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:36:47:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:36:47:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:36:47:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:36:47:   requireStack: [
+2026-03-23T18:36:47:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\repositories\\index.js',
+2026-03-23T18:36:47:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:36:47:   ]
+2026-03-23T18:36:47: }
+2026-03-23T18:36:51: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: ⚡️ secrets for agents: https://dotenvx.com/as2
+2026-03-23T18:36:51: [dotenv@17.3.1] injecting env (10) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+2026-03-23T18:36:51: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:36:52: Error: Cannot find module './leads'
+2026-03-23T18:36:52: Require stack:
+2026-03-23T18:36:52: - C:\Users\fear7\Desktop\Bot_noct\src\repositories\index.js
+2026-03-23T18:36:52: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:36:52:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:36:52:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:36:52:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:36:52:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\repositories\index.js:4:29)
+2026-03-23T18:36:52:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:36:52:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:36:52:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:36:52:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:36:52:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:36:52:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:36:52:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:36:52:   requireStack: [
+2026-03-23T18:36:52:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\repositories\\index.js',
+2026-03-23T18:36:52:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:36:52:   ]
+2026-03-23T18:36:52: }
+2026-03-23T18:36:56: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+2026-03-23T18:36:56: [dotenv@17.3.1] injecting env (10) from .env -- tip: ⚙️  override existing env vars with { override: true }
+2026-03-23T18:36:56: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:36:56: {"level":"INFO","time":"2026-03-23T17:36:56.741Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T18:36:56: {"level":"INFO","time":"2026-03-23T17:36:56.749Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: {"level":"INFO","time":"2026-03-23T17:36:56.768Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: {"level":"INFO","time":"2026-03-23T17:36:56.770Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T18:36:56: {"level":"INFO","time":"2026-03-23T17:36:56.771Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T18:36:56: {"level":"INFO","time":"2026-03-23T17:36:56.771Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T18:36:56: {"level":"INFO","time":"2026-03-23T17:36:56.771Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":true}}
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: {"level":"INFO","time":"2026-03-23T17:36:56.778Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T18:36:56: {"level":"INFO","time":"2026-03-23T17:36:56.778Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T18:36:56: {"level":"INFO","time":"2026-03-23T17:36:56.778Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T18:36:56: {"level":"WARN","time":"2026-03-23T17:36:56.779Z","service":"telegram-bot","env":"production","msg":"Webhook mode requested but domain is not usable; using polling","webhookDomain":null}
+2026-03-23T18:36:56: {"level":"INFO","time":"2026-03-23T17:36:56.779Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"webhook","effectiveMode":"polling"}
+2026-03-23T18:36:56: {"level":"INFO","time":"2026-03-23T17:36:56.801Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3060"}
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:11: {"level":"ERROR","time":"2026-03-23T17:37:11.921Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T18:37:11: {"level":"INFO","time":"2026-03-23T17:37:11.921Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T18:37:11: {"level":"INFO","time":"2026-03-23T17:37:11.922Z","service":"telegram-bot","env":"production","msg":"HTTP server closed"}
+2026-03-23T18:37:11: {"level":"INFO","time":"2026-03-23T17:37:11.922Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T18:37:12: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:12: {"level":"INFO","time":"2026-03-23T17:37:12.433Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:37:12: {"level":"INFO","time":"2026-03-23T17:37:12.433Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:37:12: {"level":"INFO","time":"2026-03-23T17:37:12.433Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T18:37:12: {"level":"INFO","time":"2026-03-23T17:37:12.433Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T18:37:12: {"level":"INFO","time":"2026-03-23T17:37:12.434Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T18:37:12: {"level":"INFO","time":"2026-03-23T17:37:12.434Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T18:37:12: {"level":"ERROR","time":"2026-03-23T17:37:12.434Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T18:37:16: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+2026-03-23T18:37:16: [dotenv@17.3.1] injecting env (10) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+2026-03-23T18:37:16: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:37:17: {"level":"INFO","time":"2026-03-23T17:37:17.100Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T18:37:17: {"level":"INFO","time":"2026-03-23T17:37:17.107Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: {"level":"INFO","time":"2026-03-23T17:37:17.125Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: {"level":"INFO","time":"2026-03-23T17:37:17.128Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T18:37:17: {"level":"INFO","time":"2026-03-23T17:37:17.128Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T18:37:17: {"level":"INFO","time":"2026-03-23T17:37:17.128Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T18:37:17: {"level":"INFO","time":"2026-03-23T17:37:17.128Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":true}}
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: {"level":"INFO","time":"2026-03-23T17:37:17.135Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T18:37:17: {"level":"INFO","time":"2026-03-23T17:37:17.135Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T18:37:17: {"level":"INFO","time":"2026-03-23T17:37:17.135Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T18:37:17: {"level":"WARN","time":"2026-03-23T17:37:17.136Z","service":"telegram-bot","env":"production","msg":"Webhook mode requested but domain is not usable; using polling","webhookDomain":null}
+2026-03-23T18:37:17: {"level":"INFO","time":"2026-03-23T17:37:17.136Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"webhook","effectiveMode":"polling"}
+2026-03-23T18:37:17: {"level":"INFO","time":"2026-03-23T17:37:17.157Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3060"}
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:32: {"level":"ERROR","time":"2026-03-23T17:37:32.266Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T18:37:32: {"level":"INFO","time":"2026-03-23T17:37:32.266Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T18:37:32: {"level":"INFO","time":"2026-03-23T17:37:32.266Z","service":"telegram-bot","env":"production","msg":"HTTP server closed"}
+2026-03-23T18:37:32: {"level":"INFO","time":"2026-03-23T17:37:32.266Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T18:37:32: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:32: {"level":"INFO","time":"2026-03-23T17:37:32.780Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:37:32: {"level":"INFO","time":"2026-03-23T17:37:32.780Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:37:32: {"level":"INFO","time":"2026-03-23T17:37:32.781Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T18:37:32: {"level":"INFO","time":"2026-03-23T17:37:32.781Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T18:37:32: {"level":"INFO","time":"2026-03-23T17:37:32.782Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T18:37:32: {"level":"INFO","time":"2026-03-23T17:37:32.782Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T18:37:32: {"level":"ERROR","time":"2026-03-23T17:37:32.782Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T18:37:36: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: 🤖 agentic secret storage: https://dotenvx.com/as2
+2026-03-23T18:37:36: [dotenv@17.3.1] injecting env (10) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+2026-03-23T18:37:37: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:37:37: {"level":"INFO","time":"2026-03-23T17:37:37.474Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T18:37:37: {"level":"INFO","time":"2026-03-23T17:37:37.482Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: {"level":"INFO","time":"2026-03-23T17:37:37.500Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: {"level":"INFO","time":"2026-03-23T17:37:37.503Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T18:37:37: {"level":"INFO","time":"2026-03-23T17:37:37.503Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T18:37:37: {"level":"INFO","time":"2026-03-23T17:37:37.503Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T18:37:37: {"level":"INFO","time":"2026-03-23T17:37:37.503Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":true}}
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: {"level":"INFO","time":"2026-03-23T17:37:37.510Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T18:37:37: {"level":"INFO","time":"2026-03-23T17:37:37.510Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T18:37:37: {"level":"INFO","time":"2026-03-23T17:37:37.510Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T18:37:37: {"level":"WARN","time":"2026-03-23T17:37:37.512Z","service":"telegram-bot","env":"production","msg":"Webhook mode requested but domain is not usable; using polling","webhookDomain":null}
+2026-03-23T18:37:37: {"level":"INFO","time":"2026-03-23T17:37:37.512Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"webhook","effectiveMode":"polling"}
+2026-03-23T18:37:37: {"level":"INFO","time":"2026-03-23T17:37:37.534Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3060"}
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:52: {"level":"ERROR","time":"2026-03-23T17:37:52.636Z","service":"telegram-bot","env":"production","msg":"Application bootstrap failed","error":{"error":"[object Object]"}}
+2026-03-23T18:37:52: {"level":"INFO","time":"2026-03-23T17:37:52.637Z","service":"telegram-bot","env":"production","msg":"Starting application teardown","reason":"bootstrap_failed"}
+2026-03-23T18:37:52: {"level":"INFO","time":"2026-03-23T17:37:52.637Z","service":"telegram-bot","env":"production","msg":"HTTP server closed"}
+2026-03-23T18:37:52: {"level":"INFO","time":"2026-03-23T17:37:52.637Z","service":"telegram-bot","env":"production","msg":"Closing queue service..."}
+2026-03-23T18:37:53: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:53: {"level":"INFO","time":"2026-03-23T17:37:53.148Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:37:53: {"level":"INFO","time":"2026-03-23T17:37:53.148Z","service":"telegram-bot","env":"production","msg":"Queue service closed"}
+2026-03-23T18:37:53: {"level":"INFO","time":"2026-03-23T17:37:53.149Z","service":"telegram-bot","env":"production","msg":"Redis connection closed"}
+2026-03-23T18:37:53: {"level":"INFO","time":"2026-03-23T17:37:53.149Z","service":"telegram-bot","env":"production","msg":"Cache service closed"}
+2026-03-23T18:37:53: {"level":"INFO","time":"2026-03-23T17:37:53.150Z","service":"telegram-bot","env":"production","msg":"Database closed"}
+2026-03-23T18:37:53: {"level":"INFO","time":"2026-03-23T17:37:53.150Z","service":"telegram-bot","env":"production","msg":"Application teardown complete"}
+2026-03-23T18:37:53: {"level":"ERROR","time":"2026-03-23T17:37:53.150Z","service":"telegram-bot","env":"production","msg":"Application failed to start","error":{"error":"[object Object]"}}
+2026-03-23T18:37:57: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+2026-03-23T18:37:57: [dotenv@17.3.1] injecting env (10) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+2026-03-23T18:37:57: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:37:57: Error: Cannot find module './services/admin-service'
+2026-03-23T18:37:57: Require stack:
+2026-03-23T18:37:57: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:37:57: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:37:57:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:37:57:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:37:57:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:37:57:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:37:57:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:37:57:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:37:57:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:37:57:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:37:57:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:37:57:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:37:57:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:37:57:   requireStack: [
+2026-03-23T18:37:57:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:37:57:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:37:57:   ]
+2026-03-23T18:37:57: }
+2026-03-23T18:38:01: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: ⚡️ secrets for agents: https://dotenvx.com/as2
+2026-03-23T18:38:01: [dotenv@17.3.1] injecting env (10) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+2026-03-23T18:38:01: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:01: Error: Cannot find module './services/admin-service'
+2026-03-23T18:38:01: Require stack:
+2026-03-23T18:38:01: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:38:01: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:38:01:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:38:01:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:38:01:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:38:01:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:38:01:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:38:01:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:38:01:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:38:01:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:38:01:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:38:01:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:38:01:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:38:01:   requireStack: [
+2026-03-23T18:38:01:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:38:01:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:38:01:   ]
+2026-03-23T18:38:01: }
+2026-03-23T18:38:06: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: ⚙️  enable debug logging with { debug: true }
+2026-03-23T18:38:06: [dotenv@17.3.1] injecting env (10) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+2026-03-23T18:38:06: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:06: Error: Cannot find module './services/admin-service'
+2026-03-23T18:38:06: Require stack:
+2026-03-23T18:38:06: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:38:06: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:38:06:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:38:06:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:38:06:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:38:06:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:38:06:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:38:06:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:38:06:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:38:06:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:38:06:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:38:06:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:38:06:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:38:06:   requireStack: [
+2026-03-23T18:38:06:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:38:06:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:38:06:   ]
+2026-03-23T18:38:06: }
+2026-03-23T18:38:10: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+2026-03-23T18:38:10: [dotenv@17.3.1] injecting env (10) from .env -- tip: 🤖 agentic secret storage: https://dotenvx.com/as2
+2026-03-23T18:38:10: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:10: Error: Cannot find module './services/admin-service'
+2026-03-23T18:38:10: Require stack:
+2026-03-23T18:38:10: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:38:10: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:38:10:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:38:10:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:38:10:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:38:10:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:38:10:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:38:10:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:38:10:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:38:10:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:38:10:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:38:10:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:38:10:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:38:10:   requireStack: [
+2026-03-23T18:38:10:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:38:10:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:38:10:   ]
+2026-03-23T18:38:10: }
+2026-03-23T18:38:14: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+2026-03-23T18:38:14: [dotenv@17.3.1] injecting env (10) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+2026-03-23T18:38:14: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:14: Error: Cannot find module './services/admin-service'
+2026-03-23T18:38:14: Require stack:
+2026-03-23T18:38:14: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:38:14: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:38:14:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:38:14:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:38:14:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:38:14:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:38:14:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:38:14:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:38:14:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:38:14:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:38:14:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:38:14:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:38:14:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:38:14:   requireStack: [
+2026-03-23T18:38:14:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:38:14:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:38:14:   ]
+2026-03-23T18:38:14: }
+2026-03-23T18:38:19: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+2026-03-23T18:38:19: [dotenv@17.3.1] injecting env (10) from .env -- tip: 🛡️ auth for agents: https://vestauth.com
+2026-03-23T18:38:19: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:19: Error: Cannot find module './services/admin-service'
+2026-03-23T18:38:19: Require stack:
+2026-03-23T18:38:19: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:38:19: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:38:19:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:38:19:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:38:19:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:38:19:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:38:19:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:38:19:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:38:19:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:38:19:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:38:19:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:38:19:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:38:19:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:38:19:   requireStack: [
+2026-03-23T18:38:19:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:38:19:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:38:19:   ]
+2026-03-23T18:38:19: }
+2026-03-23T18:38:23: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+2026-03-23T18:38:23: [dotenv@17.3.1] injecting env (10) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+2026-03-23T18:38:23: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:23: Error: Cannot find module './services/admin-service'
+2026-03-23T18:38:23: Require stack:
+2026-03-23T18:38:23: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:38:23: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:38:23:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:38:23:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:38:23:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:38:23:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:38:23:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:38:23:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:38:23:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:38:23:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:38:23:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:38:23:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:38:23:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:38:23:   requireStack: [
+2026-03-23T18:38:23:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:38:23:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:38:23:   ]
+2026-03-23T18:38:23: }
+2026-03-23T18:38:27: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: 🛡️ auth for agents: https://vestauth.com
+2026-03-23T18:38:27: [dotenv@17.3.1] injecting env (10) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+2026-03-23T18:38:27: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:28: Error: Cannot find module './services/admin-service'
+2026-03-23T18:38:28: Require stack:
+2026-03-23T18:38:28: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:38:28: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:38:28:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:38:28:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:38:28:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:38:28:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:38:28:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:38:28:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:38:28:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:38:28:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:38:28:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:38:28:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:38:28:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:38:28:   requireStack: [
+2026-03-23T18:38:28:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:38:28:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:38:28:   ]
+2026-03-23T18:38:28: }
+2026-03-23T18:38:32: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+2026-03-23T18:38:32: [dotenv@17.3.1] injecting env (10) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+2026-03-23T18:38:32: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:32: Error: Cannot find module './services/admin-service'
+2026-03-23T18:38:32: Require stack:
+2026-03-23T18:38:32: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:38:32: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:38:32:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:38:32:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:38:32:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:38:32:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:38:32:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:38:32:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:38:32:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:38:32:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:38:32:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:38:32:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:38:32:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:38:32:   requireStack: [
+2026-03-23T18:38:32:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:38:32:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:38:32:   ]
+2026-03-23T18:38:32: }
+2026-03-23T18:38:36: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+2026-03-23T18:38:36: [dotenv@17.3.1] injecting env (10) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+2026-03-23T18:38:36: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:36: Error: Cannot find module './services/admin-service'
+2026-03-23T18:38:36: Require stack:
+2026-03-23T18:38:36: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:38:36: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:38:36:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:38:36:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:38:36:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:38:36:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:38:36:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:38:36:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:38:36:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:38:36:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:38:36:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:38:36:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:38:36:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:38:36:   requireStack: [
+2026-03-23T18:38:36:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:38:36:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:38:36:   ]
+2026-03-23T18:38:36: }

@@ -1779,3 +1779,324 @@
 2026-03-23T18:36:39:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
 2026-03-23T18:36:39:   ]
 2026-03-23T18:36:39: }
+2026-03-23T18:36:43: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:36:43: Error: Cannot find module './leads'
+2026-03-23T18:36:43: Require stack:
+2026-03-23T18:36:43: - C:\Users\fear7\Desktop\Bot_noct\src\repositories\index.js
+2026-03-23T18:36:43: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:36:43:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:36:43:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:36:43:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:36:43:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\repositories\index.js:4:29)
+2026-03-23T18:36:43:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:36:43:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:36:43:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:36:43:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:36:43:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:36:43:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:36:43:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:36:43:   requireStack: [
+2026-03-23T18:36:43:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\repositories\\index.js',
+2026-03-23T18:36:43:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:36:43:   ]
+2026-03-23T18:36:43: }
+2026-03-23T18:36:47: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:36:47: Error: Cannot find module './leads'
+2026-03-23T18:36:47: Require stack:
+2026-03-23T18:36:47: - C:\Users\fear7\Desktop\Bot_noct\src\repositories\index.js
+2026-03-23T18:36:47: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:36:47:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:36:47:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:36:47:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:36:47:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\repositories\index.js:4:29)
+2026-03-23T18:36:47:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:36:47:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:36:47:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:36:47:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:36:47:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:36:47:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:36:47:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:36:47:   requireStack: [
+2026-03-23T18:36:47:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\repositories\\index.js',
+2026-03-23T18:36:47:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:36:47:   ]
+2026-03-23T18:36:47: }
+2026-03-23T18:36:51: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:36:52: Error: Cannot find module './leads'
+2026-03-23T18:36:52: Require stack:
+2026-03-23T18:36:52: - C:\Users\fear7\Desktop\Bot_noct\src\repositories\index.js
+2026-03-23T18:36:52: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:36:52:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:36:52:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:36:52:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:36:52:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\repositories\index.js:4:29)
+2026-03-23T18:36:52:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:36:52:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:36:52:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:36:52:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:36:52:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:36:52:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:36:52:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:36:52:   requireStack: [
+2026-03-23T18:36:52:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\repositories\\index.js',
+2026-03-23T18:36:52:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:36:52:   ]
+2026-03-23T18:36:52: }
+2026-03-23T18:36:56: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:36:56: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:12: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:16: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:17: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:32: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:37: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:53: [WARN] This Redis server's `default` user does not require a password, but a password was supplied
+2026-03-23T18:37:57: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:37:57: Error: Cannot find module './services/admin-service'
+2026-03-23T18:37:57: Require stack:
+2026-03-23T18:37:57: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:37:57: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:37:57:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:37:57:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:37:57:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:37:57:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:37:57:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:37:57:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:37:57:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:37:57:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:37:57:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:37:57:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:37:57:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:37:57:   requireStack: [
+2026-03-23T18:37:57:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:37:57:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:37:57:   ]
+2026-03-23T18:37:57: }
+2026-03-23T18:38:01: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:01: Error: Cannot find module './services/admin-service'
+2026-03-23T18:38:01: Require stack:
+2026-03-23T18:38:01: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:38:01: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:38:01:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:38:01:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:38:01:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:38:01:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:38:01:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:38:01:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:38:01:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:38:01:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:38:01:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:38:01:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:38:01:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:38:01:   requireStack: [
+2026-03-23T18:38:01:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:38:01:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:38:01:   ]
+2026-03-23T18:38:01: }
+2026-03-23T18:38:06: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:06: Error: Cannot find module './services/admin-service'
+2026-03-23T18:38:06: Require stack:
+2026-03-23T18:38:06: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:38:06: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:38:06:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:38:06:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:38:06:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:38:06:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:38:06:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:38:06:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:38:06:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:38:06:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:38:06:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:38:06:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:38:06:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:38:06:   requireStack: [
+2026-03-23T18:38:06:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:38:06:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:38:06:   ]
+2026-03-23T18:38:06: }
+2026-03-23T18:38:10: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:10: Error: Cannot find module './services/admin-service'
+2026-03-23T18:38:10: Require stack:
+2026-03-23T18:38:10: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:38:10: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:38:10:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:38:10:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:38:10:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:38:10:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:38:10:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:38:10:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:38:10:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:38:10:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:38:10:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:38:10:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:38:10:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:38:10:   requireStack: [
+2026-03-23T18:38:10:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:38:10:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:38:10:   ]
+2026-03-23T18:38:10: }
+2026-03-23T18:38:14: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:14: Error: Cannot find module './services/admin-service'
+2026-03-23T18:38:14: Require stack:
+2026-03-23T18:38:14: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:38:14: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:38:14:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:38:14:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:38:14:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:38:14:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:38:14:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:38:14:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:38:14:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:38:14:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:38:14:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:38:14:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:38:14:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:38:14:   requireStack: [
+2026-03-23T18:38:14:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:38:14:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:38:14:   ]
+2026-03-23T18:38:14: }
+2026-03-23T18:38:19: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:19: Error: Cannot find module './services/admin-service'
+2026-03-23T18:38:19: Require stack:
+2026-03-23T18:38:19: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:38:19: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:38:19:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:38:19:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:38:19:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:38:19:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:38:19:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:38:19:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:38:19:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:38:19:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:38:19:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:38:19:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:38:19:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:38:19:   requireStack: [
+2026-03-23T18:38:19:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:38:19:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:38:19:   ]
+2026-03-23T18:38:19: }
+2026-03-23T18:38:23: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:23: Error: Cannot find module './services/admin-service'
+2026-03-23T18:38:23: Require stack:
+2026-03-23T18:38:23: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:38:23: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:38:23:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:38:23:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:38:23:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:38:23:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:38:23:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:38:23:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:38:23:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:38:23:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:38:23:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:38:23:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:38:23:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:38:23:   requireStack: [
+2026-03-23T18:38:23:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:38:23:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:38:23:   ]
+2026-03-23T18:38:23: }
+2026-03-23T18:38:27: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:28: Error: Cannot find module './services/admin-service'
+2026-03-23T18:38:28: Require stack:
+2026-03-23T18:38:28: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:38:28: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:38:28:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:38:28:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:38:28:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:38:28:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:38:28:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:38:28:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:38:28:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:38:28:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:38:28:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:38:28:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:38:28:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:38:28:   requireStack: [
+2026-03-23T18:38:28:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:38:28:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:38:28:   ]
+2026-03-23T18:38:28: }
+2026-03-23T18:38:32: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:32: Error: Cannot find module './services/admin-service'
+2026-03-23T18:38:32: Require stack:
+2026-03-23T18:38:32: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:38:32: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:38:32:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:38:32:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:38:32:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:38:32:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:38:32:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:38:32:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:38:32:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:38:32:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:38:32:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:38:32:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:38:32:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:38:32:   requireStack: [
+2026-03-23T18:38:32:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:38:32:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:38:32:   ]
+2026-03-23T18:38:32: }
+2026-03-23T18:38:36: [WARN] TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling
+2026-03-23T18:38:36: Error: Cannot find module './services/admin-service'
+2026-03-23T18:38:36: Require stack:
+2026-03-23T18:38:36: - C:\Users\fear7\Desktop\Bot_noct\src\bot.js
+2026-03-23T18:38:36: - C:\Users\fear7\Desktop\Bot_noct\index.js
+2026-03-23T18:38:36:     at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+2026-03-23T18:38:36:     at Hook._require.Module.require (C:\Users\fear7\AppData\Roaming\npm\node_modules\pm2\node_modules\require-in-the-middle\index.js:81:25)
+2026-03-23T18:38:36:     at require (node:internal/modules/helpers:152:16)
+2026-03-23T18:38:36:     at Object.<anonymous> (C:\Users\fear7\Desktop\Bot_noct\src\bot.js:7:32)
+2026-03-23T18:38:36:     at Module._compile (node:internal/modules/cjs/loader:1812:14)
+2026-03-23T18:38:36:     at Object..js (node:internal/modules/cjs/loader:1943:10)
+2026-03-23T18:38:36:     at Module.load (node:internal/modules/cjs/loader:1533:32)
+2026-03-23T18:38:36:     at Module._load (node:internal/modules/cjs/loader:1335:12)
+2026-03-23T18:38:36:     at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+2026-03-23T18:38:36:     at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12) {
+2026-03-23T18:38:36:   code: 'MODULE_NOT_FOUND',
+2026-03-23T18:38:36:   requireStack: [
+2026-03-23T18:38:36:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\src\\bot.js',
+2026-03-23T18:38:36:     'C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js'
+2026-03-23T18:38:36:   ]
+2026-03-23T18:38:36: }

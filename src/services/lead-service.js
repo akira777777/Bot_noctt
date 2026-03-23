@@ -103,6 +103,28 @@ function createLeadService({
     };
 
     repos.sessions.set(clientId, "lead", "quantity", draft);
+    if (repos.leadEvents) {
+      repos.leadEvents.create({
+        leadId: null,
+        clientTelegramId: clientId,
+        eventType: "lead_flow_started",
+        sourcePayload: draft.sourcePayload,
+        metadata: {
+          product_code: draft.productCode,
+          product_name: draft.productName,
+        },
+      });
+      repos.leadEvents.create({
+        leadId: null,
+        clientTelegramId: clientId,
+        eventType: "product_selected",
+        sourcePayload: draft.sourcePayload,
+        metadata: {
+          product_code: draft.productCode,
+          product_name: draft.productName,
+        },
+      });
+    }
     return {
       resumed: false,
       step: "quantity",
@@ -139,12 +161,25 @@ function createLeadService({
     }
 
     const nextStep = "confirm";
-    return moveToStep(clientId, nextStep, session, {
+    const result = moveToStep(clientId, nextStep, session, {
       quantity,
       contactLabel:
         session?.draft?.contactLabel || buildTelegramContactLabel(client, clientId),
       isConfirmEditing: false,
     });
+    if (repos.leadEvents) {
+      repos.leadEvents.create({
+        leadId: null,
+        clientTelegramId: clientId,
+        eventType: "quantity_submitted",
+        sourcePayload: result.draft.sourcePayload || null,
+        metadata: {
+          quantity,
+          product_code: result.draft.productCode,
+        },
+      });
+    }
+    return result;
   }
 
   function saveComment({ clientId, session, comment }) {
@@ -163,26 +198,54 @@ function createLeadService({
       };
     }
     const nextStep = "confirm";
-    return moveToStep(clientId, nextStep, session, {
+    const result = moveToStep(clientId, nextStep, session, {
       comment: trimmed,
       isConfirmEditing: false,
     });
+    if (repos.leadEvents) {
+      repos.leadEvents.create({
+        leadId: null,
+        clientTelegramId: clientId,
+        eventType: "comment_added",
+        sourcePayload: result.draft.sourcePayload || null,
+      });
+    }
+    return result;
   }
 
   function skipComment({ clientId, session }) {
     const nextStep = "confirm";
-    return moveToStep(clientId, nextStep, session, {
+    const result = moveToStep(clientId, nextStep, session, {
       comment: "",
       isConfirmEditing: false,
     });
+    if (repos.leadEvents) {
+      repos.leadEvents.create({
+        leadId: null,
+        clientTelegramId: clientId,
+        eventType: "comment_skipped",
+        sourcePayload: result.draft.sourcePayload || null,
+      });
+    }
+    return result;
   }
 
   function useTelegramContact({ client, session }) {
     const contactLabel = buildTelegramContactLabel(client, client.id);
-    return moveToStep(client.id, "confirm", session, {
+    const result = moveToStep(client.id, "confirm", session, {
       contactLabel,
       isConfirmEditing: false,
     });
+    if (repos.leadEvents) {
+      repos.leadEvents.create({
+        leadId: null,
+        clientTelegramId: client.id,
+        eventType: "contact_confirmed",
+        sourcePayload: result.draft.sourcePayload || null,
+        metadata: { via: "telegram" },
+      });
+    }
+    return result;
   }
 
   function requestCustomContact({ clientId, session }) {
@@ -202,10 +265,33 @@ function createLeadService({
       return { ok: false, error: "Контакт не должен превышать 500 символов." };
     }
 
-    return moveToStep(clientId, "confirm", session, {
+    const result = moveToStep(clientId, "confirm", session, {
       contactLabel: value,
       isConfirmEditing: false,
     });
+    if (repos.leadEvents) {
+      repos.leadEvents.create({
+        leadId: null,
+        clientTelegramId: clientId,
+        eventType: "contact_confirmed",
+        sourcePayload: result.draft.sourcePayload || null,
+        metadata: { via: "custom" },
+      });
+    }
+    return result;
+  }
+
+  function cancelLeadDraft(clientId) {
+    const session = repos.sessions.get(clientId);
+    if (session?.flow === "lead" && repos.leadEvents) {
+      repos.leadEvents.create({
+        leadId: null,
+        clientTelegramId: clientId,
+        eventType: "lead_cancelled",
+        sourcePayload: session.draft.sourcePayload || null,
+      });
+    }
+    repos.sessions.clear(clientId);
   }
 
   function startConfirmEdit({ clientId, session, field }) {
@@ -289,6 +375,19 @@ function createLeadService({
         `Создана заявка #${result.id}: ${result.product_name} x${result.quantity}`,
       );
 
+      if (repos.leadEvents) {
+        repos.leadEvents.create({
+          leadId: result.id,
+          clientTelegramId: client.id,
+          eventType: "lead_confirmed",
+          sourcePayload: session.draft.sourcePayload || null,
+          metadata: {
+            product_code: result.product_code,
+            quantity: result.quantity,
+          },
+        });
+      }
+
       repos.sessions.clear(client.id);
       return result;
     });
@@ -322,6 +421,7 @@ function createLeadService({
   return {
     getSession,
     clearSession,
+    cancelLeadDraft,
     startLeadDraft,
     saveQuantity,
     saveComment,

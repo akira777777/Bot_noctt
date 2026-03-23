@@ -17,6 +17,19 @@ function createStatsRepo(db) {
     GROUP BY date(created_at)
     ORDER BY day ASC
   `);
+  const countOverdueLeads = db.prepare(`
+    SELECT COUNT(*) AS cnt
+    FROM leads
+    WHERE (
+      status = 'new'
+      AND first_admin_reply_at IS NULL
+      AND created_at <= datetime('now', '-15 minutes')
+    ) OR (
+      status = 'in_progress'
+      AND next_follow_up_at IS NOT NULL
+      AND next_follow_up_at <= CURRENT_TIMESTAMP
+    )
+  `);
 
   return {
     leadCountsByStatus() {
@@ -30,6 +43,9 @@ function createStatsRepo(db) {
     },
     dailyLeadCounts(days = 30) {
       return dailyLeadCounts.all(`-${days}`);
+    },
+    countOverdueLeads() {
+      return countOverdueLeads.get().cnt;
     },
   };
 }
