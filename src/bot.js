@@ -23,6 +23,7 @@ const {
   handleClientStatus,
   handleClientText,
   handleClientAction,
+  handleClientMedia,
 } = require("./handlers/client");
 const { logError } = require("./utils/logger");
 
@@ -102,6 +103,21 @@ function createBot({ db, repos }) {
     }
 
     await handleClientText(ctx, deps);
+  });
+
+  // Photo and document support
+  bot.on("photo", async (ctx) => {
+    if (ctx.chat.type !== "private" || ctx.from.id === deps.adminId) {
+      return;
+    }
+    await handleClientMedia(ctx, deps, "photo");
+  });
+
+  bot.on("document", async (ctx) => {
+    if (ctx.chat.type !== "private" || ctx.from.id === deps.adminId) {
+      return;
+    }
+    await handleClientMedia(ctx, deps, "document");
   });
 
   return bot;

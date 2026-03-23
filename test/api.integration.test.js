@@ -8,7 +8,6 @@ const Database = require("better-sqlite3");
 const { runMigrations } = require("../src/db/migrations");
 const { createRepositories } = require("../src/repositories");
 const { createWebServer } = require("../src/web/server");
-const { buildTelegramInitData } = require("./helpers/telegram-init-data");
 
 function createTempDb() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "bot-noct-api-"));
@@ -39,15 +38,14 @@ async function stopServer(server) {
         reject(error);
         return;
       }
-
       resolve();
     });
   });
 }
 
-test("admin API normalizes legacy lead filters and updates", async (t) => {
+test("admin API manages leads with status filters", async (t) => {
   const adminId = 9001;
-  const botToken = "bot:test-token";
+  const apiSecret = "test-api-secret";
   const { db, cleanup } = createTempDb();
   const repos = createRepositories(db);
 
@@ -77,69 +75,59 @@ test("admin API normalizes legacy lead filters and updates", async (t) => {
     status: "new",
   });
 
-  const app = createWebServer({ repos, botToken, adminId });
+  const app = createWebServer({
+    repos,
+    conversationService: {},
+    bot: {},
+    adminId,
+    apiSecret,
+    corsOrigin: null,
+    isProduction: false,
+  });
   const server = await startServer(app);
   t.after(async () => {
     await stopServer(server);
     cleanup();
   });
 
-  const initData = buildTelegramInitData({
-    botToken,
-    user: {
-      id: adminId,
-      username: "admin",
-      first_name: "Admin",
-    },
-  });
   const baseUrl = `http://127.0.0.1:${server.address().port}`;
   const headers = {
-    Authorization: `tma ${initData}`,
+    "X-Api-Key": apiSecret,
     "Content-Type": "application/json",
   };
 
-  const meResponse = await fetch(`${baseUrl}/api/admin/me`, { headers });
-  assert.equal(meResponse.status, 200);
-
-  const newResponse = await fetch(`${baseUrl}/api/leads?status=new`, {
-    headers,
-  });
-  const openResponse = await fetch(`${baseUrl}/api/leads?status=open`, {
+  // List leads filtered by status
+  const newResponse = await fetch(`${baseUrl}/api/admin/leads?status=new`, {
     headers,
   });
   const newPayload = await newResponse.json();
-  const openPayload = await openResponse.json();
-
+  assert.equal(newResponse.status, 200);
   assert.deepEqual(
     newPayload.leads.map((lead) => lead.id),
     [createdLead.id],
   );
-  assert.deepEqual(
-    openPayload.leads.map((lead) => lead.id),
-    [createdLead.id],
-  );
-  assert.equal(openPayload.leads[0].status, "new");
 
-  const patchLegacyAliasResponse = await fetch(
-    `${baseUrl}/api/leads/${createdLead.id}/status`,
+  // Update status
+  const patchResponse = await fetch(
+    `${baseUrl}/api/admin/leads/${createdLead.id}/status`,
     {
       method: "PATCH",
       headers,
-      body: JSON.stringify({ status: "open" }),
+      body: JSON.stringify({ status: "in_progress" }),
     },
   );
-  const patchLegacyAliasPayload = await patchLegacyAliasResponse.json();
-  assert.equal(patchLegacyAliasResponse.status, 200);
-  assert.equal(patchLegacyAliasPayload.lead.status, "new");
+  const patchPayload = await patchResponse.json();
+  assert.equal(patchResponse.status, 200);
+  assert.equal(patchPayload.lead.status, "in_progress");
 
+  // Invalid status returns 400
   const patchInvalidResponse = await fetch(
-    `${baseUrl}/api/leads/${createdLead.id}/status`,
+    `${baseUrl}/api/admin/leads/${createdLead.id}/status`,
     {
       method: "PATCH",
       headers,
       body: JSON.stringify({ status: "unknown" }),
     },
   );
-
   assert.equal(patchInvalidResponse.status, 400);
 });

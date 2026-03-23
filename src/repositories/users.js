@@ -14,6 +14,10 @@ function createUsersRepo(db) {
     `SELECT * FROM users WHERE lower(username) = lower(?)`,
   );
   const list = db.prepare(`SELECT * FROM users ORDER BY updated_at DESC LIMIT ?`);
+  const listPaginated = db.prepare(
+    `SELECT * FROM users ORDER BY updated_at DESC LIMIT ? OFFSET ?`,
+  );
+  const countAll = db.prepare(`SELECT COUNT(*) AS cnt FROM users`);
   const listClients = db.prepare(
     `SELECT * FROM users WHERE role = 'client' AND is_blocked = 0`,
   );
@@ -36,6 +40,12 @@ function createUsersRepo(db) {
     },
     list(limit = 100) {
       return list.all(limit);
+    },
+    listPaginated(limit, offset) {
+      return listPaginated.all(limit, offset);
+    },
+    countAll() {
+      return countAll.get().cnt;
     },
     listClients() {
       return listClients.all();

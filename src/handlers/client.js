@@ -32,6 +32,7 @@ const {
   resolveStartAction,
 } = require("../utils/source-payload");
 const { createRateLimiter } = require("../utils/rate-limiter");
+const { formatClientLabel } = require("../utils/formatters");
 
 // 5 messages per 60 seconds per user
 const messageLimiter = createRateLimiter(5, 60 * 1000);
@@ -459,6 +460,71 @@ async function handleClientAction(ctx, deps) {
   }
 }
 
+async function handleClientMedia(ctx, deps, mediaType) {
+  if (!messageLimiter.isAllowed(ctx.from.id)) {
+    await ctx.reply(rateLimitMessage());
+    return;
+  }
+
+  const user = deps.services.conversation.upsertTelegramUser(
+    ctx.from,
+    "client",
+  );
+  if (isUserBlocked(user)) {
+    await rejectBlocked(ctx);
+    return;
+  }
+
+  const sourcePayload = getCurrentSourcePayload(deps.repos, ctx.from.id);
+  const conversation = deps.services.conversation.ensureConversation(
+    ctx.from.id,
+    sourcePayload,
+  );
+
+  let fileId;
+  let caption = "";
+
+  if (mediaType === "photo") {
+    const photos = ctx.message.photo;
+    fileId = photos[photos.length - 1].file_id;
+    caption = ctx.message.caption || "";
+  } else {
+    fileId = ctx.message.document.file_id;
+    caption = ctx.message.caption || "";
+  }
+
+  const messageData = JSON.stringify({ file_id: fileId, caption });
+  deps.repos.messages.create(
+    conversation.id,
+    "client",
+    ctx.from.id,
+    messageData,
+    mediaType,
+  );
+
+  const clientLabel = formatClientLabel(ctx.from, ctx.chat.id);
+  const adminCaption = `${clientLabel}\n${caption || "(без подписи)"}`;
+
+  try {
+    if (mediaType === "photo") {
+      await deps.bot.telegram.sendPhoto(deps.adminId, fileId, {
+        caption: adminCaption,
+      });
+    } else {
+      await deps.bot.telegram.sendDocument(deps.adminId, fileId, {
+        caption: adminCaption,
+      });
+    }
+  } catch {
+    await deps.bot.telegram.sendMessage(
+      deps.adminId,
+      `${clientLabel} отправил(а) ${mediaType === "photo" ? "фото" : "документ"}, но не удалось переслать.`,
+    );
+  }
+
+  await ctx.reply(clientMessageDelivered(), backToMainKeyboard());
+}
+
 module.exports = {
   handleClientStart,
   handleClientHelp,
@@ -466,4 +532,5 @@ module.exports = {
   handleClientStatus,
   handleClientText,
   handleClientAction,
+  handleClientMedia,
 };

@@ -1,7 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git -C /c/Users/fear7/Desktop/Bot_noct/.claude/worktrees/interesting-noyce push)"
+      "Bash(git -C /c/Users/fear7/Desktop/Bot_noct/.claude/worktrees/interesting-noyce push)",
       "mcp__plugin_serena_serena__list_dir",
       "mcp__plugin_serena_serena__read_file",
       "mcp__plugin_serena_serena__activate_project",

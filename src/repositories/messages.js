@@ -1,7 +1,7 @@
 function createMessagesRepo(db) {
   const insert = db.prepare(`
-    INSERT INTO messages (conversation_id, sender_role, sender_telegram_id, message_text)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO messages (conversation_id, sender_role, sender_telegram_id, message_text, message_type)
+    VALUES (?, ?, ?, ?, ?)
   `);
   const listByConversation = db.prepare(`
     SELECT * FROM messages
@@ -14,8 +14,8 @@ function createMessagesRepo(db) {
   );
 
   return {
-    create(conversationId, senderRole, senderTelegramId, text) {
-      insert.run(conversationId, senderRole, senderTelegramId, text);
+    create(conversationId, senderRole, senderTelegramId, text, messageType = "text") {
+      insert.run(conversationId, senderRole, senderTelegramId, text, messageType);
     },
     listByConversation(conversationId, limit = 10) {
       return listByConversation.all(conversationId, limit);

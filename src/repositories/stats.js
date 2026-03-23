@@ -10,6 +10,13 @@ function createStatsRepo(db) {
     LIMIT ?
   `);
   const totalLeads = db.prepare(`SELECT COUNT(*) AS cnt FROM leads`);
+  const dailyLeadCounts = db.prepare(`
+    SELECT date(created_at) AS day, COUNT(*) AS cnt
+    FROM leads
+    WHERE created_at >= date('now', ? || ' days')
+    GROUP BY date(created_at)
+    ORDER BY day ASC
+  `);
 
   return {
     leadCountsByStatus() {
@@ -20,6 +27,9 @@ function createStatsRepo(db) {
     },
     totalLeads() {
       return totalLeads.get().cnt;
+    },
+    dailyLeadCounts(days = 30) {
+      return dailyLeadCounts.all(`-${days}`);
     },
   };
 }

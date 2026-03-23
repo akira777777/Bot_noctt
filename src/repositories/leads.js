@@ -51,11 +51,43 @@ function createLeadsRepo(db) {
     ORDER BY l.created_at DESC
     LIMIT 10000
   `);
+  const listPaginated = db.prepare(`
+    SELECT l.*, u.username, u.first_name, u.last_name
+    FROM leads l
+    LEFT JOIN users u ON u.telegram_id = l.client_telegram_id
+    ORDER BY l.created_at DESC
+    LIMIT ? OFFSET ?
+  `);
+  const listByStatusPaginated = db.prepare(`
+    SELECT l.*, u.username, u.first_name, u.last_name
+    FROM leads l
+    LEFT JOIN users u ON u.telegram_id = l.client_telegram_id
+    WHERE l.status = ?
+    ORDER BY l.created_at DESC
+    LIMIT ? OFFSET ?
+  `);
+  const countAll = db.prepare(`SELECT COUNT(*) AS cnt FROM leads`);
+  const countByStatus = db.prepare(
+    `SELECT COUNT(*) AS cnt FROM leads WHERE status = ?`,
+  );
   const updateStatus = db.prepare(`
     UPDATE leads
     SET status = ?, updated_at = CURRENT_TIMESTAMP
     WHERE id = ?
     RETURNING *
+  `);
+  const listStale = db.prepare(`
+    SELECT l.*, u.username, u.first_name, u.last_name
+    FROM leads l
+    LEFT JOIN users u ON u.telegram_id = l.client_telegram_id
+    WHERE l.status = ?
+      AND l.updated_at < datetime('now', ? || ' minutes')
+    ORDER BY l.updated_at ASC
+    LIMIT ?
+  `);
+  const countNewToday = db.prepare(`
+    SELECT COUNT(*) AS cnt FROM leads
+    WHERE created_at >= date('now')
   `);
 
   return {
@@ -68,6 +100,18 @@ function createLeadsRepo(db) {
     listAll() {
       return listAll.all();
     },
+    listPaginated(limit, offset) {
+      return listPaginated.all(limit, offset);
+    },
+    listByStatusPaginated(status, limit, offset) {
+      return listByStatusPaginated.all(status, limit, offset);
+    },
+    countAll() {
+      return countAll.get().cnt;
+    },
+    countByStatus(status) {
+      return countByStatus.get(status).cnt;
+    },
     getById(id) {
       return getById.get(id);
     },
@@ -79,6 +123,12 @@ function createLeadsRepo(db) {
     },
     updateStatus(id, status) {
       return updateStatus.get(status, id);
+    },
+    listStale(status, olderThanMinutes, limit = 20) {
+      return listStale.all(status, `-${olderThanMinutes}`, limit);
+    },
+    countNewToday() {
+      return countNewToday.get().cnt;
     },
   };
 }
