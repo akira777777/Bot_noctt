@@ -41,6 +41,9 @@ const {
   createShutdownHandler,
   createMemoryMonitor,
 } = require("./src/utils/graceful-shutdown");
+const {
+  launchTelegramRuntime,
+} = require("./src/services/telegram-runtime");
 const { inspect } = require("node:util");
 // Import logger with fallback to console if module fails
 let log;
@@ -105,18 +108,6 @@ function startHttpServer(app, port) {
     const server = app.listen(port, () => resolve(server));
     server.once("error", reject);
   });
-}
-
-function withTimeout(promise, timeoutMs, label) {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) => {
-      setTimeout(
-        () => reject(new Error(`${label} timed out after ${timeoutMs}ms`)),
-        timeoutMs,
-      );
-    }),
-  ]);
 }
 
 function shouldUseWebhookMode(webhookDomain) {
@@ -418,27 +409,16 @@ async function bootstrap() {
 
     // Launch bot
     try {
-      const telegramStartupTimeoutMs = TELEGRAM_STARTUP_TIMEOUT_MS;
-      if (webhookEnabled) {
-        const webhookUrl = `${WEBHOOK_DOMAIN}/webhook/${BOT_TOKEN}`;
-        await withTimeout(
-          bot.telegram.setWebhook(webhookUrl),
-          telegramStartupTimeoutMs,
-          "setWebhook",
-        );
-        resources.botLaunched = true;
-        log.info("Bot started in webhook mode", { webhookUrl });
-      } else {
-        // Ensure polling mode is not blocked by an old webhook configuration.
-        await withTimeout(
-          bot.telegram.deleteWebhook({ drop_pending_updates: false }),
-          telegramStartupTimeoutMs,
-          "deleteWebhook",
-        );
-        await withTimeout(bot.launch(), telegramStartupTimeoutMs, "bot.launch");
-        resources.botLaunched = true;
-        log.info("Bot started in polling mode");
-      }
+      const launchedBot = await launchTelegramRuntime({
+        bot,
+        webhookEnabled,
+        webhookDomain: WEBHOOK_DOMAIN,
+        botToken: BOT_TOKEN,
+        timeoutMs: TELEGRAM_STARTUP_TIMEOUT_MS,
+        log,
+      });
+      resources.botLaunched = true;
+      log.info(`Bot started in ${launchedBot.mode} mode`, launchedBot.details);
     } catch (error) {
       if (isProduction && !allowBotLaunchFailureInProduction) {
         throw error;
