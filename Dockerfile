@@ -36,25 +36,6 @@ COPY package*.json ./
 RUN npm ci
 
 # -----------------------------------------------------------------------------
-# Stage 3: Build webapp
-# -----------------------------------------------------------------------------
-FROM node:20-alpine AS webapp-builder
-
-RUN apk add --no-cache \
-    python3 \
-    make \
-    g++
-
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm ci
-
-COPY webapp/ ./webapp/
-
-RUN npm run build:web
-
-# -----------------------------------------------------------------------------
 # Stage 4: Production
 # -----------------------------------------------------------------------------
 FROM node:20-alpine AS production
@@ -79,8 +60,6 @@ COPY --from=deps /app/node_modules ./node_modules
 # Copy application code
 COPY --chown=appuser:appgroup . .
 
-# Copy built webapp (from builder stage if available, otherwise skip)
-COPY --chown=appuser:appgroup webapp/dist/ ./webapp/dist/ 2>/dev/null || true
 
 # Create data directory for SQLite
 RUN mkdir -p data && chown appuser:appgroup data
@@ -93,7 +72,7 @@ EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://localhost:3000/healthz || exit 1
 
 # Start application
 CMD ["node", "index.js"]

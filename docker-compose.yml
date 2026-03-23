@@ -50,7 +50,7 @@ services:
   bot-dev:
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     container_name: bot_noct_dev
     restart: no
     ports:
@@ -66,7 +66,6 @@ services:
       - CORS_ORIGIN=http://localhost:5173
     volumes:
       - ./src:/app/src:ro
-      - ./webapp/src:/app/webapp/src:ro
       - ./index.js:/app/index.js:ro
       - bot_data:/app/data
     command: node --watch --inspect=0.0.0.0:9229 index.js
@@ -74,22 +73,24 @@ services:
       - bot_network
 
   # ---------------------------------------------------------------------------
-  # Webapp (React + Vite dev server)
+  # Web dashboard (Next.js dev server)
   # ---------------------------------------------------------------------------
-  webapp:
-    build:
-      context: .
-      dockerfile: Dockerfile.webapp
-    container_name: bot_noct_webapp
+  web:
+    image: node:20-alpine
+    container_name: bot_noct_web
     restart: no
     ports:
-      - "5173:5173"
+      - "5173:3000"
     environment:
-      - VITE_API_URL=http://bot:3000
+      - NODE_ENV=development
+      - PORT=3000
+      - API_URL=http://bot:3000
+      - API_SECRET=${API_SECRET:-}
     volumes:
-      - ./webapp:/app:ro
-      - webapp_node_modules:/app/node_modules
-    command: npm run dev:web -- --host 0.0.0.0
+      - ./web:/app/web:ro
+      - web_node_modules:/app/web/node_modules
+    working_dir: /app
+    command: sh -c "cd /app/web && npm ci && npm run dev -- --hostname 0.0.0.0"
     networks:
       - bot_network
     depends_on:
@@ -122,7 +123,7 @@ volumes:
       type: none
       o: bind
       device: ./data
-  webapp_node_modules:
+  web_node_modules:
     driver: local
 
 # =============================================================================

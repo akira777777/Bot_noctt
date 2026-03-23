@@ -8,21 +8,10 @@
       "port": 3081
     },
     {
-      "name": "Vite webapp (dev:web)",
+      "name": "Web dashboard (dev:web)",
       "runtimeExecutable": "npm.cmd",
       "runtimeArgs": ["run", "dev:web"],
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["node_modules/vite/bin/vite.js", "--config", "webapp/vite.config.js"],
-      "name": "Backend (Node)",
-      "runtimeExecutable": "D:/Nodejs/node.exe",
-      "runtimeArgs": ["index.js"],
-      "port": 10000
-    },
-    {
-      "name": "Frontend (Vite)",
-      "runtimeExecutable": "D:/Nodejs/node.exe",
-      "runtimeArgs": ["D:/Nodejs/node_modules/npm/bin/npx-cli.js", "vite", "--config", "webapp/vite.config.js"],
-      "port": 5173
+      "port": 3000
     }
   ]
 }
