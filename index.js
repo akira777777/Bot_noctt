@@ -71,6 +71,10 @@ async function teardown(resources, reason) {
     return;
   }
 
+  if (resources.sessionCleanupTimer) {
+    clearInterval(resources.sessionCleanupTimer);
+  }
+
   if (resources.botLaunched) {
     stopBot(resources.bot, reason);
   }
@@ -143,6 +147,15 @@ async function bootstrap() {
     logInfo("Bot started");
 
     await configureAdminMenu(bot);
+
+    // Clean up expired sessions on startup, then every hour
+    repos.sessions.clearExpired();
+    const sessionCleanupTimer = setInterval(
+      () => repos.sessions.clearExpired(),
+      60 * 60 * 1000,
+    );
+    sessionCleanupTimer.unref();
+    resources.sessionCleanupTimer = sessionCleanupTimer;
 
     return resources;
   } catch (error) {

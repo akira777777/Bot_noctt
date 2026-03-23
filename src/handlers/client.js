@@ -23,6 +23,7 @@ const {
   contactManagerMessage,
   clientMessageDelivered,
   clientLeadStatusMessage,
+  rateLimitMessage,
 } = require("../ui/messages");
 const { buildCatalogIntro, buildProductCard } = require("../ui/catalog-view");
 const { safeAnswerCbQuery } = require("../utils/telegram");
@@ -30,12 +31,13 @@ const {
   parseSourcePayload,
   resolveStartAction,
 } = require("../utils/source-payload");
+const { createRateLimiter } = require("../utils/rate-limiter");
+
+// 5 messages per 60 seconds per user
+const messageLimiter = createRateLimiter(5, 60 * 1000);
 
 const HOME_ACTION_LABELS = {
-  "Оставить заявку": "lead:start",
-  Каталог: "catalog:root",
-  "Связаться с менеджером": "contact:manager",
-  "Как оформить заказ": "info:how_to_order",
+  "💬 Что вас интересует?": "contact:manager",
 };
 
 function getCurrentSourcePayload(repos, clientId, fallbackSource = null) {
@@ -261,6 +263,11 @@ async function handleClientStatus(ctx, deps) {
 }
 
 async function handleClientText(ctx, deps) {
+  if (!messageLimiter.isAllowed(ctx.from.id)) {
+    await ctx.reply(rateLimitMessage());
+    return;
+  }
+
   const user = deps.services.conversation.upsertTelegramUser(
     ctx.from,
     "client",
