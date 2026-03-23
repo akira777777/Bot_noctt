@@ -11,7 +11,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: ${PORT:-3000}
-      TELEGRAM_DELIVERY_MODE: ${TELEGRAM_DELIVERY_MODE:-webhook}
+      TELEGRAM_DELIVERY_MODE: webhook
       WEBHOOK_DOMAIN: ${WEBHOOK_DOMAIN:-}
       BOT_TOKEN: ${BOT_TOKEN}
       ADMIN_ID: ${ADMIN_ID}
