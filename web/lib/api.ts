@@ -33,11 +33,18 @@ export function fetchCatalog() {
   }>("/catalog");
 }
 
-export function fetchLeadStatus(id: number) {
+export function fetchLeadStatus(trackingToken: string) {
   return apiFetch<{
     ok: boolean;
-    lead: { id: number; status: string; status_label: string; product_name: string; quantity: number; created_at: string };
-  }>(`/lead/${id}/status`);
+    lead: {
+      tracking_token: string;
+      status: string;
+      status_label: string;
+      product_name: string;
+      quantity: number;
+      created_at: string;
+    };
+  }>(`/lead/track/${trackingToken}/status`);
 }
 
 export function submitWebLead(data: {
@@ -47,7 +54,7 @@ export function submitWebLead(data: {
   contact_label: string;
   source?: string;
 }) {
-  return apiFetch<{ ok: boolean; lead: { id: number } }>("/lead", {
+  return apiFetch<{ ok: boolean; lead: { tracking_token: string; status: string } }>("/lead", {
     method: "POST",
     body: JSON.stringify(data),
   });

@@ -1,3 +1,7 @@
+const {
+  generateLeadTrackingToken,
+} = require("../domain/tracking-token");
+
 function createLeadsRepo(db) {
   const create = db.prepare(`
     INSERT INTO leads (
@@ -8,7 +12,8 @@ function createLeadsRepo(db) {
       comment,
       contact_label,
       source_payload,
-      status
+      status,
+      tracking_token
     )
     VALUES (
       @client_telegram_id,
@@ -18,11 +23,17 @@ function createLeadsRepo(db) {
       @comment,
       @contact_label,
       @source_payload,
-      @status
+      @status,
+      @tracking_token
     )
     RETURNING *
   `);
   const getById = db.prepare(`SELECT * FROM leads WHERE id = ?`);
+  const getByTrackingToken = db.prepare(`
+    SELECT *
+    FROM leads
+    WHERE tracking_token = ?
+  `);
   const getLatestByClient = db.prepare(`
     SELECT * FROM leads
     WHERE client_telegram_id = ?
@@ -92,7 +103,26 @@ function createLeadsRepo(db) {
 
   return {
     create(payload) {
-      return create.get(payload);
+      const nextPayload = {
+        ...payload,
+        tracking_token: payload.tracking_token || generateLeadTrackingToken(),
+      };
+
+      try {
+        return create.get(nextPayload);
+      } catch (error) {
+        if (
+          !payload.tracking_token &&
+          typeof error?.message === "string" &&
+          error.message.includes("idx_leads_tracking_token")
+        ) {
+          return create.get({
+            ...payload,
+            tracking_token: generateLeadTrackingToken(),
+          });
+        }
+        throw error;
+      }
     },
     list(limit = 10) {
       return list.all(limit);
@@ -114,6 +144,9 @@ function createLeadsRepo(db) {
     },
     getById(id) {
       return getById.get(id);
+    },
+    getByTrackingToken(trackingToken) {
+      return getByTrackingToken.get(trackingToken);
     },
     getLatestByClient(telegramId) {
       return getLatestByClient.get(telegramId);

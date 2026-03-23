@@ -18,13 +18,20 @@ interface Props {
 }
 
 export default async function TrackLeadPage({ params }: Props) {
-  const { id } = await params;
+  const { id: trackingToken } = await params;
 
-  let lead: { id: number; status: string; status_label: string; product_name: string; quantity: number; created_at: string } | null = null;
+  let lead: {
+    tracking_token: string;
+    status: string;
+    status_label: string;
+    product_name: string;
+    quantity: number;
+    created_at: string;
+  } | null = null;
   let error = "";
 
   try {
-    const res = await fetchLeadStatus(Number(id));
+    const res = await fetchLeadStatus(trackingToken);
     lead = res.lead;
   } catch {
     error = "Заявка не найдена";
@@ -40,7 +47,7 @@ export default async function TrackLeadPage({ params }: Props) {
           ← Каталог
         </Link>
         <h1 className="text-3xl font-bold tracking-tight mt-4">
-          Заявка {lead ? <span className="font-mono">#{lead.id}</span> : ""}
+          Заявка {lead ? <span className="font-mono">{lead.tracking_token}</span> : ""}
         </h1>
       </div>
 

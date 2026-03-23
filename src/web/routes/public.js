@@ -2,6 +2,9 @@ const express = require("express");
 const { validateWebLead } = require("../validators/lead");
 const { createRateLimiter } = require("../middleware/rate-limit");
 const { getLeadStatusLabel } = require("../../domain/lead-status");
+const {
+  normalizeLeadTrackingToken,
+} = require("../../domain/tracking-token");
 
 function createPublicRoutes({ repos, bot, adminId, isProduction }) {
   const router = express.Router();
@@ -18,18 +21,14 @@ function createPublicRoutes({ repos, bot, adminId, isProduction }) {
     res.json({ ok: true, products });
   });
 
-  // GET /api/lead/:id/status — public lead status (no PII)
-  router.get("/lead/:id/status", (req, res) => {
-    if (isProduction) {
-      return res.status(404).json({ ok: false, error: "Not found" });
+  // GET /api/lead/track/:token/status — public lead status by opaque token
+  router.get("/lead/track/:token/status", (req, res) => {
+    const trackingToken = normalizeLeadTrackingToken(req.params.token);
+    if (!trackingToken) {
+      return res.status(400).json({ ok: false, error: "Invalid tracking token" });
     }
 
-    const id = Number(req.params.id);
-    if (!id) {
-      return res.status(400).json({ ok: false, error: "Invalid lead ID" });
-    }
-
-    const lead = repos.leads.getById(id);
+    const lead = repos.leads.getByTrackingToken(trackingToken);
     if (!lead) {
       return res.status(404).json({ ok: false, error: "Lead not found" });
     }
@@ -37,7 +36,7 @@ function createPublicRoutes({ repos, bot, adminId, isProduction }) {
     res.json({
       ok: true,
       lead: {
-        id: lead.id,
+        tracking_token: lead.tracking_token,
         product_name: lead.product_name,
         quantity: lead.quantity,
         status: lead.status,
@@ -88,7 +87,7 @@ function createPublicRoutes({ repos, bot, adminId, isProduction }) {
     res.status(201).json({
       ok: true,
       lead: {
-        id: lead.id,
+        tracking_token: lead.tracking_token,
         status: lead.status,
       },
     });

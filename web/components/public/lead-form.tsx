@@ -15,7 +15,7 @@ export function LeadForm({ preselectedProduct }: { preselectedProduct: string })
   const [comment, setComment] = useState("");
   const [contactLabel, setContactLabel] = useState("");
   const [loading, setLoading] = useState(false);
-  const [createdLeadId, setCreatedLeadId] = useState<number | null>(null);
+  const [createdLeadToken, setCreatedLeadToken] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCatalog().then(({ products: prods }) => {
@@ -42,7 +42,7 @@ export function LeadForm({ preselectedProduct }: { preselectedProduct: string })
         contact_label: contactLabel.trim(),
         source: "web_form",
       });
-      setCreatedLeadId(result.lead.id);
+      setCreatedLeadToken(result.lead.tracking_token);
       setStep("success");
     } catch (err) {
       alert(err instanceof Error ? err.message : "Ошибка при отправке заявки");
@@ -51,16 +51,18 @@ export function LeadForm({ preselectedProduct }: { preselectedProduct: string })
     }
   }
 
-  if (step === "success" && createdLeadId) {
+  if (step === "success" && createdLeadToken) {
     return (
       <div className="rounded-xl border border-border bg-card p-8 text-center space-y-4">
         <p className="text-2xl font-bold">Заявка отправлена!</p>
-        <p className="text-muted-foreground">Номер заявки: <span className="font-mono">#{createdLeadId}</span></p>
+        <p className="text-muted-foreground">
+          Токен отслеживания: <span className="font-mono">{createdLeadToken}</span>
+        </p>
         <p className="text-sm text-muted-foreground">Мы свяжемся с вами в ближайшее время.</p>
         <div className="flex gap-3 justify-center mt-4">
           {canTrackLead && (
             <Link
-              href={`/track/${createdLeadId}`}
+              href={`/track/${createdLeadToken}`}
               className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
             >
               Отследить статус

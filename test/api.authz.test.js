@@ -81,7 +81,7 @@ test("admin endpoints fail closed when API secret is not configured", async (t) 
   assert.match(payload.error, /disabled/i);
 });
 
-test("public lead status endpoint is disabled in production", async (t) => {
+test("public lead status endpoint resolves by tracking token in production", async (t) => {
   const adminId = 9001;
   const { db, cleanup } = createTempDb("bot-noct-authz-");
   const repos = createRepositories(db);
@@ -122,33 +122,21 @@ test("public lead status endpoint is disabled in production", async (t) => {
   });
 
   const baseUrl = `http://127.0.0.1:${server.address().port}`;
-  const response = await fetch(`${baseUrl}/api/lead/${lead.id}/status`);
-  assert.equal(response.status, 404);
+  const response = await fetch(
+    `${baseUrl}/api/lead/track/${lead.tracking_token}/status`,
+  );
+  assert.equal(response.status, 200);
+
+  const payload = await response.json();
+  assert.equal(payload.ok, true);
+  assert.equal(payload.lead.tracking_token, lead.tracking_token);
+  assert.equal(payload.lead.status, "new");
 });
 
-test("public lead status endpoint remains available in non-production", async (t) => {
+test("public lead status endpoint rejects malformed tracking tokens", async (t) => {
   const adminId = 9001;
   const { db, cleanup } = createTempDb("bot-noct-authz-");
   const repos = createRepositories(db);
-
-  repos.users.upsert({
-    telegram_id: 1001,
-    username: "client_1001",
-    first_name: "Client",
-    last_name: null,
-    role: "client",
-  });
-
-  const lead = repos.leads.create({
-    client_telegram_id: 1001,
-    product_code: "basic",
-    product_name: "Базовый пакет",
-    quantity: 3,
-    comment: "",
-    contact_label: "Telegram",
-    source_payload: "web_form",
-    status: "in_progress",
-  });
 
   const app = createWebServer({
     repos,
@@ -167,11 +155,10 @@ test("public lead status endpoint remains available in non-production", async (t
   });
 
   const baseUrl = `http://127.0.0.1:${server.address().port}`;
-  const response = await fetch(`${baseUrl}/api/lead/${lead.id}/status`);
-  assert.equal(response.status, 200);
+  const response = await fetch(`${baseUrl}/api/lead/track/not-a-token/status`);
+  assert.equal(response.status, 400);
 
   const payload = await response.json();
-  assert.equal(payload.ok, true);
-  assert.equal(payload.lead.id, lead.id);
-  assert.equal(payload.lead.status, "in_progress");
+  assert.equal(payload.ok, false);
+  assert.match(payload.error, /tracking token/i);
 });
