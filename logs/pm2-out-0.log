@@ -1930,3 +1930,45 @@
 2026-03-23T16:52:28: {"level":"INFO","time":"2026-03-23T15:52:28.497Z","service":"telegram-bot","env":"production","msg":"Shutdown handlers registered"}
 2026-03-23T16:52:28: {"level":"INFO","time":"2026-03-23T15:52:28.497Z","service":"telegram-bot","env":"production","msg":"Application bootstrap completed successfully","uptime":15.9765076}
 2026-03-23T16:52:28: {"level":"INFO","time":"2026-03-23T15:52:28.497Z","service":"telegram-bot","env":"production","msg":"Application is ready","uptime":15.9765833,"pid":27236}
+2026-03-23T17:06:32: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: 🛡️ auth for agents: https://vestauth.com
+2026-03-23T17:06:32: [dotenv@17.3.1] injecting env (16) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+2026-03-23T17:06:32: {"ts":"2026-03-23T16:06:32.923Z","level":"warn","msg":"TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling"}
+2026-03-23T17:06:33: {"level":"INFO","time":"2026-03-23T16:06:33.472Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T17:06:33: {"level":"INFO","time":"2026-03-23T16:06:33.481Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T17:06:33: {"level":"INFO","time":"2026-03-23T16:06:33.504Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T17:06:33: {"level":"INFO","time":"2026-03-23T16:06:33.506Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T17:06:33: {"level":"INFO","time":"2026-03-23T16:06:33.507Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T17:06:33: {"level":"INFO","time":"2026-03-23T16:06:33.507Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T17:06:33: {"level":"INFO","time":"2026-03-23T16:06:33.507Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":true}}
+2026-03-23T17:06:33: {"level":"INFO","time":"2026-03-23T16:06:33.515Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T17:06:33: {"level":"INFO","time":"2026-03-23T16:06:33.515Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T17:06:33: {"level":"INFO","time":"2026-03-23T16:06:33.515Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T17:06:33: {"level":"WARN","time":"2026-03-23T16:06:33.517Z","service":"telegram-bot","env":"production","msg":"Webhook mode requested but domain is not usable; using polling","webhookDomain":null}
+2026-03-23T17:06:33: {"level":"INFO","time":"2026-03-23T16:06:33.517Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"webhook","effectiveMode":"polling"}
+2026-03-23T17:06:33: {"level":"INFO","time":"2026-03-23T16:06:33.543Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3060"}
+2026-03-23T17:06:48: {"level":"WARN","time":"2026-03-23T16:06:48.646Z","service":"telegram-bot","env":"production","msg":"Bot launch failed; continuing in API-only mode","error":"bot.launch timed out after 15000ms","details":{"name":"Error","message":"bot.launch timed out after 15000ms","stack":"Error: bot.launch timed out after 15000ms\n    at Timeout._onTimeout (C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js:108:22)\n    at listOnTimeout (node:internal/timers:605:17)\n    at process.processTimers (node:internal/timers:541:7)"},"productionFallbackEnabled":true}
+2026-03-23T17:06:48: {"level":"INFO","time":"2026-03-23T16:06:48.647Z","service":"telegram-bot","env":"production","msg":"Memory monitor started","checkInterval":30000}
+2026-03-23T17:06:48: {"level":"INFO","time":"2026-03-23T16:06:48.647Z","service":"telegram-bot","env":"production","msg":"Shutdown handlers registered"}
+2026-03-23T17:06:48: {"level":"INFO","time":"2026-03-23T16:06:48.647Z","service":"telegram-bot","env":"production","msg":"Application bootstrap completed successfully","uptime":17.1252564}
+2026-03-23T17:06:48: {"level":"INFO","time":"2026-03-23T16:06:48.647Z","service":"telegram-bot","env":"production","msg":"Application is ready","uptime":17.1253067,"pid":31928}
+2026-03-23T17:07:05: [dotenv@17.3.1] injecting env (0) from .env.local -- tip: ⚙️  suppress all logs with { quiet: true }
+2026-03-23T17:07:05: [dotenv@17.3.1] injecting env (16) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+2026-03-23T17:07:05: {"ts":"2026-03-23T16:07:05.318Z","level":"warn","msg":"TELEGRAM_DELIVERY_MODE=webhook but WEBHOOK_DOMAIN is not set; app will fallback to polling"}
+2026-03-23T17:07:05: {"level":"INFO","time":"2026-03-23T16:07:05.770Z","service":"telegram-bot","env":"production","msg":"Starting application bootstrap","environment":"production","nodeVersion":"v24.14.0"}
+2026-03-23T17:07:05: {"level":"INFO","time":"2026-03-23T16:07:05.778Z","service":"telegram-bot","env":"production","msg":"Database initialized"}
+2026-03-23T17:07:05: {"level":"INFO","time":"2026-03-23T16:07:05.796Z","service":"telegram-bot","env":"production","msg":"Redis client connecting"}
+2026-03-23T17:07:05: {"level":"INFO","time":"2026-03-23T16:07:05.798Z","service":"telegram-bot","env":"production","msg":"Redis client ready"}
+2026-03-23T17:07:05: {"level":"INFO","time":"2026-03-23T16:07:05.798Z","service":"telegram-bot","env":"production","msg":"Redis cache connected successfully"}
+2026-03-23T17:07:05: {"level":"INFO","time":"2026-03-23T16:07:05.798Z","service":"telegram-bot","env":"production","msg":"Cache service initialized","mode":"redis"}
+2026-03-23T17:07:05: {"level":"INFO","time":"2026-03-23T16:07:05.799Z","service":"telegram-bot","env":"production","msg":"Initializing queue service","redisConfig":{"host":"localhost","port":6379,"db":0,"hasPassword":true}}
+2026-03-23T17:07:05: {"level":"INFO","time":"2026-03-23T16:07:05.806Z","service":"telegram-bot","env":"production","msg":"Recurring jobs scheduled"}
+2026-03-23T17:07:05: {"level":"INFO","time":"2026-03-23T16:07:05.806Z","service":"telegram-bot","env":"production","msg":"Queue service initialized successfully"}
+2026-03-23T17:07:05: {"level":"INFO","time":"2026-03-23T16:07:05.806Z","service":"telegram-bot","env":"production","msg":"Queue service initialized"}
+2026-03-23T17:07:05: {"level":"WARN","time":"2026-03-23T16:07:05.807Z","service":"telegram-bot","env":"production","msg":"Webhook mode requested but domain is not usable; using polling","webhookDomain":null}
+2026-03-23T17:07:05: {"level":"INFO","time":"2026-03-23T16:07:05.807Z","service":"telegram-bot","env":"production","msg":"Telegram delivery mode resolved","requestedMode":"webhook","effectiveMode":"polling"}
+2026-03-23T17:07:05: {"level":"INFO","time":"2026-03-23T16:07:05.834Z","service":"telegram-bot","env":"production","msg":"HTTP server started on port 3060"}
+2026-03-23T17:07:20: {"level":"WARN","time":"2026-03-23T16:07:20.943Z","service":"telegram-bot","env":"production","msg":"Bot launch failed; continuing in API-only mode","error":"bot.launch timed out after 15000ms","details":{"name":"Error","message":"bot.launch timed out after 15000ms","stack":"Error: bot.launch timed out after 15000ms\n    at Timeout._onTimeout (C:\\Users\\fear7\\Desktop\\Bot_noct\\index.js:108:22)\n    at listOnTimeout (node:internal/timers:605:17)\n    at process.processTimers (node:internal/timers:541:7)"},"productionFallbackEnabled":true}
+2026-03-23T17:07:20: {"level":"INFO","time":"2026-03-23T16:07:20.944Z","service":"telegram-bot","env":"production","msg":"Memory monitor started","checkInterval":30000}
+2026-03-23T17:07:20: {"level":"INFO","time":"2026-03-23T16:07:20.944Z","service":"telegram-bot","env":"production","msg":"Shutdown handlers registered"}
+2026-03-23T17:07:20: {"level":"INFO","time":"2026-03-23T16:07:20.944Z","service":"telegram-bot","env":"production","msg":"Application bootstrap completed successfully","uptime":15.8356723}
+2026-03-23T17:07:20: {"level":"INFO","time":"2026-03-23T16:07:20.944Z","service":"telegram-bot","env":"production","msg":"Application is ready","uptime":15.8357381,"pid":23200}

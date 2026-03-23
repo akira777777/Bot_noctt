@@ -3,6 +3,7 @@ const assert = require("node:assert/strict");
 
 const { createRepositories } = require("../src/repositories");
 const { createWebServer } = require("../src/web/server");
+const { clientLeadTakenMessage } = require("../src/ui/messages");
 const {
   createTempDb,
   startServer,
@@ -134,4 +135,83 @@ test("admin CSV export stays protected by API key auth", async (t) => {
     headers: { "X-Api-Key": apiSecret },
   });
   assert.equal(authorized.status, 200);
+});
+
+test("admin API status update reuses lead workflow side effects", async (t) => {
+  const adminId = 9001;
+  const apiSecret = "test-api-secret";
+  const { db, cleanup } = createTempDb("bot-noct-api-");
+  const repos = createRepositories(db);
+  const sentMessages = [];
+
+  repos.users.upsert({
+    telegram_id: adminId,
+    username: "admin",
+    first_name: "Admin",
+    last_name: null,
+    role: "admin",
+  });
+  repos.users.upsert({
+    telegram_id: 1001,
+    username: "client_1001",
+    first_name: "Client",
+    last_name: null,
+    role: "client",
+  });
+
+  const createdLead = repos.leads.create({
+    client_telegram_id: 1001,
+    product_code: "basic",
+    product_name: "Базовый пакет",
+    quantity: 2,
+    comment: "",
+    contact_label: "Telegram",
+    source_payload: "from_channel",
+    status: "new",
+  });
+
+  const app = createWebServer({
+    repos,
+    conversationService: {},
+    bot: {
+      telegram: {
+        async sendMessage(chatId, text) {
+          sentMessages.push({ chatId, text });
+          return { ok: true };
+        },
+      },
+    },
+    adminId,
+    apiSecret,
+    corsOrigin: null,
+    isProduction: false,
+  });
+  const server = await startServer(app);
+  t.after(async () => {
+    await stopServer(server);
+    cleanup();
+  });
+
+  const baseUrl = `http://127.0.0.1:${server.address().port}`;
+  const headers = {
+    "X-Api-Key": apiSecret,
+    "Content-Type": "application/json",
+  };
+
+  const patchResponse = await fetch(
+    `${baseUrl}/api/admin/leads/${createdLead.id}/status`,
+    {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({ status: "in_progress" }),
+    },
+  );
+
+  assert.equal(patchResponse.status, 200);
+  assert.deepEqual(sentMessages, [
+    {
+      chatId: 1001,
+      text: clientLeadTakenMessage(),
+    },
+  ]);
 });
