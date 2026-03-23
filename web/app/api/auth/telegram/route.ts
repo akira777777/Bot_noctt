@@ -22,7 +22,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "Access denied" }, { status: 403 });
   }
 
-  const token = createSessionToken(Number(data.id));
+  let token = "";
+  try {
+    token = createSessionToken(Number(data.id));
+  } catch (error) {
+    return NextResponse.json({ ok: false, error: "Session auth is not configured" }, { status: 503 });
+  }
 
   const response = NextResponse.json({ ok: true });
   response.cookies.set(SESSION_COOKIE, token, {

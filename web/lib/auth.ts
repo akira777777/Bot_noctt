@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import crypto from "crypto";
 
-const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-change-me";
+const JWT_SECRET = process.env.JWT_SECRET?.trim() || "";
 const BOT_TOKEN = process.env.BOT_TOKEN || "";
 const ADMIN_ID = Number(process.env.ADMIN_ID || "0");
 const SESSION_COOKIE = "bot_noct_session";
@@ -16,7 +16,22 @@ interface TelegramLoginData {
   hash: string;
 }
 
+function safeCompare(left: string, right: string): boolean {
+  const leftBuffer = Buffer.from(left, "utf8");
+  const rightBuffer = Buffer.from(right, "utf8");
+
+  if (leftBuffer.length !== rightBuffer.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(leftBuffer, rightBuffer);
+}
+
 export function verifyTelegramLogin(data: TelegramLoginData): boolean {
+  if (!BOT_TOKEN) {
+    return false;
+  }
+
   const { hash, ...rest } = data;
 
   // Check auth_date is not too old (1 day)
@@ -35,7 +50,7 @@ export function verifyTelegramLogin(data: TelegramLoginData): boolean {
   const secretKey = crypto.createHash("sha256").update(BOT_TOKEN).digest();
   const hmac = crypto.createHmac("sha256", secretKey).update(checkString).digest("hex");
 
-  return hmac === hash;
+  return safeCompare(hmac, hash);
 }
 
 export function isAdmin(telegramId: number): boolean {
@@ -43,6 +58,10 @@ export function isAdmin(telegramId: number): boolean {
 }
 
 export function createSessionToken(telegramId: number): string {
+  if (!JWT_SECRET) {
+    throw new Error("JWT_SECRET is required for web sessions");
+  }
+
   const payload = JSON.stringify({ sub: telegramId, iat: Math.floor(Date.now() / 1000) });
   const encoded = Buffer.from(payload).toString("base64url");
   const signature = crypto.createHmac("sha256", JWT_SECRET).update(encoded).digest("base64url");
@@ -50,11 +69,13 @@ export function createSessionToken(telegramId: number): string {
 }
 
 export function verifySessionToken(token: string): { sub: number } | null {
+  if (!JWT_SECRET) return null;
+
   const [encoded, signature] = token.split(".");
   if (!encoded || !signature) return null;
 
   const expectedSig = crypto.createHmac("sha256", JWT_SECRET).update(encoded).digest("base64url");
-  if (signature !== expectedSig) return null;
+  if (!safeCompare(signature, expectedSig)) return null;
 
   try {
     const payload = JSON.parse(Buffer.from(encoded, "base64url").toString());
