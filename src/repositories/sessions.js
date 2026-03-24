@@ -1,3 +1,5 @@
+const { logWarn } = require("../utils/logger");
+
 function createSessionsRepo(db) {
   const SESSION_TTL_HOURS = 72;
   const set = db.prepare(`
@@ -62,7 +64,12 @@ function createSessionsRepo(db) {
     let draft = {};
     try {
       draft = JSON.parse(session.draft_json || "{}");
-    } catch (_) {}
+    } catch (err) {
+      logWarn("Session draft_json parse failed; resetting draft", {
+        telegramId: session.telegram_id,
+        error: err.message,
+      });
+    }
 
     return { ...session, draft };
   }

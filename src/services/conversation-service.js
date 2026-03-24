@@ -5,6 +5,7 @@ const {
 } = require("../ui/messages");
 const { formatClientLabel } = require("../utils/formatters");
 const { safeSendMessage } = require("../utils/telegram");
+const { logError } = require("../utils/logger");
 
 function createConversationService({ repos, bot, adminId, aiService = null }) {
   function ensureTelegramDeliveryAvailable() {
@@ -67,7 +68,9 @@ function createConversationService({ repos, bot, adminId, aiService = null }) {
           repos.messages.create(conversation.id, "admin", adminId, aiReply);
           await safeSendMessage(bot, client.id, `🤖 ${aiReply}`);
         }
-      } catch (_) {}
+      } catch (err) {
+        logError("AI auto-reply failed", err, { clientId: client.id });
+      }
     }
 
     return conversation;
