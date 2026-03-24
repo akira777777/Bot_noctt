@@ -15,6 +15,8 @@ const DEFAULT_QUICK_TEMPLATES = {
     "После подтверждения заявки подберём удобный вариант доставки.",
 };
 
+const { logWarn } = require("../utils/logger");
+
 function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
   function upsertAdmin(from) {
     repos.users.upsert({
@@ -253,7 +255,11 @@ function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
       try {
         await bot.telegram.sendMessage(client.telegram_id, text);
         sent++;
-      } catch (_) {
+      } catch (err) {
+        logWarn("Broadcast delivery failed for client", {
+          clientId: client.telegram_id,
+          error: err.message,
+        });
         failed++;
       }
     }

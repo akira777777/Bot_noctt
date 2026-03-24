@@ -34,6 +34,16 @@ function optionalUrlString(key, fallbackKeys = []) {
     return null;
   }
 
+  if (
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname === "0.0.0.0" ||
+    hostname.endsWith(".local")
+  ) {
+    emitConfigWarning(`${key} points to a local address which cannot receive Telegram webhooks; treating it as unset`);
+    return null;
+  }
+
   return value;
 }
 

@@ -8,6 +8,7 @@ const messageTypeMigration = require("./007_message_type");
 const leadTrackingTokenMigration = require("./008_lead_tracking_token");
 const leadWorkflowOpsMigration = require("./009_lead_workflow_ops");
 const lawfulInquiryCleanupMigration = require("./010_lawful_inquiry_cleanup");
+const moreIndexesMigration = require("./011_more_indexes");
 
 const migrations = [
   initialMigration,
@@ -20,6 +21,7 @@ const migrations = [
   leadTrackingTokenMigration,
   leadWorkflowOpsMigration,
   lawfulInquiryCleanupMigration,
+  moreIndexesMigration,
 ];
 
 function ensureMigrationTable(db) {

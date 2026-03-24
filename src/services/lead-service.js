@@ -3,6 +3,7 @@ const { adminLeadCard } = require("../ui/messages");
 const { formatClientLabel } = require("../utils/formatters");
 const { safeSendMessage } = require("../utils/telegram");
 const { logError } = require("../utils/logger");
+const { normalizeText } = require("../utils/text");
 
 function createLeadService({
   db,
@@ -46,13 +47,6 @@ function createLeadService({
       ...(session?.draft || {}),
       ...patch,
     };
-  }
-
-  function normalizeText(value) {
-    if (typeof value !== "string") {
-      return "";
-    }
-    return value.trim();
   }
 
   function moveToStep(clientId, nextStep, session, patch = {}) {
