@@ -23,7 +23,12 @@
       "Bash(vercel ls:*)",
       "Bash(curl -s \"https://bot-noct-6yx5p3w1k-akirtas-projects.vercel.app/healthz\")",
       "Bash(vercel alias:*)",
-      "Bash(curl -s \"https://bot-noct-akirtas-projects.vercel.app/healthz\")"
+      "Bash(curl -s \"https://bot-noct-akirtas-projects.vercel.app/healthz\")",
+      "Bash(curl -s \"https://bot-noctt.vercel.app/api/catalog\")",
+      "Bash(curl -si \"https://bot-noctt.vercel.app/api/catalog\")",
+      "Bash(vercel env:*)",
+      "Bash(git add:*)",
+      "Bash(git push:*)"
     ]
   }
 }
