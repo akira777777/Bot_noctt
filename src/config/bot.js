@@ -3,6 +3,7 @@ const {
   emitConfigWarning,
   requiredString,
   optionalString,
+  optionalUrlString,
   optionalInteger,
   optionalBoolean,
 } = require("./helpers");
@@ -24,7 +25,7 @@ function resolveBotConfig(runtimeConfig) {
     : runtimeConfig.isProduction
       ? "webhook"
       : "polling";
-  const WEBHOOK_DOMAIN = optionalString("WEBHOOK_DOMAIN", [
+  const WEBHOOK_DOMAIN = optionalUrlString("WEBHOOK_DOMAIN", [
     "RENDER_EXTERNAL_URL",
   ]);
   const TELEGRAM_STARTUP_TIMEOUT_MS = optionalInteger(
