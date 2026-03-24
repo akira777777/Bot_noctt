@@ -5,17 +5,23 @@ const DEFAULT_QUICK_TEMPLATES = {
     "Проверяю сроки и доступный объём. Вернусь с ответом в ближайшее время.",
   contact:
     "Чтобы не потерять заявку, пришлите удобный контакт для связи, если Telegram неудобен.",
-  ack:
-    "Заявка уже в работе. Я на связи и вернусь с апдейтом в рамках текущего окна ответа.",
-  proposal:
-    "Подготовлю предложение с условиями и пришлю его в этом чате.",
-  payment:
-    "Подготовлю предложение с условиями и пришлю его в этом чате.",
-  delivery:
-    "После подтверждения заявки подберём удобный вариант доставки.",
+  ack: "Заявка уже в работе. Я на связи и вернусь с апдейтом в рамках текущего окна ответа.",
+  payment: "После подтверждения деталей пришлю доступные варианты оплаты.",
+  delivery: "После подтверждения заявки подберём удобный вариант доставки.",
 };
 
-function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
+const { logError } = require("../utils/logger");
+
+/** Delay between direct sends when the Bull queue is unavailable (ms). */
+const BROADCAST_DIRECT_DELAY_MS = 55;
+
+const ADMIN_PAGE_SIZE = 8;
+
+function createAdminService({
+  repos,
+  templates = DEFAULT_QUICK_TEMPLATES,
+  queueService = null,
+} = {}) {
   function upsertAdmin(from) {
     repos.users.upsert({
       telegram_id: from.id,
@@ -54,6 +60,36 @@ function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
     return repos.leads.list(limit);
   }
 
+  function listRecentDialogsPage(offset = 0) {
+    const rows = repos.conversations.listRecentPaginated(
+      ADMIN_PAGE_SIZE + 1,
+      offset,
+    );
+    return {
+      rows: rows.slice(0, ADMIN_PAGE_SIZE),
+      hasMore: rows.length > ADMIN_PAGE_SIZE,
+    };
+  }
+
+  function listInboxPage(offset = 0) {
+    const rows = repos.leads.listPriorityInboxPaginated(
+      ADMIN_PAGE_SIZE + 1,
+      offset,
+    );
+    return {
+      rows: rows.slice(0, ADMIN_PAGE_SIZE),
+      hasMore: rows.length > ADMIN_PAGE_SIZE,
+    };
+  }
+
+  function listRecentLeadsPage(offset = 0) {
+    const rows = repos.leads.listPaginated(ADMIN_PAGE_SIZE + 1, offset);
+    return {
+      rows: rows.slice(0, ADMIN_PAGE_SIZE),
+      hasMore: rows.length > ADMIN_PAGE_SIZE,
+    };
+  }
+
   function getLatestLeadByClient(clientId) {
     return repos.leads.getLatestByClient(clientId);
   }
@@ -70,12 +106,8 @@ function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
     return repos.leads.updateStatus(leadId, "called_back");
   }
 
-  function markLeadProposalSent(leadId) {
-    return repos.leads.updateStatus(leadId, "proposal_sent");
-  }
-
   function markLeadAwaitingPayment(leadId) {
-    return markLeadProposalSent(leadId);
+    return repos.leads.updateStatus(leadId, "awaiting_payment");
   }
 
   function markLeadFulfilled(leadId) {
@@ -138,7 +170,9 @@ function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
   }
 
   function getDashboardWindowStats(hours) {
-    const sinceIso = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
+    const sinceIso = new Date(
+      Date.now() - hours * 60 * 60 * 1000,
+    ).toISOString();
     const draftsStarted = repos.leadEvents.countByTypeSince(
       "lead_flow_started",
       sinceIso,
@@ -247,14 +281,38 @@ function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
 
   async function broadcastToClients(bot, text) {
     const clients = repos.users.listClients();
+    const chatIds = clients.map((c) => c.telegram_id);
+
+    if (
+      queueService &&
+      typeof queueService.queueBulkMessages === "function" &&
+      chatIds.length > 0
+    ) {
+      try {
+        const job = await queueService.queueBulkMessages(chatIds, text, {});
+        const results = await job.finished();
+        const sent = results.filter((r) => r.success).length;
+        const failed = results.filter((r) => !r.success).length;
+        return { total: clients.length, sent, failed };
+      } catch (err) {
+        logError("broadcast queue failed; falling back to direct send", err);
+      }
+    }
+
     let sent = 0;
     let failed = 0;
-    for (const client of clients) {
+    for (let i = 0; i < clients.length; i++) {
+      const client = clients[i];
       try {
         await bot.telegram.sendMessage(client.telegram_id, text);
         sent++;
       } catch (_) {
         failed++;
+      }
+      if (i < clients.length - 1) {
+        await new Promise((resolve) =>
+          setTimeout(resolve, BROADCAST_DIRECT_DELAY_MS),
+        );
       }
     }
     return { total: clients.length, sent, failed };
@@ -290,14 +348,17 @@ function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
     getActiveClientId,
     selectClient,
     clearSelectedClient,
+    ADMIN_PAGE_SIZE,
     listRecentDialogs,
     listInbox,
     listRecentLeads,
+    listRecentDialogsPage,
+    listInboxPage,
+    listRecentLeadsPage,
     getLatestLeadByClient,
     takeLead,
     closeLead,
     markLeadCalledBack,
-    markLeadProposalSent,
     markLeadAwaitingPayment,
     markLeadFulfilled,
     getTemplate,

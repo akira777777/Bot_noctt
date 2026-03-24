@@ -25,6 +25,9 @@ const {
   clientLeadFulfilledMessage,
   conversationResolvedMessage,
   rateLimitMessage,
+  nonAdminCommandMessage,
+  callbackRateLimitMessage,
+  botErrorUserMessage,
   clientLeadStatusMessage,
 } = require("../src/ui/messages");
 const {
@@ -112,6 +115,9 @@ test("message builders render lead and admin text variants", () => {
   assert.match(clientLeadFulfilledMessage(), /выполнена/i);
   assert.match(conversationResolvedMessage(), /обработан и закрыт/);
   assert.match(rateLimitMessage(), /слишком часто/);
+  assert.match(nonAdminCommandMessage(), /только администратору/);
+  assert.match(callbackRateLimitMessage(), /Слишком часто/);
+  assert.match(botErrorUserMessage(), /Произошла ошибка/);
   assert.match(clientLeadStatusMessage(null), /пока нет ни одной заявки/);
   assert.match(
     clientLeadStatusMessage({

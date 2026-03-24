@@ -1,11 +1,4 @@
-const {
-  generateLeadTrackingToken,
-} = require("../domain/tracking-token");
-const {
-  normalizeLeadRecord,
-  normalizeLeadRecords,
-  normalizeLeadStatus,
-} = require("../domain/lead-status");
+const { generateLeadTrackingToken } = require("../domain/tracking-token");
 
 function createLeadsRepo(db) {
   const create = db.prepare(`
@@ -22,7 +15,8 @@ function createLeadsRepo(db) {
       first_admin_reply_at,
       closed_reason,
       next_follow_up_at,
-      tracking_token
+      tracking_token,
+      line_items_json
     )
     VALUES (
       @client_telegram_id,
@@ -37,7 +31,8 @@ function createLeadsRepo(db) {
       @first_admin_reply_at,
       @closed_reason,
       @next_follow_up_at,
-      @tracking_token
+      @tracking_token,
+      @line_items_json
     )
     RETURNING *
   `);
@@ -222,6 +217,53 @@ function createLeadsRepo(db) {
       END ASC
     LIMIT ?
   `);
+  const listPriorityInboxPaginated = db.prepare(`
+    SELECT
+      c.*,
+      u.username,
+      u.first_name,
+      u.last_name,
+      l.id AS lead_id,
+      l.status AS lead_status,
+      l.product_name,
+      l.created_at AS lead_created_at,
+      l.updated_at AS lead_updated_at,
+      l.first_admin_reply_at,
+      l.next_follow_up_at,
+      (
+        SELECT m.message_text
+        FROM messages m
+        WHERE m.conversation_id = c.id
+        ORDER BY m.created_at DESC
+        LIMIT 1
+      ) AS last_message_text
+    FROM conversations c
+    LEFT JOIN users u ON u.telegram_id = c.client_telegram_id
+    LEFT JOIN leads l ON l.id = (
+      SELECT l2.id
+      FROM leads l2
+      WHERE l2.client_telegram_id = c.client_telegram_id
+        AND l2.status NOT IN ('closed', 'fulfilled')
+      ORDER BY l2.created_at DESC
+      LIMIT 1
+    )
+    ORDER BY
+      CASE
+        WHEN l.status = 'new' AND l.first_admin_reply_at IS NULL THEN 0
+        WHEN l.status = 'in_progress'
+          AND l.next_follow_up_at IS NOT NULL
+          AND l.next_follow_up_at <= CURRENT_TIMESTAMP THEN 1
+        ELSE 2
+      END ASC,
+      CASE
+        WHEN l.status = 'new' AND l.first_admin_reply_at IS NULL THEN l.created_at
+        WHEN l.status = 'in_progress'
+          AND l.next_follow_up_at IS NOT NULL
+          AND l.next_follow_up_at <= CURRENT_TIMESTAMP THEN l.next_follow_up_at
+        ELSE c.last_message_at
+      END ASC
+    LIMIT ? OFFSET ?
+  `);
   const countOverdue = db.prepare(`
     SELECT COUNT(*) AS cnt
     FROM leads
@@ -262,72 +304,70 @@ function createLeadsRepo(db) {
     create(payload) {
       const nextPayload = {
         ...payload,
-        status: normalizeLeadStatus(payload.status) || payload.status,
         tracking_token: payload.tracking_token || generateLeadTrackingToken(),
         first_admin_reply_at: payload.first_admin_reply_at || null,
         closed_reason: payload.closed_reason || null,
         next_follow_up_at: payload.next_follow_up_at || null,
         last_client_activity_at: payload.last_client_activity_at || null,
+        line_items_json: payload.line_items_json ?? null,
       };
 
       try {
-        return normalizeLeadRecord(create.get(nextPayload));
+        return create.get(nextPayload);
       } catch (error) {
         if (
           !payload.tracking_token &&
           typeof error?.message === "string" &&
           error.message.includes("idx_leads_tracking_token")
         ) {
-          return normalizeLeadRecord(create.get({
+          return create.get({
             ...nextPayload,
             tracking_token: generateLeadTrackingToken(),
-          }));
+          });
         }
         throw error;
       }
     },
     list(limit = 10) {
-      return normalizeLeadRecords(list.all(limit));
+      return list.all(limit);
     },
     listAll() {
-      return normalizeLeadRecords(listAll.all());
+      return listAll.all();
     },
     listPaginated(limit, offset) {
-      return normalizeLeadRecords(listPaginated.all(limit, offset));
+      return listPaginated.all(limit, offset);
     },
     listByStatusPaginated(status, limit, offset) {
-      return normalizeLeadRecords(
-        listByStatusPaginated.all(normalizeLeadStatus(status) || status, limit, offset),
-      );
+      return listByStatusPaginated.all(status, limit, offset);
     },
     countAll() {
       return countAll.get().cnt;
     },
     countByStatus(status) {
-      return countByStatus.get(normalizeLeadStatus(status) || status).cnt;
+      return countByStatus.get(status).cnt;
     },
     getById(id) {
-      return normalizeLeadRecord(getById.get(id));
+      return getById.get(id);
     },
     getByTrackingToken(trackingToken) {
-      return normalizeLeadRecord(getByTrackingToken.get(trackingToken));
+      return getByTrackingToken.get(trackingToken);
     },
     getLatestByClient(telegramId) {
-      return normalizeLeadRecord(getLatestByClient.get(telegramId));
+      return getLatestByClient.get(telegramId);
     },
     getLatestOpenByClient(telegramId) {
-      return normalizeLeadRecord(getLatestOpenByClient.get(telegramId));
+      return getLatestOpenByClient.get(telegramId);
     },
     getOpenByClientAndProduct(telegramId, productCode) {
-      return normalizeLeadRecord(getOpenByClientAndProduct.get(telegramId, productCode));
+      return getOpenByClientAndProduct.get(telegramId, productCode);
     },
     updateStatus(id, status, metadata = {}) {
-      return normalizeLeadRecord(updateStatus.get({
+      return updateStatus.get({
         id,
-        status: normalizeLeadStatus(status) || status,
+        status,
         closed_reason: metadata.closedReason || null,
         next_follow_up_at: metadata.nextFollowUpAt || null,
-      }));
+      });
     },
     recordFirstAdminReplyByClient(telegramId) {
       const lead = getLatestOpenByClient.get(telegramId);
@@ -356,11 +396,9 @@ function createLeadsRepo(db) {
       return countNewToday.get().cnt;
     },
     listPendingSlaReminder(reminderKey, limit = 20) {
-      return normalizeLeadRecords(
-        reminderKey === "60m"
-          ? listPendingSla60m.all(limit)
-          : listPendingSla15m.all(limit),
-      );
+      return reminderKey === "60m"
+        ? listPendingSla60m.all(limit)
+        : listPendingSla15m.all(limit);
     },
     markSlaReminderSent(leadId, reminderKey) {
       if (reminderKey === "60m") {
@@ -370,13 +408,16 @@ function createLeadsRepo(db) {
       markSla15mReminderSent.run(leadId);
     },
     listDueFollowUps(limit = 20) {
-      return normalizeLeadRecords(listDueFollowUps.all(limit));
+      return listDueFollowUps.all(limit);
     },
     markFollowUpReminderSent(leadId) {
       markFollowUpReminderSent.run(leadId);
     },
     listPriorityInbox(limit = 10) {
-      return normalizeLeadRecords(listPriorityInbox.all(limit));
+      return listPriorityInbox.all(limit);
+    },
+    listPriorityInboxPaginated(limit = 10, offset = 0) {
+      return listPriorityInboxPaginated.all(limit, offset);
     },
     countOverdue() {
       return countOverdue.get().cnt;

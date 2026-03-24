@@ -1,4 +1,7 @@
-const API_URL = process.env.API_URL || "http://localhost:3000";
+// In the browser, use relative URLs so they hit the Next.js proxy routes.
+// On the server (proxy routes themselves), use the real bot API URL.
+const API_URL =
+  typeof window !== "undefined" ? "" : (process.env.API_URL || "http://localhost:3000");
 
 export async function apiFetch<T = unknown>(
   path: string,

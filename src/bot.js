@@ -1,4 +1,5 @@
 const { Telegraf } = require("telegraf");
+const { AI_ENABLED, AI_MODEL } = require("./config/env");
 const {
   createConversationService,
 } = require("./services/conversation-service");
@@ -24,6 +25,7 @@ const {
   handleClientMedia,
 } = require("./handlers/client");
 const { createAiService } = require("./services/ai-service");
+const { createAiAgentService } = require("./services/ai-agent-service");
 const { logError } = require("./utils/logger");
 
 function createBot({

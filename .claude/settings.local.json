@@ -8,7 +8,22 @@
       "mcp__plugin_serena_serena__find_file",
       "mcp__plugin_serena_serena__create_text_file",
       "mcp__plugin_serena_serena__check_onboarding_performed",
-      "mcp__plugin_serena_serena__get_symbols_overview"
+      "mcp__plugin_serena_serena__get_symbols_overview",
+      "Bash(find /c/Users/fear7/Desktop/Bot_noct/web/app -type f -name *.tsx -o -name *.ts)",
+      "Bash(grep -r \"WEB_APP_URL\\\\|WEBAPP_URL\" /c/Users/fear7/Desktop/Bot_noct --include=*.js --include=*.ts --include=*.tsx)",
+      "Bash(grep -l \"WEB_APP_URL\\\\|webAppUrl\\\\|mini.app\" \"/c/Users/fear7/Desktop/Bot_noct/test\"/*.js)",
+      "Bash(find /c/Users/fear7/Desktop/Bot_noct/web/lib -type f \\\\\\(-name *.ts -o -name *.tsx \\\\\\))",
+      "Bash(find /c/Users/fear7/Desktop/Bot_noct/web/components -type f \\\\\\(-name *.ts -o -name *.tsx \\\\\\))",
+      "Bash(npm test:*)",
+      "Bash(npm list:*)",
+      "Bash(vercel --prod)",
+      "Bash(vercel --prod --yes)",
+      "Bash(node -e \":*)",
+      "Bash(grep -l \"createAiAgentService\\\\|AI_ENABLED\\\\|AI_MODEL\" c:/Users/fear7/Desktop/Bot_noct/src/services/*.js)",
+      "Bash(vercel ls:*)",
+      "Bash(curl -s \"https://bot-noct-6yx5p3w1k-akirtas-projects.vercel.app/healthz\")",
+      "Bash(vercel alias:*)",
+      "Bash(curl -s \"https://bot-noct-akirtas-projects.vercel.app/healthz\")"
     ]
   }
 }

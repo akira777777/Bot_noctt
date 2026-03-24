@@ -12,10 +12,20 @@ function createLeadService({
   catalogService,
   conversationService,
 }) {
+  const CART_PRODUCT_CODE = "__cart__";
+
   const EDITABLE_CONFIRM_STEPS = Object.freeze({
     quantity: "quantity",
     comment: "comment",
     contact: "contact",
+  });
+
+  const CART_BACK_TRANSITIONS = Object.freeze({
+    line_qty: "catalog",
+    comment: "catalog",
+    contact: "comment",
+    contact_custom: "contact",
+    confirm: "contact",
   });
 
   const BACK_TRANSITIONS = Object.freeze({
@@ -64,6 +74,35 @@ function createLeadService({
       nextStep,
       draft,
     };
+  }
+
+  function moveCartStep(clientId, nextStep, session, patch = {}) {
+    const draft = buildDraft(session, patch);
+    repos.sessions.set(clientId, "cart", nextStep, draft);
+    return {
+      ok: true,
+      nextStep,
+      draft,
+    };
+  }
+
+  function parsePositiveQuantity(rawQuantity) {
+    const quantityText = normalizeText(rawQuantity);
+    const quantity = Number(quantityText);
+    if (!Number.isInteger(quantity) || quantity <= 0) {
+      return {
+        ok: false,
+        error:
+          "Количество должно быть целым положительным числом. Пример: 1, 5, 12.",
+      };
+    }
+    if (quantity > 10000) {
+      return {
+        ok: false,
+        error: "Слишком большое количество. Укажите значение до 10000.",
+      };
+    }
+    return { ok: true, quantity };
   }
 
   function buildTelegramContactLabel(client, clientId) {
@@ -161,27 +200,18 @@ function createLeadService({
   }
 
   function saveQuantity({ client, clientId, session, rawQuantity }) {
-    const quantityText = normalizeText(rawQuantity);
-    const quantity = Number(quantityText);
-    if (!Number.isInteger(quantity) || quantity <= 0) {
-      return {
-        ok: false,
-        error:
-          "Количество должно быть целым положительным числом. Пример: 1, 5, 12.",
-      };
+    const parsed = parsePositiveQuantity(rawQuantity);
+    if (!parsed.ok) {
+      return parsed;
     }
-    if (quantity > 10000) {
-      return {
-        ok: false,
-        error: "Слишком большое количество. Укажите значение до 10000.",
-      };
-    }
+    const { quantity } = parsed;
 
     const nextStep = "confirm";
     const result = moveToStep(clientId, nextStep, session, {
       quantity,
       contactLabel:
-        session?.draft?.contactLabel || buildTelegramContactLabel(client, clientId),
+        session?.draft?.contactLabel ||
+        buildTelegramContactLabel(client, clientId),
       isConfirmEditing: false,
     });
     recordLeadEvent({
@@ -288,14 +318,190 @@ function createLeadService({
     return result;
   }
 
+  function startCartAddProduct({ clientId, product, sourcePayload }) {
+    const existingSession = repos.sessions.get(clientId);
+    if (existingSession?.flow === "lead") {
+      return {
+        ok: false,
+        error:
+          "Сначала завершите или отмените заявку на один товар (кнопка «Отмена»).",
+      };
+    }
+
+    const baseDraft =
+      existingSession?.flow === "cart" &&
+      Array.isArray(existingSession.draft?.items)
+        ? { ...existingSession.draft }
+        : {
+            items: [],
+            comment: "",
+            contactLabel: "",
+            sourcePayload: sourcePayload || null,
+            catalogPage: 0,
+          };
+
+    baseDraft.pendingProductId = product.id;
+    baseDraft.pendingProductCode = product.code;
+    baseDraft.pendingProductName = product.title;
+    baseDraft.sourcePayload = baseDraft.sourcePayload || sourcePayload || null;
+
+    repos.sessions.set(clientId, "cart", "line_qty", baseDraft);
+    return { ok: true, step: "line_qty", draft: baseDraft };
+  }
+
+  function saveCartLineQuantity({ client, clientId, session, rawQuantity }) {
+    const parsed = parsePositiveQuantity(rawQuantity);
+    if (!parsed.ok) {
+      return parsed;
+    }
+    const { quantity } = parsed;
+    const pendingId = session?.draft?.pendingProductId;
+    const code = session?.draft?.pendingProductCode;
+    const name = session?.draft?.pendingProductName;
+    if (!pendingId || !code || !name) {
+      return { ok: false, error: "Сессия устарела. Откройте каталог снова." };
+    }
+
+    const items = Array.isArray(session.draft.items)
+      ? session.draft.items.map((row) => ({ ...row }))
+      : [];
+    const idx = items.findIndex((row) => row.productCode === code);
+    if (idx >= 0) {
+      items[idx] = {
+        ...items[idx],
+        quantity: items[idx].quantity + quantity,
+      };
+    } else {
+      items.push({
+        productId: pendingId,
+        productCode: code,
+        productName: name,
+        quantity,
+      });
+    }
+
+    const result = moveCartStep(clientId, "catalog", session, {
+      items,
+      pendingProductId: null,
+      pendingProductCode: null,
+      pendingProductName: null,
+      contactLabel:
+        session?.draft?.contactLabel ||
+        buildTelegramContactLabel(client, clientId),
+      isConfirmEditing: false,
+    });
+    return result;
+  }
+
+  function startCartCheckout(clientId) {
+    const session = repos.sessions.get(clientId);
+    if (!session || session.flow !== "cart") {
+      return { ok: false, error: "Корзина не активна." };
+    }
+    const items = session.draft?.items || [];
+    if (!items.length) {
+      return { ok: false, error: "Добавьте хотя бы одну позицию в корзину." };
+    }
+    return moveCartStep(clientId, "comment", session, {
+      isConfirmEditing: false,
+    });
+  }
+
+  function saveCartComment({ clientId, session, comment }) {
+    const trimmed = normalizeText(comment);
+    if (trimmed.length === 0) {
+      return {
+        ok: false,
+        error: "Комментарий не может быть пустым.",
+      };
+    }
+    if (trimmed.length > 500) {
+      return {
+        ok: false,
+        error: "Комментарий не должен превышать 500 символов.",
+      };
+    }
+    const result = moveCartStep(clientId, "confirm", session, {
+      comment: trimmed,
+      isConfirmEditing: false,
+    });
+    recordLeadEvent({
+      leadId: null,
+      clientTelegramId: clientId,
+      eventType: "comment_added",
+      sourcePayload: result.draft.sourcePayload || null,
+    });
+    return result;
+  }
+
+  function skipCartComment({ clientId, session }) {
+    const result = moveCartStep(clientId, "confirm", session, {
+      comment: "",
+      isConfirmEditing: false,
+    });
+    recordLeadEvent({
+      leadId: null,
+      clientTelegramId: clientId,
+      eventType: "comment_skipped",
+      sourcePayload: result.draft.sourcePayload || null,
+    });
+    return result;
+  }
+
+  function useTelegramContactCart({ client, session }) {
+    const contactLabel = buildTelegramContactLabel(client, client.id);
+    const result = moveCartStep(client.id, "confirm", session, {
+      contactLabel,
+      isConfirmEditing: false,
+    });
+    recordLeadEvent({
+      leadId: null,
+      clientTelegramId: client.id,
+      eventType: "contact_confirmed",
+      sourcePayload: result.draft.sourcePayload || null,
+      metadata: { via: "telegram" },
+    });
+    return result;
+  }
+
+  function requestCustomContactCart({ clientId, session }) {
+    return moveCartStep(clientId, "contact_custom", session);
+  }
+
+  function saveCustomContactCart({ clientId, session, contactText }) {
+    const value = normalizeText(contactText);
+    if (!value) {
+      return {
+        ok: false,
+        error:
+          "Укажите контакт одним сообщением: @username, телефон или любой удобный способ связи.",
+      };
+    }
+    if (value.length > 500) {
+      return { ok: false, error: "Контакт не должен превышать 500 символов." };
+    }
+    const result = moveCartStep(clientId, "confirm", session, {
+      contactLabel: value,
+      isConfirmEditing: false,
+    });
+    recordLeadEvent({
+      leadId: null,
+      clientTelegramId: clientId,
+      eventType: "contact_confirmed",
+      sourcePayload: result.draft.sourcePayload || null,
+      metadata: { via: "custom" },
+    });
+    return result;
+  }
+
   function cancelLeadDraft(clientId) {
     const session = repos.sessions.get(clientId);
-    if (session?.flow === "lead") {
+    if (session?.flow === "lead" || session?.flow === "cart") {
       recordLeadEvent({
         leadId: null,
         clientTelegramId: clientId,
         eventType: "lead_cancelled",
-        sourcePayload: session.draft.sourcePayload || null,
+        sourcePayload: session.draft?.sourcePayload || null,
       });
     }
     repos.sessions.clear(clientId);
@@ -320,9 +526,59 @@ function createLeadService({
     return { ok: true, nextStep: targetStep };
   }
 
+  function startCartConfirmEdit({ clientId, session, field }) {
+    if (!session || session.flow !== "cart" || session.step !== "confirm") {
+      return { ok: false };
+    }
+    if (field === "quantity") {
+      repos.sessions.set(clientId, "cart", "catalog", {
+        ...session.draft,
+        isConfirmEditing: true,
+      });
+      return { ok: true, nextStep: "catalog" };
+    }
+    if (field === "comment") {
+      repos.sessions.set(clientId, "cart", "comment", {
+        ...session.draft,
+        isConfirmEditing: true,
+      });
+      return { ok: true, nextStep: "comment" };
+    }
+    if (field === "contact") {
+      repos.sessions.set(clientId, "cart", "contact", {
+        ...session.draft,
+        isConfirmEditing: true,
+      });
+      return { ok: true, nextStep: "contact" };
+    }
+    return { ok: false };
+  }
+
+  function goBackCart(clientId, session) {
+    if (session.step === "line_qty") {
+      const draft = {
+        ...session.draft,
+        pendingProductId: null,
+        pendingProductCode: null,
+        pendingProductName: null,
+      };
+      repos.sessions.set(clientId, "cart", "catalog", draft);
+      return "catalog";
+    }
+    const previousStep = CART_BACK_TRANSITIONS[session.step];
+    if (!previousStep) {
+      return null;
+    }
+    repos.sessions.set(clientId, "cart", previousStep, session.draft);
+    return previousStep;
+  }
+
   function goBack(clientId, session) {
     if (!session) {
       return null;
+    }
+    if (session.flow === "cart") {
+      return goBackCart(clientId, session);
     }
     const previousStep =
       session.step === "comment" && !isConfirmEditing(session)
@@ -419,6 +675,103 @@ function createLeadService({
     return lead;
   }
 
+  async function confirmCartLead({ client, chatId }) {
+    const session = repos.sessions.get(client.id);
+    if (!session || session.flow !== "cart" || session.step !== "confirm") {
+      return null;
+    }
+
+    const items = session.draft?.items || [];
+    if (!items.length) {
+      return null;
+    }
+
+    const existingLead = getOpenLeadByClientAndProduct(
+      client.id,
+      CART_PRODUCT_CODE,
+    );
+    if (existingLead) {
+      return { duplicate: true, existingLead };
+    }
+
+    const totalQty = items.reduce((sum, row) => sum + row.quantity, 0);
+    const lineItemsJson = JSON.stringify(items);
+
+    const transaction = db.transaction(() => {
+      const conversation = conversationService.ensureConversation(
+        client.id,
+        session.draft.sourcePayload || null,
+      );
+      const result = repos.leads.create({
+        client_telegram_id: client.id,
+        product_code: CART_PRODUCT_CODE,
+        product_name: `Корзина (${items.length} поз.)`,
+        quantity: totalQty,
+        comment: session.draft.comment || "",
+        contact_label: session.draft.contactLabel || "",
+        source_payload: session.draft.sourcePayload || null,
+        status: "new",
+        line_items_json: lineItemsJson,
+      });
+
+      repos.messages.create(
+        conversation.id,
+        "system",
+        client.id,
+        `Создана заявка #${result.id}: корзина (${items.length} поз.)`,
+      );
+
+      recordLeadEvent({
+        leadId: result.id,
+        clientTelegramId: client.id,
+        eventType: "lead_confirmed",
+        sourcePayload: session.draft.sourcePayload || null,
+        metadata: {
+          product_code: CART_PRODUCT_CODE,
+          line_count: items.length,
+          quantity: totalQty,
+        },
+      });
+
+      repos.sessions.clear(client.id);
+      return result;
+    });
+
+    let lead;
+    try {
+      lead = transaction();
+    } catch (error) {
+      if (isOpenLeadUniqueViolation(error)) {
+        const duplicate = getOpenLeadByClientAndProduct(
+          client.id,
+          CART_PRODUCT_CODE,
+        );
+        return { duplicate: true, existingLead: duplicate };
+      }
+      throw error;
+    }
+    try {
+      await notifyAdminAboutLead(lead, client, chatId);
+    } catch (err) {
+      logError(`notifyAdminAboutLead failed for lead #${lead.id}`, err);
+    }
+
+    return lead;
+  }
+
+  function updateCartCatalogPage(clientId, page) {
+    const session = repos.sessions.get(clientId);
+    if (!session || session.flow !== "cart") {
+      return { ok: false };
+    }
+    const safePage = Number.isFinite(page) && page >= 0 ? Math.floor(page) : 0;
+    repos.sessions.set(clientId, "cart", session.step, {
+      ...session.draft,
+      catalogPage: safePage,
+    });
+    return { ok: true };
+  }
+
   function hydrateProductForLead(productId) {
     return catalogService.getProductById(productId);
   }
@@ -437,6 +790,17 @@ function createLeadService({
     startConfirmEdit,
     goBack,
     confirmLead,
+    confirmCartLead,
+    startCartAddProduct,
+    saveCartLineQuantity,
+    startCartCheckout,
+    saveCartComment,
+    skipCartComment,
+    useTelegramContactCart,
+    requestCustomContactCart,
+    saveCustomContactCart,
+    startCartConfirmEdit,
+    updateCartCatalogPage,
     hydrateProductForLead,
   };
 }
