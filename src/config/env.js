@@ -4,6 +4,7 @@ const {
   optionalString,
   optionalInteger,
   optionalBoolean,
+  optionalUrlString,
   emitConfigWarning,
 } = require("./helpers");
 
@@ -57,7 +58,7 @@ const DB_PATH =
 const PORT = optionalInteger("PORT", 3000);
 const API_SECRET = optionalString("API_SECRET");
 const CORS_ORIGIN = optionalString("CORS_ORIGIN", ["ALLOWED_ORIGINS"]);
-const WEB_APP_URL = optionalString("WEB_APP_URL", ["WEBAPP_URL"]);
+const WEB_APP_URL = optionalUrlString("WEB_APP_URL", ["WEBAPP_URL"]);
 const API_COMPRESSION = optionalBoolean("API_COMPRESSION", true);
 const LOG_LEVEL =
   optionalString("LOG_LEVEL") || (isProduction ? "info" : "debug");
@@ -122,14 +123,11 @@ if (isProduction && !CORS_ORIGIN) {
 module.exports = {
   NODE_ENV,
   isProduction,
+  BOT_ENABLED,
   AI_GATEWAY_API_KEY,
   AI_MODEL,
   AI_ENABLED,
-  BOT_TOKEN,
   ADMIN_ID,
-  AI_GATEWAY_API_KEY,
-  AI_MODEL,
-  AI_ENABLED,
   DB_PATH,
   PORT,
   API_SECRET,
@@ -141,8 +139,6 @@ module.exports = {
   MEMORY_LIMIT_WARN,
   MEMORY_LIMIT_CRITICAL,
   APP_VERSION,
-  AI_GATEWAY_API_KEY,
-  AI_ENABLED,
   REDIS_URL,
   REDIS_CONFIG,
   CACHE_TTL,
