@@ -41,11 +41,13 @@ function createBot({
 
   const catalog = createCatalogService({ repos });
   const ai = createAiService({ repos });
-  const aiAgent = createAiAgentService({
-    repos,
-    catalogService: catalog,
-    config: { enabled: AI_ENABLED, aiModel: AI_MODEL },
-  });
+  const aiAgent = AI_ENABLED
+    ? createAiAgentService({
+        repos,
+        catalogService: catalog,
+        config: { enabled: true, aiModel: AI_MODEL },
+      })
+    : null;
   const conversation = createConversationService({
     repos,
     bot,

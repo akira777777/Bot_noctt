@@ -47,7 +47,7 @@ const DB_PATH =
 const PORT = optionalInteger("PORT", 3000);
 const API_SECRET = optionalString("API_SECRET");
 const CORS_ORIGIN = optionalString("CORS_ORIGIN", ["ALLOWED_ORIGINS"]);
-const WEB_APP_URL = optionalString("WEB_APP_URL", ["WEBAPP_URL"]);
+const WEB_APP_URL = optionalUrlString("WEB_APP_URL", ["WEBAPP_URL"]);
 const API_COMPRESSION = optionalBoolean("API_COMPRESSION", true);
 const LOG_LEVEL =
   optionalString("LOG_LEVEL") || (isProduction ? "info" : "debug");
