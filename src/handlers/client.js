@@ -30,7 +30,9 @@ const {
   buildProductCard,
 } = require("../ui/catalog-view");
 const { safeAnswerCbQuery } = require("../utils/telegram");
-const { ACTIONS, ACTION_PREFIXES, parseActionId } = require("../utils/actions");
+const { logWarn } = require("../utils/logger");
+const { normalizeText } = require("../utils/text");
+const { ACTIONS, parseActionId } = require("../utils/actions");
 const { parseSourcePayload } = require("../utils/source-payload");
 const { createRateLimiter } = require("../utils/rate-limiter");
 const { formatClientLabel } = require("../utils/formatters");
@@ -73,13 +75,6 @@ function setHomeSession(
   repos.sessions.set(clientId, "home", "menu", {
     sourcePayload: sourcePayload || null,
   });
-}
-
-function normalizeText(value) {
-  if (typeof value !== "string") {
-    return "";
-  }
-  return value.trim();
 }
 
 async function showHomeScreen(ctx, deps, entry) {
@@ -616,7 +611,9 @@ async function handleClientAction(ctx, deps) {
     "client",
   );
   if (isUserBlocked(user)) {
-    await ctx.answerCbQuery("Ваш аккаунт заблокирован.").catch(() => {});
+    await ctx.answerCbQuery("Ваш аккаунт заблокирован.").catch((err) => {
+      logWarn("answerCbQuery failed for blocked user", { error: err.message });
+    });
     return;
   }
 

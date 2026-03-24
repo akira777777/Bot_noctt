@@ -4,6 +4,7 @@ const {
   optionalString,
   optionalInteger,
   optionalBoolean,
+  optionalUrlString,
   emitConfigWarning,
 } = require("./helpers");
 
@@ -31,6 +32,16 @@ function optionalUrlString(key, fallbackKeys = []) {
   const hostname = parsed.hostname.toLowerCase();
   if (hostname === "example.com" || hostname.endsWith(".example")) {
     emitConfigWarning(`${key} still uses a placeholder domain; treating it as unset`);
+    return null;
+  }
+
+  if (
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname === "0.0.0.0" ||
+    hostname.endsWith(".local")
+  ) {
+    emitConfigWarning(`${key} points to a local address which cannot receive Telegram webhooks; treating it as unset`);
     return null;
   }
 
@@ -113,6 +124,9 @@ module.exports = {
   NODE_ENV,
   isProduction,
   BOT_ENABLED,
+  AI_GATEWAY_API_KEY,
+  AI_MODEL,
+  AI_ENABLED,
   ADMIN_ID,
   DB_PATH,
   PORT,
@@ -127,10 +141,6 @@ module.exports = {
   TELEGRAM_STARTUP_TIMEOUT_MS,
   ALLOW_BOT_LAUNCH_FAILURE,
   APP_VERSION,
-  AI_GATEWAY_API_KEY,
-  VERCEL_OIDC_TOKEN,
-  AI_MODEL,
-  AI_ENABLED,
   REDIS_URL,
   REDIS_CONFIG,
   CACHE_TTL,

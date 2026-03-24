@@ -12,6 +12,7 @@ const {
   normalizeLeadStatus,
 } = require("../domain/lead-status");
 const { safeSendMessage } = require("../utils/telegram");
+const { logError } = require("../utils/logger");
 
 const STATUS_NOTIFICATIONS = Object.freeze({
   in_progress: clientLeadTakenMessage,
@@ -39,15 +40,19 @@ function createLeadStatusService({ repos, bot = null }) {
     }
 
     if (normalizedStatus === "closed" && repos.leadEvents) {
-      repos.leadEvents.create({
-        leadId: lead.id,
-        clientTelegramId: lead.client_telegram_id,
-        eventType: "lead_closed",
-        sourcePayload: lead.source_payload || null,
-        metadata: {
-          closed_reason: lead.closed_reason || null,
-        },
-      });
+      try {
+        repos.leadEvents.create({
+          leadId: lead.id,
+          clientTelegramId: lead.client_telegram_id,
+          eventType: "lead_closed",
+          sourcePayload: lead.source_payload || null,
+          metadata: {
+            closed_reason: lead.closed_reason || null,
+          },
+        });
+      } catch (err) {
+        logError("Failed to persist lead_closed event", err, { leadId: lead.id });
+      }
     }
 
     const notificationFactory =

@@ -10,18 +10,9 @@ const DEFAULT_QUICK_TEMPLATES = {
   delivery: "После подтверждения заявки подберём удобный вариант доставки.",
 };
 
-const { logError } = require("../utils/logger");
+const { logWarn } = require("../utils/logger");
 
-/** Delay between direct sends when the Bull queue is unavailable (ms). */
-const BROADCAST_DIRECT_DELAY_MS = 55;
-
-const ADMIN_PAGE_SIZE = 8;
-
-function createAdminService({
-  repos,
-  templates = DEFAULT_QUICK_TEMPLATES,
-  queueService = null,
-} = {}) {
+function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
   function upsertAdmin(from) {
     repos.users.upsert({
       telegram_id: from.id,
@@ -306,7 +297,11 @@ function createAdminService({
       try {
         await bot.telegram.sendMessage(client.telegram_id, text);
         sent++;
-      } catch (_) {
+      } catch (err) {
+        logWarn("Broadcast delivery failed for client", {
+          clientId: client.telegram_id,
+          error: err.message,
+        });
         failed++;
       }
       if (i < clients.length - 1) {

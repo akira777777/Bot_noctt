@@ -1,8 +1,4 @@
-const {
-  adminQuickReplyKeyboard,
-  adminInboxKeyboard,
-  adminListPaginationKeyboard,
-} = require("../ui/keyboards");
+const { adminQuickReplyKeyboard, adminInboxKeyboard } = require("../ui/keyboards");
 const { removeReplyKeyboard } = require("../ui/reply-keyboards");
 const {
   adminSelectedClientMessage,
@@ -13,6 +9,7 @@ const {
 const { formatConversationRow, formatLeadRow } = require("../utils/formatters");
 const { safeAnswerCbQuery, safeSendMessage } = require("../utils/telegram");
 const { parseActionId } = require("../utils/actions");
+const { logWarn } = require("../utils/logger");
 
 // Ephemeral cache: stores AI suggestions shown to admin until they are sent or discarded.
 // Key: `${adminId}:${clientId}`, value: suggestion text string.
@@ -39,7 +36,12 @@ async function replaceWithStatusButton(ctx, text) {
     await ctx.editMessageReplyMarkup({
       inline_keyboard: [[{ text, callback_data: "admin:noop" }]],
     });
-  } catch (_) {}
+  } catch (err) {
+    // Telegram may reject edits on old or already-modified messages; this is expected.
+    logWarn("editMessageReplyMarkup failed (message may be too old)", {
+      error: err.message,
+    });
+  }
 }
 
 async function selectClient(ctx, deps, clientId) {
