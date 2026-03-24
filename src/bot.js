@@ -87,6 +87,29 @@ function createBot({
     logError(`Unhandled bot error for update ${updateId}`, error);
   });
 
+  // Set persistent menu button and command list
+  if (webAppUrl) {
+    bot.telegram
+      .setChatMenuButton({
+        menu_button: {
+          type: "web_app",
+          text: "Открыть",
+          web_app: { url: webAppUrl },
+        },
+      })
+      .catch(() => {});
+  }
+  bot.telegram
+    .setMyCommands([
+      { command: "start", description: "Главное меню" },
+      { command: "app", description: "Открыть мини-приложение" },
+      { command: "menu", description: "Показать меню" },
+      { command: "status", description: "Статус заявки" },
+      { command: "help", description: "Помощь" },
+      { command: "myid", description: "Узнать свой Telegram ID" },
+    ])
+    .catch(() => {});
+
   registerAdminCommands(bot, deps);
 
   bot.start((ctx) => {

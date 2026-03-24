@@ -1,54 +1,43 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-
-type TelegramWebAppWindow = Window & {
-  Telegram?: {
-    WebApp?: {
-      ready?: () => void;
-      expand?: () => void;
-      setHeaderColor?: (color: string) => void;
-      setBackgroundColor?: (color: string) => void;
-    };
-  };
-};
+import { useTelegramWebApp } from "@/components/telegram-webapp-provider";
 
 export default function MiniAppPage() {
+  const { webApp, user } = useTelegramWebApp();
+  const router = useRouter();
+
+  // MainButton: primary CTA to submit a lead
   useEffect(() => {
-    const scriptId = "telegram-webapp-script";
+    if (!webApp) return;
 
-    const initTelegramWebApp = () => {
-      const w = window as TelegramWebAppWindow;
-      if (!w.Telegram?.WebApp) {
-        return;
-      }
+    const go = () => router.push("/form");
 
-      w.Telegram.WebApp.ready?.();
-      w.Telegram.WebApp.expand?.();
-      w.Telegram.WebApp.setHeaderColor?.("#0f172a");
-      w.Telegram.WebApp.setBackgroundColor?.("#020617");
+    webApp.MainButton.setParams({
+      text: "Оставить заявку",
+      color: "#2563eb",
+      text_color: "#ffffff",
+      is_visible: true,
+    });
+    webApp.MainButton.onClick(go);
+
+    return () => {
+      webApp.MainButton.offClick(go);
+      webApp.MainButton.hide();
     };
+  }, [webApp, router]);
 
-    const existingScript = document.getElementById(scriptId) as HTMLScriptElement | null;
-    if (existingScript) {
-      initTelegramWebApp();
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.id = scriptId;
-    script.src = "https://telegram.org/js/telegram-web-app.js";
-    script.async = true;
-    script.onload = initTelegramWebApp;
-    document.head.appendChild(script);
-  }, []);
+  const greeting = user?.first_name
+    ? `Привет, ${user.first_name}!`
+    : "Добро пожаловать!";
 
   return (
-    <main id="main-content" className="min-h-screen p-6 lg:p-10">
+    <main id="main-content" className="min-h-screen p-6">
       <div className="mx-auto flex w-full max-w-xl flex-col gap-6 rounded-2xl border border-white/10 bg-black/30 p-6">
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight">Bot Noct Mini App</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{greeting}</h1>
           <p className="text-sm text-muted-foreground">
             Быстрый доступ к каталогу и заявкам прямо из Telegram.
           </p>
@@ -66,12 +55,6 @@ export default function MiniAppPage() {
             className="rounded-lg bg-primary px-4 py-3 text-center text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
           >
             Оставить заявку
-          </Link>
-          <Link
-            href="/"
-            className="rounded-lg border border-white/15 px-4 py-3 text-center text-sm font-medium transition hover:bg-white/5"
-          >
-            На главную
           </Link>
         </div>
       </div>
