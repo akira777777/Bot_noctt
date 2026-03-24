@@ -68,6 +68,22 @@ function leadSummaryMessage(draft) {
   const comment = withFallback(draft.comment, "Без комментария");
   const contact = withFallback(draft.contactLabel, "Ответить в этом чате");
   const source = formatSourceLabel(draft.sourcePayload);
+
+  if (draft.items && draft.items.length) {
+    const lines = draft.items
+      .map((row) => `• ${row.productName} ×${row.quantity}`)
+      .join("\n");
+    return (
+      "Шаг 4 из 4.\n\nПроверьте заявку (корзина):\n\n" +
+      `${lines}\n\n` +
+      `Комментарий: ${comment}\n` +
+      `Контакт: ${contact}\n` +
+      `Источник: ${source}\n\n` +
+      "Если всё верно, подтвердите заявку.\n" +
+      "Нужно что-то поправить? Используйте кнопки ниже."
+    );
+  }
+
   return (
     "Шаг 4 из 4.\n\nПроверьте заявку:\n\n" +
     `Товар: ${draft.productName}\n` +
@@ -129,11 +145,29 @@ function adminLeadCard(lead, clientLabel) {
   const comment = withFallback(lead.comment, "Без комментария");
   const contact = withFallback(lead.contact_label, "Ответить в Telegram");
   const source = formatSourceLabel(lead.source_payload);
+
+  let linesBlock = "";
+  if (lead.line_items_json) {
+    try {
+      const items = JSON.parse(lead.line_items_json);
+      if (Array.isArray(items) && items.length) {
+        linesBlock =
+          items.map((i) => `• ${i.productName} ×${i.quantity}`).join("\n") +
+          "\n\n";
+      }
+    } catch {
+      linesBlock = "";
+    }
+  }
+
+  const productBlock = linesBlock
+    ? `${linesBlock}Всего единиц: ${lead.quantity}\n`
+    : `Товар: ${lead.product_name}\nКоличество: ${lead.quantity}\n`;
+
   return (
     "Новая заявка:\n" +
     `${clientLabel}\n\n` +
-    `Товар: ${lead.product_name}\n` +
-    `Количество: ${lead.quantity}\n` +
+    productBlock +
     `Комментарий: ${comment}\n` +
     `Контакт: ${contact}\n` +
     `Источник: ${source}\n` +
@@ -181,6 +215,18 @@ function rateLimitMessage() {
   return "Вы отправляете сообщения слишком часто. Пожалуйста, подождите немного.";
 }
 
+function nonAdminCommandMessage() {
+  return "Эта команда доступна только администратору.";
+}
+
+function callbackRateLimitMessage() {
+  return "Слишком часто. Подождите немного.";
+}
+
+function botErrorUserMessage() {
+  return "Произошла ошибка. Попробуйте позже.";
+}
+
 function clientLeadStatusMessage(lead) {
   if (!lead) {
     return "У вас пока нет ни одной заявки. Оформить можно через главное меню.";
@@ -197,10 +243,25 @@ function clientLeadStatusMessage(lead) {
     minute: "2-digit",
   });
 
+  let linesBlock = "";
+  if (lead.line_items_json) {
+    try {
+      const items = JSON.parse(lead.line_items_json);
+      if (Array.isArray(items) && items.length) {
+        linesBlock = `${items.map((i) => `• ${i.productName} ×${i.quantity}`).join("\n")}\n\n`;
+      }
+    } catch {
+      linesBlock = "";
+    }
+  }
+
+  const productBlock = linesBlock
+    ? `${linesBlock}Всего единиц: ${lead.quantity}\n`
+    : `Товар: ${lead.product_name}\nКоличество: ${lead.quantity}\n`;
+
   return (
     `Ваша последняя заявка #${lead.id}:\n\n` +
-    `Товар: ${lead.product_name}\n` +
-    `Количество: ${lead.quantity}\n` +
+    productBlock +
     `Комментарий: ${comment}\n` +
     `Контакт: ${contact}\n` +
     `Статус: ${statusLabel}\n` +
@@ -211,6 +272,9 @@ function clientLeadStatusMessage(lead) {
 module.exports = {
   conversationResolvedMessage,
   rateLimitMessage,
+  nonAdminCommandMessage,
+  callbackRateLimitMessage,
+  botErrorUserMessage,
   welcomeMessage,
   helpMessage,
   howToOrderMessage,

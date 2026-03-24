@@ -47,18 +47,39 @@ function formatConversationRow(conversation) {
     : "Без сообщений";
   const source = formatSourceLabel(conversation.source_payload);
   const status = conversation.lead_status || conversation.status;
-  const statusLabel = status ? getLeadStatusLabel(status) : "Без активной заявки";
+  const statusLabel = status
+    ? getLeadStatusLabel(status)
+    : "Без активной заявки";
   const productLabel = conversation.product_name
     ? ` — ${conversation.product_name}`
     : "";
   return `• ${name} — id ${conversation.client_telegram_id} — ${statusLabel}${productLabel} — ${source} — ${lastText}`;
 }
 
+function formatLineItemsShort(lead) {
+  if (!lead?.line_items_json) {
+    return null;
+  }
+  try {
+    const arr = JSON.parse(lead.line_items_json);
+    if (!Array.isArray(arr) || !arr.length) {
+      return null;
+    }
+    return arr.map((i) => `${i.productName}×${i.quantity}`).join(", ");
+  } catch {
+    return null;
+  }
+}
+
 function formatLeadRow(lead) {
   const name = getUserDisplayName(lead);
   const source = formatSourceLabel(lead.source_payload);
   const statusLabel = getLeadStatusLabel(lead.status);
-  return `• #${lead.id} ${lead.product_name} x${lead.quantity} — ${name} — ${statusLabel} — ${source}`;
+  const cartSummary = formatLineItemsShort(lead);
+  const productPart = cartSummary
+    ? `Корзина (${cartSummary})`
+    : `${lead.product_name} x${lead.quantity}`;
+  return `• #${lead.id} ${productPart} — ${name} — ${statusLabel} — ${source}`;
 }
 
 module.exports = {

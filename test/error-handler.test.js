@@ -1,6 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 
+const { NODE_ENV } = require("../src/config/env");
 const {
   errorHandler,
   notFoundHandler,
@@ -97,7 +98,6 @@ test("asyncHandler forwards async failures to next", async () => {
   assert.equal(capturedError.message, "boom");
 });
 
-test("trustProxy follows explicit runtime mode", () => {
-  assert.equal(trustProxy({ isProduction: true }), true);
-  assert.equal(trustProxy({ isProduction: false }), false);
+test("trustProxy is enabled only when NODE_ENV is production", () => {
+  assert.equal(trustProxy({}), NODE_ENV === "production");
 });

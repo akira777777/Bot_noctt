@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { TelegramWebAppProvider } from "@/components/telegram-webapp-provider";
 import "./globals.css";
 
 const geistSans = Geist({ subsets: ["latin", "cyrillic"], variable: "--font-geist-sans" });
@@ -18,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#main-content" className="skip-link">
           Перейти к основному содержанию
         </a>
-        {children}
+        <TelegramWebAppProvider>{children}</TelegramWebAppProvider>
       </body>
     </html>
   );

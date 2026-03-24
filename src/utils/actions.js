@@ -11,6 +11,7 @@ const ACTIONS = Object.freeze({
   LEAD_RESUME: "lead:resume",
   LEAD_BACK: "lead:back",
   LEAD_CANCEL: "lead:cancel",
+  CART_CHECKOUT: "cart:checkout",
   LEAD_EDIT_QUANTITY: "lead:edit_quantity",
   LEAD_EDIT_COMMENT: "lead:edit_comment",
   LEAD_EDIT_CONTACT: "lead:edit_contact",
@@ -21,6 +22,8 @@ const ACTIONS = Object.freeze({
 
 const ACTION_PREFIXES = Object.freeze({
   CATALOG_PRODUCT: "catalog:product:",
+  CATALOG_PAGE: "catalog:page:",
+  CART_ADD: "cart:add:",
   LEAD_PRODUCT: "lead:product:",
   ADMIN_REPLY: "admin:reply:",
   ADMIN_DIALOG: "admin:dialog:",
@@ -34,6 +37,7 @@ const ACTION_PREFIXES = Object.freeze({
   ADMIN_LEAD_AWAITING_PAYMENT: "admin:lead_awaiting_payment:",
   ADMIN_LEAD_FULFILLED: "admin:lead_fulfilled:",
   ADMIN_TEMPLATE: "admin:template:",
+  ADMIN_LIST: "admin:list:",
 });
 
 function buildAction(prefix, id) {
