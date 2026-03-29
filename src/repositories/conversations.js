@@ -36,24 +36,6 @@ function createConversationsRepo(db) {
     ORDER BY c.last_message_at DESC
     LIMIT ?
   `);
-  const listRecentPaginated = db.prepare(`
-    SELECT
-      c.*,
-      u.username,
-      u.first_name,
-      u.last_name,
-      (
-        SELECT m.message_text
-        FROM messages m
-        WHERE m.conversation_id = c.id
-        ORDER BY m.created_at DESC
-        LIMIT 1
-      ) AS last_message_text
-    FROM conversations c
-    LEFT JOIN users u ON u.telegram_id = c.client_telegram_id
-    ORDER BY c.last_message_at DESC
-    LIMIT ? OFFSET ?
-  `);
 
   return {
     ensure(clientTelegramId, adminId, sourcePayload = null) {
@@ -70,9 +52,6 @@ function createConversationsRepo(db) {
     },
     listRecent(limit = 10) {
       return listRecent.all(limit);
-    },
-    listRecentPaginated(limit = 10, offset = 0) {
-      return listRecentPaginated.all(limit, offset);
     },
   };
 }

@@ -139,6 +139,8 @@ test("admin dashboard stats summarize funnel and response windows for 24h and 7d
   assert.equal(dashboard.last24Hours.topSources[0].source_payload, "quote_channel");
   assert.ok("conversionRate" in dashboard.last7Days);
 });
+<<<<<<< Updated upstream
+=======
 
 test("broadcastToClients delivers to clients without queue (direct path)", async () => {
   const { repos, service } = createAdminHarness();
@@ -193,3 +195,32 @@ test("broadcastToClients uses queue when queueBulkMessages is available", async 
   const result = await svc.broadcastToClients(bot, "x");
   assert.deepEqual(result, { total: 1, sent: 1, failed: 0 });
 });
+
+test("markLeadAwaitingPayment persists canonical proposal_sent status", () => {
+  const { repos, service } = createAdminHarness();
+
+  repos.users.upsert({
+    telegram_id: 903,
+    username: "c903",
+    first_name: "Client",
+    last_name: null,
+    role: "client",
+  });
+
+  const lead = repos.leads.create({
+    client_telegram_id: 903,
+    product_code: "p903",
+    product_name: "Товар 903",
+    quantity: 1,
+    comment: "",
+    contact_label: "Telegram",
+    source_payload: "quote_channel",
+    status: "in_progress",
+  });
+
+  const updated = service.markLeadAwaitingPayment(lead.id);
+
+  assert.equal(updated.status, "proposal_sent");
+  assert.equal(repos.leads.getById(lead.id).status, "proposal_sent");
+});
+>>>>>>> Stashed changes

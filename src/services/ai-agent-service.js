@@ -136,12 +136,24 @@ function createAiAgentService({ repos, catalogService, config }) {
 
   /**
    * Handle a free-form client message.
+   * @param {{ clientId: number, messageText: string, conversationHistory?: Array<{sender_role: string, message_text: string}> }} params
    * @returns {{ handled: true, text: string } | { handled: false }}
    */
-  async function runClientAgent({ clientId, messageText }) {
+  async function runClientAgent({ clientId, messageText, conversationHistory = [] }) {
     try {
+      // Build message history so the agent has conversation context.
+      // Map DB rows (sender_role: 'client'|'admin') → AI SDK message format.
+      const messages = conversationHistory
+        .filter((m) => m.message_text)
+        .map((m) => ({
+          role: m.sender_role === 'admin' ? 'assistant' : 'user',
+          content: m.message_text,
+        }));
+      // Append the current message as the final user turn
+      messages.push({ role: 'user', content: messageText });
+
       const result = await clientAgent.generate({
-        prompt: messageText,
+        messages,
         context: { clientId },
       });
 

@@ -4,6 +4,7 @@
  */
 const { v4: uuidv4 } = require("uuid");
 const log = require("../../utils/logger-enhanced");
+const { NODE_ENV } = require("../../config/env");
 
 // Error codes mapping
 const ERROR_CODES = {
@@ -88,78 +89,79 @@ class RateLimitError extends AppError {
 /**
  * Error handling middleware
  */
-function createErrorHandler({ isProduction = false } = {}) {
-  return function errorHandler(err, req, res, next) {
-    void next;
+function errorHandler(err, req, res, next) {
+  // Generate unique error ID for tracking
+  const errorId = uuidv4();
 
-    const errorId = uuidv4();
-    const statusCode = err.statusCode || err.status || 500;
-    const errorCode = err.code || ERROR_CODES.INTERNAL_ERROR;
-    const message = err.message || "Internal server error";
-    const details = err.details || null;
+  // Extract error details
+  const statusCode = err.statusCode || err.status || 500;
+  const errorCode = err.code || ERROR_CODES.INTERNAL_ERROR;
+  const message = err.message || "Internal server error";
+  const details = err.details || null;
 
-    const logContext = {
-      errorId,
-      errorCode,
-      statusCode,
-      path: req.path,
-      method: req.method,
-      userId: req.user?.id || req.user?.telegram_id,
-      ip: req.ip,
-      userAgent: req.get("user-agent"),
-      referer: req.get("referer"),
-    };
-
-    if (statusCode >= 500) {
-      log.error(`Server error: ${message}`, err, logContext);
-    } else if (statusCode >= 400) {
-      log.warn(`Client error: ${message}`, logContext);
-    }
-
-    const errorResponse = {
-      success: false,
-      error: {
-        id: errorId,
-        code: errorCode,
-        message:
-          isProduction && statusCode >= 500
-            ? "An internal error occurred"
-            : message,
-        ...(details && { details }),
-      },
-    };
-
-    if (err instanceof RateLimitError && err.retryAfter) {
-      res.set("Retry-After", err.retryAfter.toString());
-    }
-
-    res.status(statusCode).json(errorResponse);
+  // Log the error with full context
+  const logContext = {
+    errorId,
+    errorCode,
+    statusCode,
+    path: req.path,
+    method: req.method,
+    userId: req.user?.id || req.user?.telegram_id,
+    ip: req.ip,
+    userAgent: req.get("user-agent"),
+    referer: req.get("referer"),
   };
+
+  // Log based on status code
+  if (statusCode >= 500) {
+    log.error(`Server error: ${message}`, err, logContext);
+  } else if (statusCode >= 400) {
+    log.warn(`Client error: ${message}`, logContext);
+  }
+
+  // Build error response
+  const errorResponse = {
+    success: false,
+    error: {
+      id: errorId,
+      code: errorCode,
+      message:
+        NODE_ENV === "production" && statusCode >= 500
+          ? "An internal error occurred"
+          : message,
+      ...(details && { details }),
+    },
+  };
+
+  // Add retry-after header for rate limit errors
+  if (err instanceof RateLimitError && err.retryAfter) {
+    res.set("Retry-After", err.retryAfter.toString());
+  }
+
+  res.status(statusCode).json(errorResponse);
 }
 
 /**
  * Not found handler - catch 404s
  */
-function createNotFoundHandler() {
-  return function notFoundHandler(req, res) {
-    const errorId = uuidv4();
+function notFoundHandler(req, res) {
+  const errorId = uuidv4();
 
-    log.warn("Route not found", {
-      errorId,
-      path: req.path,
-      method: req.method,
-      ip: req.ip,
-    });
+  log.warn("Route not found", {
+    errorId,
+    path: req.path,
+    method: req.method,
+    ip: req.ip,
+  });
 
-    res.status(404).json({
-      success: false,
-      error: {
-        id: errorId,
-        code: ERROR_CODES.NOT_FOUND,
-        message: `Route ${req.method} ${req.path} not found`,
-      },
-    });
-  };
+  res.status(404).json({
+    success: false,
+    error: {
+      id: errorId,
+      code: ERROR_CODES.NOT_FOUND,
+      message: `Route ${req.method} ${req.path} not found`,
+    },
+  });
 }
 
 /**
@@ -174,50 +176,46 @@ function asyncHandler(fn) {
 /**
  * Request logging middleware
  */
-function createRequestLogger() {
-  return function requestLogger(req, res, next) {
-    const startTime = Date.now();
+function requestLogger(req, res, next) {
+  const startTime = Date.now();
 
-    res.on("finish", () => {
-      const duration = Date.now() - startTime;
+  // Log when response finishes
+  res.on("finish", () => {
+    const duration = Date.now() - startTime;
 
-      const logData = {
-        method: req.method,
-        path: req.path,
-        statusCode: res.statusCode,
-        duration: `${duration}ms`,
+    const logData = {
+      method: req.method,
+      path: req.path,
+      statusCode: res.statusCode,
+      duration: `${duration}ms`,
+      ip: req.ip,
+      userId: req.user?.id || req.user?.telegram_id,
+    };
+
+    if (res.statusCode >= 400) {
+      log.warn("Request completed with error", logData);
+    } else {
+      log.http(req.method, req.path, res.statusCode, duration, {
         ip: req.ip,
-        userId: req.user?.id || req.user?.telegram_id,
-      };
+      });
+    }
+  });
 
-      if (res.statusCode >= 400) {
-        log.warn("Request completed with error", logData);
-      } else {
-        log.http(req.method, req.path, res.statusCode, duration, {
-          ip: req.ip,
-        });
-      }
-    });
-
-    next();
-  };
+  next();
 }
 
 /**
  * Trust proxy middleware (for getting real IP behind load balancer)
  */
-function trustProxy({ isProduction = false } = {}) {
-  return Boolean(isProduction);
+function trustProxy(req) {
+  // In production, trust common proxy headers
+  if (NODE_ENV === "production") {
+    return true;
+  }
+  return false;
 }
 
-const errorHandler = createErrorHandler();
-const notFoundHandler = createNotFoundHandler();
-const requestLogger = createRequestLogger();
-
 module.exports = {
-  createErrorHandler,
-  createNotFoundHandler,
-  createRequestLogger,
   errorHandler,
   notFoundHandler,
   asyncHandler,

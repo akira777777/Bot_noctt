@@ -1,12 +1,8 @@
 const { logInfo, logError } = require("../utils/logger");
-const { leadResumeKeyboard } = require("../ui/keyboards");
+const { leadResumeKeyboard, adminLeadKeyboard } = require("../ui/keyboards");
 
 function createSchedulerService({ repos, bot, adminId }) {
   async function sendDraftReminders() {
-    if (!bot?.telegram?.sendMessage) {
-      return;
-    }
-
     const reminderConfigs = [
       {
         key: "15m",
@@ -55,10 +51,6 @@ function createSchedulerService({ repos, bot, adminId }) {
   }
 
   async function sendSlaReminders() {
-    if (!bot?.telegram?.sendMessage) {
-      return;
-    }
-
     const reminderConfigs = [
       { key: "15m", label: "15 минут" },
       { key: "60m", label: "60 минут" },
@@ -70,50 +62,52 @@ function createSchedulerService({ repos, bot, adminId }) {
         continue;
       }
 
-      const lines = leads.map(
-        (lead) =>
-          `  #${lead.id} — ${lead.product_name} — ${lead.first_name || lead.username || `id:${lead.client_telegram_id}`}`,
-      );
-
-      try {
-        await bot.telegram.sendMessage(
-          adminId,
-          `SLA ${reminder.label}: заявки без первого ответа\n\n${lines.join("\n")}`,
-        );
-        for (const lead of leads) {
+      for (const lead of leads) {
+        const clientLabel =
+          lead.first_name || lead.username || `id:${lead.client_telegram_id}`;
+        const text =
+          `⚠️ SLA ${reminder.label}: заявка #${lead.id} без ответа\n\n` +
+          `Клиент: ${clientLabel}\n` +
+          `Товар: ${lead.product_name}\n` +
+          `Количество: ${lead.quantity}`;
+        try {
+          await bot.telegram.sendMessage(
+            adminId,
+            text,
+            adminLeadKeyboard(lead.id, lead.client_telegram_id),
+          );
           repos.leads.markSlaReminderSent(lead.id, reminder.key);
+        } catch (error) {
+          logError("Failed to send SLA reminder", error);
         }
-      } catch (error) {
-        logError("Failed to send SLA reminder", error);
       }
     }
   }
 
   async function sendDueFollowUpReminders() {
-    if (!bot?.telegram?.sendMessage) {
-      return;
-    }
-
     const leads = repos.leads.listDueFollowUps(20);
     if (leads.length === 0) {
       return;
     }
 
-    const lines = leads.map(
-      (lead) =>
-        `  #${lead.id} — ${lead.product_name} — ${lead.first_name || lead.username || `id:${lead.client_telegram_id}`}`,
-    );
-
-    try {
-      await bot.telegram.sendMessage(
-        adminId,
-        `follow-up: пришло время вернуться к лидам\n\n${lines.join("\n")}`,
-      );
-      for (const lead of leads) {
+    for (const lead of leads) {
+      const clientLabel =
+        lead.first_name || lead.username || `id:${lead.client_telegram_id}`;
+      const text =
+        `🔔 Follow-up: заявка #${lead.id}\n\n` +
+        `Клиент: ${clientLabel}\n` +
+        `Товар: ${lead.product_name}\n` +
+        `Количество: ${lead.quantity}`;
+      try {
+        await bot.telegram.sendMessage(
+          adminId,
+          text,
+          adminLeadKeyboard(lead.id, lead.client_telegram_id),
+        );
         repos.leads.markFollowUpReminderSent(lead.id);
+      } catch (error) {
+        logError("Failed to send follow-up reminders", error);
       }
-    } catch (error) {
-      logError("Failed to send follow-up reminders", error);
     }
   }
 

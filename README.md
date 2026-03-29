@@ -1,145 +1,337 @@
-# Bot_noct
+# Bot_noct - Telegram Lead Management Bot
 
-Lawful inquiry bot on `Telegraf + Express + SQLite + Next.js`.
+Enhanced Telegram бот для управления лидами и клиентами с расширенным функционалом.
 
-The repository keeps the existing API paths and SQLite tables for backward compatibility, but the product domain is now a neutral catalog and request workflow in Russian.
+## 🚀 Возможности
 
-## What It Does
+### Основные функции
 
-- Telegram bot for catalog browsing, request creation, follow-up questions, and admin replies
-- Express API for public catalog access, request creation, tracking, and admin operations
-- Next.js dashboard for request management and reporting
-- SQLite storage with automatic migrations and default lawful sample catalog
-- Optional Redis cache and Bull queues
-- API-only runtime via `BOT_ENABLED=false` for smoke checks, tests, and non-Telegram environments
+- **Управление лидами** - создание, редактирование, статусы
+- **Каталог товаров** - просмотр и заказ товаров через бота
+- **Админ-панель** - веб-интерфейс для управления
+- **Telegram WebApp** - интерактивные формы
 
-## Runtime Modes
+### Производительность и оптимизации
 
-- `BOT_ENABLED=true` (default): starts the API and Telegram runtime
-- `BOT_ENABLED=false`: starts only the API/web stack; bot-only config is skipped
+- **Redis кэширование** - быстрый отклик и низкая нагрузка на БД
+- **Bull очереди** - асинхронная обработка сообщений и задач
+- **Compression** - автоматическое сжатие HTTP ответов
+- **Rate limiting** - защита от спама и DDoS
 
-This split is intentional: API, cache, logger, migrations, health checks, and tests must not depend on `BOT_TOKEN`.
+### Мониторинг и надёжность
 
-## Canonical Request Statuses
+- **Health checks** - `/healthz`, `/readyz`, `/livez`, `/health`
+- **Graceful shutdown** - корректное завершение работы
+- **Структурированное логирование** - Pino
+- **Мониторинг памяти** - автоматические алерты
 
-- `new`
-- `in_progress`
-- `called_back`
-- `proposal_sent`
-- `fulfilled`
-- `closed`
+### Безопасность
 
-Legacy `awaiting_payment` is normalized to `proposal_sent` on reads and updates. Public interfaces keep existing route names for compatibility.
+- **Helmet.js** - security headers
+- **API Key аутентификация** - для admin endpoints
+- **CORS настройка** - контроль доступа
+- **Rate limiting** - ограничение запросов
 
-## Commands
+## 📋 Требования
 
-```bash
-npm start
-npm run dev
-npm test
-npm run lint
-npm run smoke:api
-npm run build:web
-npm run backup
-npm run restore-check
-```
+- Node.js 18+
+- Redis 6+ (для кэширования и очередей)
+- Docker & Docker Compose (опционально)
 
-## Quick Start
+## 🛠 Установка
+
+### Быстрый старт
 
 ```bash
+# Клонирование репозитория
 git clone <repo-url>
 cd Bot_noct
+
+# Установка зависимостей
 npm install
-npm --prefix web install
+
+# Настройка переменных окружения
 cp .env.example .env
+# Отредактируйте .env с вашими данными
+
+# Запуск с Docker
+docker compose up -d
+
+# Или запуск вручную
 npm start
 ```
 
-For API-only local checks:
+### Docker Compose (примеры)
 
 ```bash
-BOT_ENABLED=false npm run smoke:api
+# Development profile (bot-dev + web + redis + mcp)
+docker compose --profile dev up -d
+
+# Просмотр логов
+docker compose logs -f
+
+# Остановка
+docker compose down
+
+# Production profile (bot + redis + mcp)
+docker compose --profile prod up -d
 ```
 
-On Windows PowerShell:
+## ⚙️ Конфигурация
 
-```powershell
-$env:BOT_ENABLED='false'
-npm run smoke:api
-```
-
-## Environment
-
-Base runtime config can load without Telegram secrets:
+### Переменные окружения
 
 ```env
+# Telegram
+BOT_TOKEN=your_bot_token
+ADMIN_ID=your_telegram_id
+
+# App
 NODE_ENV=development
-BOT_ENABLED=true
 PORT=3000
+DEV_PORT=3001
 DB_PATH=./data/bot.sqlite
-API_SECRET=replace_with_strong_secret
+
+# Режим доставки Telegram
+# local: polling
+# production: webhook + WEBHOOK_DOMAIN
+TELEGRAM_DELIVERY_MODE=polling
+WEBHOOK_DOMAIN=
+TELEGRAM_STARTUP_TIMEOUT_MS=15000
+
+# Web / Mini App
+WEB_APP_URL=https://your-miniapp-domain.example/mini-app
 CORS_ORIGIN=
-WEB_APP_URL=
+
+# API
+API_SECRET=replace_with_strong_secret
 API_COMPRESSION=true
+
+# Redis (кэш и очереди; опционально)
 REDIS_HOST=localhost
 REDIS_PORT=6379
+REDIS_DB=0
+
+# Logging
 LOG_LEVEL=info
 LOG_FORMAT=json
 ```
 
-Bot-specific variables are only required when `BOT_ENABLED=true`:
+Подробнее: [DEPLOYMENT.md](DEPLOYMENT.md)
 
-```env
-BOT_TOKEN=your_telegram_bot_token
-ADMIN_ID=123456789
-TELEGRAM_DELIVERY_MODE=polling
-WEBHOOK_DOMAIN=
-TELEGRAM_STARTUP_TIMEOUT_MS=15000
-ALLOW_BOT_LAUNCH_FAILURE=false
+## 📡 API Endpoints
+
+### Публичные
+
+| Endpoint                         | Метод | Описание                          |
+| -------------------------------- | ----- | --------------------------------- |
+| `/api/lead`                      | POST  | Создать лид                       |
+| `/api/lead/track/:token/status`  | GET   | Получить публичный статус заявки  |
+| `/api/catalog`                   | GET   | Каталог товаров                   |
+
+### Admin (требуется API Key)
+
+| Endpoint                            | Метод | Описание            |
+| ----------------------------------- | ----- | ------------------- |
+| `/api/admin/leads`                  | GET   | Все лиды            |
+| `/api/admin/leads/:id/status`       | PATCH | Обновить статус     |
+| `/api/admin/conversations/:id/reply`| POST  | Ответить клиенту    |
+| `/api/admin/products`               | GET   | Товары              |
+| `/api/admin/users`                  | GET   | Пользователи        |
+
+### Проверка состояния
+
+| Endpoint   | Описание         |
+| ---------- | ---------------- |
+| `/healthz` | Liveness probe   |
+| `/readyz`  | Readiness probe  |
+| `/livez`   | Liveness check   |
+| `/health`  | Детальный статус |
+
+## 🏗 Архитектура
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│                      Telegram API                         │
+└────────────────────────┬────────────────────────────────┘
+                         │
+┌────────────────────────▼────────────────────────────────┐
+│                     Telegraf Bot                         │
+├─────────────────────────────────────────────────────────┤
+│  Handlers │ Repositories │ Services │ Cache │ Queue     │
+└────────────────────────┬────────────────────────────────┘
+                         │
+┌────────────────────────▼────────────────────────────────┐
+│                   Express Web Server                     │
+├─────────────────────────────────────────────────────────┤
+│ Routes │ Middleware │ Compression │ Rate Limiting        │
+└────────────────────────┬────────────────────────────────┘
+                         │
+┌────────────────────────▼────────────────────────────────┐
+│                  Data Layer                              │
+├─────────────────────────────────────────────────────────┤
+│  SQLite │ Redis (Cache) │ Redis (Bull Queue)           │
+└─────────────────────────────────────────────────────────┘
 ```
 
-See [.env.example](.env.example), [DEPLOYMENT.md](DEPLOYMENT.md), and [DEPLOYMENT_PRODUCTION.md](DEPLOYMENT_PRODUCTION.md).
+## 📁 Структура проекта
 
-## HTTP API
+```text
+Bot_noct/
+├── src/
+│   ├── bot.js              # Telegram bot initialization
+│   ├── config/
+│   │   └── env.js          # Environment configuration
+│   ├── db/
+│   │   ├── sqlite.js       # Database connection
+│   │   └── migrations/     # Database migrations
+│   ├── handlers/
+│   │   ├── admin.js        # Admin command handlers
+│   │   └── client.js       # Client handlers
+│   ├── repositories/       # Data access layer
+│   ├── services/
+│   │   ├── cache-service.js    # Redis cache
+│   │   ├── queue-service.js    # Bull queues
+│   │   ├── lead-service.js     # Lead business logic
+│   │   └── conversation-service.js
+│   ├── ui/
+│   │   ├── keyboards.js    # Inline keyboards
+│   │   └── messages.js     # Message templates
+│   ├── utils/
+│   │   ├── logger-enhanced.js  # Structured logging
+│   │   ├── graceful-shutdown.js
+│   │   └── rate-limiter.js
+│   └── web/
+│       ├── server.js       # Express app
+│       ├── middleware/     # Express middleware
+│       └── routes/         # API routes
+├── web/                    # Next.js admin panel
+│   └── app/admin/         # Admin dashboard
+├── docker-compose.yml
+├── Dockerfile
+└── DEPLOYMENT.md          # Deployment guide
+```
 
-Public endpoints remain unchanged:
-
-- `GET /api/catalog`
-- `POST /api/lead`
-- `GET /api/lead/track/:token/status`
-
-Admin endpoints remain under:
-
-- `GET /api/admin/*`
-- `PATCH /api/admin/*`
-
-Health endpoints:
-
-- `GET /healthz`
-- `GET /readyz`
-- `GET /livez`
-- `GET /health`
-
-## Architecture
-
-- `index.js`: bootstrap, database, cache, queues, bot runtime, web server, shutdown
-- `src/config/env.js`: base runtime config
-- `src/config/bot.js`: bot-only config resolver
-- `src/db/sqlite.js`: SQLite setup and lawful default seeds
-- `src/db/migrations/`: schema and data migrations
-- `src/web/server.js`: Express app, health routes, public/admin API
-- `src/bot.js`: Telegram handlers and services
-- `web/`: Next.js admin dashboard
-
-## Verification Flow
-
-Recommended local verification after changes:
+## 🔧 Разработка
 
 ```bash
+# Режим разработки с hot reload
+npm run dev
+
+# Тесты
 npm test
-npm run smoke:api
+
+# Линтинг
 npm run lint
-npm run build:web
+
+# Форматирование
+npm run format
 ```
 
-For manual QA, use [docs/manual-test-checklist.md](docs/manual-test-checklist.md). For operational recovery and rollback, use [docs/runbook.md](docs/runbook.md).
+## 📊 Мониторинг
+
+### Health Checks
+
+```bash
+# Базовый check
+curl http://localhost:3000/healthz
+
+# Readiness (проверяет все компоненты)
+curl http://localhost:3000/readyz
+
+# Детальный статус
+curl http://localhost:3000/health
+```
+
+### Метрики
+
+```bash
+# Статистика очередей (admin)
+curl -H "X-API-Key: your-key" http://localhost:3000/api/admin/queues
+
+# Статистика кэша
+curl -H "X-API-Key: your-key" http://localhost:3000/api/admin/cache
+
+# Использование памяти (dev)
+curl http://localhost:3000/debug/memory
+```
+
+## 🐳 Docker
+
+### Образы
+
+```bash
+# Сборка
+docker build -t bot-noct .
+
+# Запуск
+docker run -d \
+  -e BOT_TOKEN=your_token \
+  -e REDIS_HOST=redis \
+  --link redis \
+  bot-noct
+```
+
+### Docker Compose
+
+```bash
+# Запуск production bot
+docker compose --profile prod up -d bot redis
+
+# Запуск development bot + web
+docker compose --profile dev up -d bot-dev web redis
+```
+
+## 🔒 Безопасность
+
+- [ ] Используйте сильный `API_SECRET`
+- [ ] Без `API_SECRET` admin HTTP API работает в fail-closed режиме и возвращает `503`
+- [ ] Настройте `CORS_ORIGIN` для продакшена
+- [ ] Включите `LOG_FORMAT=json` в продакшене
+- [ ] Настройте firewall для Redis порта
+- [ ] Используйте TLS для webhook URL
+
+## 📈 Масштабирование
+
+### Горизонтальное масштабирование
+
+```bash
+# Запуск нескольких инстансов
+docker compose up -d --scale bot=5
+```
+
+### Очереди
+
+- Сообщения обрабатываются асинхронно
+- Автоматический retry при ошибках
+- Rate limiting предотвращает перегрузку
+
+## 🐛 Troubleshooting
+
+### Бот не запускается
+
+```bash
+# Проверьте токен
+curl https://api.telegram.org/bot${BOT_TOKEN}/getMe
+
+# Проверьте логи
+docker compose logs bot
+```
+
+### Ошибки подключения к Redis
+
+```bash
+# Проверьте Redis
+redis-cli ping
+
+# Docker
+docker compose logs redis
+```
+
+## 📝 Лицензия
+
+MIT
+
+## 🤝 Contributing
+
+См. [CONTRIBUTING.md](CONTRIBUTING.md)

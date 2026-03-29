@@ -6,20 +6,22 @@ const { createDatabase } = require("./src/db/sqlite");
 const { createRepositories } = require("./src/repositories");
 const { createBot } = require("./src/bot");
 const {
-  BOT_ENABLED,
+  BOT_TOKEN,
   ADMIN_ID,
   PORT,
   API_SECRET,
+  WEBHOOK_DOMAIN,
+  TELEGRAM_DELIVERY_MODE,
   CORS_ORIGIN,
-  WEB_APP_URL,
   isProduction,
   NODE_ENV,
   API_COMPRESSION,
+  ALLOW_BOT_LAUNCH_FAILURE,
+  TELEGRAM_STARTUP_TIMEOUT_MS,
   MEMORY_LIMIT_WARN,
   MEMORY_LIMIT_CRITICAL,
   REDIS_CONFIG,
 } = require("./src/config/env");
-const { resolveBotConfig } = require("./src/config/bot");
 const { createWebServer } = require("./src/web/server");
 const {
   createConversationService,
@@ -27,11 +29,13 @@ const {
 const { createSchedulerService } = require("./src/services/scheduler-service");
 const {
   initCacheService,
+  getCacheService,
 } = require("./src/services/cache-service");
 const {
   initQueueService,
   closeQueueService,
   processMessageJobs,
+  processWebhookJobs,
 } = require("./src/services/queue-service");
 const {
   createShutdownHandler,
@@ -271,25 +275,7 @@ async function bootstrap() {
     environment: NODE_ENV,
     nodeVersion: process.version,
   });
-  const runtimeConfig = {
-    BOT_ENABLED,
-    ADMIN_ID,
-    PORT,
-    API_SECRET,
-    CORS_ORIGIN,
-    WEB_APP_URL,
-    isProduction,
-    NODE_ENV,
-    API_COMPRESSION,
-    MEMORY_LIMIT_WARN,
-    MEMORY_LIMIT_CRITICAL,
-    REDIS_CONFIG,
-  };
-  const botConfig = resolveBotConfig(runtimeConfig);
-
-  if (BOT_ENABLED && !Number.isInteger(ADMIN_ID)) {
-    throw new Error("ADMIN_ID must be set when BOT_ENABLED=true");
-  }
+  const allowBotLaunchFailureInProduction = ALLOW_BOT_LAUNCH_FAILURE;
 
   // Initialize database
   const db = createDatabase();
@@ -317,30 +303,22 @@ async function bootstrap() {
     await initQueueService(REDIS_CONFIG);
     queueService = require("./src/services/queue-service");
     log.info("Queue service initialized");
+
+    // Setup message queue processor
+    if (repos.bot) {
+      // Bot will be set after bot creation
+    }
   } catch (error) {
     log.warn("Queue service initialization failed, continuing without queues", {
       error: formatError(error),
     });
   }
 
-  // Create bot only when Telegram runtime is enabled
-  let bot = null;
-  if (botConfig) {
-    bot = createBot({
-      db,
-      repos,
-      botToken: botConfig.BOT_TOKEN,
-      adminId: ADMIN_ID,
-      webAppUrl: WEB_APP_URL,
-      cacheService,
-      queueService,
-    });
-  } else {
-    log.info("BOT_ENABLED=false, skipping Telegram bot initialization");
-  }
+  // Create bot
+  const bot = createBot({ db, repos, cacheService, queueService });
 
   // Setup queue processors with bot instance
-  if (queueService && bot?.telegram?.sendMessage) {
+  if (queueService) {
     // Process outgoing messages from queue
     processMessageJobs(async (chatId, text, options) => {
       try {
@@ -354,10 +332,6 @@ async function bootstrap() {
         throw error;
       }
     });
-  } else if (queueService) {
-    log.info(
-      "Queue service initialized without Telegram runtime; message jobs are not registered",
-    );
   }
 
   // Create services
@@ -377,23 +351,21 @@ async function bootstrap() {
   });
 
   let webhookEnabled = false;
-  if (botConfig?.TELEGRAM_DELIVERY_MODE === "webhook") {
-    webhookEnabled = shouldUseWebhookMode(botConfig.WEBHOOK_DOMAIN);
+  if (TELEGRAM_DELIVERY_MODE === "webhook") {
+    webhookEnabled = shouldUseWebhookMode(WEBHOOK_DOMAIN);
     if (!webhookEnabled) {
       log.warn(
         "Webhook mode requested but domain is not usable; using polling",
         {
-          webhookDomain: botConfig.WEBHOOK_DOMAIN || null,
+          webhookDomain: WEBHOOK_DOMAIN || null,
         },
       );
     }
   }
-  if (botConfig) {
-    log.info("Telegram delivery mode resolved", {
-      requestedMode: botConfig.TELEGRAM_DELIVERY_MODE,
-      effectiveMode: webhookEnabled ? "webhook" : "polling",
-    });
-  }
+  log.info("Telegram delivery mode resolved", {
+    requestedMode: TELEGRAM_DELIVERY_MODE,
+    effectiveMode: webhookEnabled ? "webhook" : "polling",
+  });
 
   // Create web server
   const webServer = createWebServer({
@@ -407,12 +379,11 @@ async function bootstrap() {
     compressionEnabled: API_COMPRESSION,
     cacheService,
     queueService,
-    environment: NODE_ENV,
   });
 
   // Mount webhook handler if using webhook mode
-  if (webhookEnabled && botConfig && bot) {
-    const webhookPath = `/webhook/${botConfig.BOT_TOKEN}`;
+  if (webhookEnabled) {
+    const webhookPath = `/webhook/${BOT_TOKEN}`;
     webServer.use(bot.webhookCallback(webhookPath));
     log.info("Webhook handler mounted", { path: webhookPath });
   }
@@ -437,30 +408,26 @@ async function bootstrap() {
     log.info(`HTTP server started on port ${PORT}`);
 
     // Launch bot
-    if (bot && botConfig) {
-      try {
-        const launchedBot = await launchTelegramRuntime({
-          bot,
-          webhookEnabled,
-          webhookDomain: botConfig.WEBHOOK_DOMAIN,
-          botToken: botConfig.BOT_TOKEN,
-          timeoutMs: botConfig.TELEGRAM_STARTUP_TIMEOUT_MS,
-          log,
-        });
-        resources.botLaunched = true;
-        log.info(`Bot started in ${launchedBot.mode} mode`, launchedBot.details);
-      } catch (error) {
-        if (isProduction && !botConfig.ALLOW_BOT_LAUNCH_FAILURE) {
-          throw error;
-        }
-        log.warn("Bot launch failed; continuing in API-only mode", {
-          error: formatError(error),
-          details: serializeErrorDetails(error),
-          productionFallbackEnabled: botConfig.ALLOW_BOT_LAUNCH_FAILURE,
-        });
+    try {
+      const launchedBot = await launchTelegramRuntime({
+        bot,
+        webhookEnabled,
+        webhookDomain: WEBHOOK_DOMAIN,
+        botToken: BOT_TOKEN,
+        timeoutMs: TELEGRAM_STARTUP_TIMEOUT_MS,
+        log,
+      });
+      resources.botLaunched = true;
+      log.info(`Bot started in ${launchedBot.mode} mode`, launchedBot.details);
+    } catch (error) {
+      if (isProduction && !allowBotLaunchFailureInProduction) {
+        throw error;
       }
-    } else {
-      log.info("Telegram runtime is disabled; application started in API-only mode");
+      log.warn("Bot launch failed; continuing in API-only mode", {
+        error: formatError(error),
+        details: serializeErrorDetails(error),
+        productionFallbackEnabled: allowBotLaunchFailureInProduction,
+      });
     }
 
     // Start session cleanup

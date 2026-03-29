@@ -6,13 +6,14 @@ function withFallback(value, fallback) {
 }
 
 function welcomeMessage(entry) {
-  const tagline = "Оставьте заявку в пару шагов или сразу напишите менеджеру.";
+  const tagline =
+    "Оставьте заявку в пару шагов или сразу напишите менеджеру.";
 
   if (entry?.source === "channel") {
     return `${entry.title}.\n\n${tagline}`;
   }
 
-  return `Здравствуйте! Поможем подобрать подходящее решение под ваш запрос.\n\n${tagline}`;
+  return `Здравствуйте! Мы можем найти для вас всё что угодно.\n\n${tagline}`;
 }
 
 function helpMessage() {
@@ -21,6 +22,7 @@ function helpMessage() {
     "/start — открыть стартовый экран\n" +
     "/menu — показать главное меню\n" +
     "/status — статус вашей последней заявки\n" +
+    "/cancel — отменить текущую заявку\n" +
     "/help — справка\n\n" +
     "Также вы можете просто написать сообщение менеджеру или оформить заявку через меню."
   );
@@ -28,7 +30,7 @@ function helpMessage() {
 
 function howToOrderMessage() {
   return (
-    "Как оформить заявку:\n" +
+    "Как оформить заказ:\n" +
     '1. Откройте каталог или нажмите "Оставить заявку".\n' +
     "2. Выберите товар.\n" +
     "3. Укажите количество и комментарий.\n" +
@@ -68,22 +70,6 @@ function leadSummaryMessage(draft) {
   const comment = withFallback(draft.comment, "Без комментария");
   const contact = withFallback(draft.contactLabel, "Ответить в этом чате");
   const source = formatSourceLabel(draft.sourcePayload);
-
-  if (draft.items && draft.items.length) {
-    const lines = draft.items
-      .map((row) => `• ${row.productName} ×${row.quantity}`)
-      .join("\n");
-    return (
-      "Шаг 4 из 4.\n\nПроверьте заявку (корзина):\n\n" +
-      `${lines}\n\n` +
-      `Комментарий: ${comment}\n` +
-      `Контакт: ${contact}\n` +
-      `Источник: ${source}\n\n` +
-      "Если всё верно, подтвердите заявку.\n" +
-      "Нужно что-то поправить? Используйте кнопки ниже."
-    );
-  }
-
   return (
     "Шаг 4 из 4.\n\nПроверьте заявку:\n\n" +
     `Товар: ${draft.productName}\n` +
@@ -105,8 +91,8 @@ function leadCreatedMessage() {
 
 function contactManagerMessage() {
   return (
-    "Напишите, какая задача, товар или услуга вас интересует.\n\n" +
-    "Мы уточним детали, подберём решение и вернёмся с ответом."
+    "Напишите, что вас интересует — любой товар или услуга.\n\n" +
+    "Мы подберём вариант и сообщим цену в ответном сообщении."
   );
 }
 
@@ -145,29 +131,11 @@ function adminLeadCard(lead, clientLabel) {
   const comment = withFallback(lead.comment, "Без комментария");
   const contact = withFallback(lead.contact_label, "Ответить в Telegram");
   const source = formatSourceLabel(lead.source_payload);
-
-  let linesBlock = "";
-  if (lead.line_items_json) {
-    try {
-      const items = JSON.parse(lead.line_items_json);
-      if (Array.isArray(items) && items.length) {
-        linesBlock =
-          items.map((i) => `• ${i.productName} ×${i.quantity}`).join("\n") +
-          "\n\n";
-      }
-    } catch {
-      linesBlock = "";
-    }
-  }
-
-  const productBlock = linesBlock
-    ? `${linesBlock}Всего единиц: ${lead.quantity}\n`
-    : `Товар: ${lead.product_name}\nКоличество: ${lead.quantity}\n`;
-
   return (
     "Новая заявка:\n" +
     `${clientLabel}\n\n` +
-    productBlock +
+    `Товар: ${lead.product_name}\n` +
+    `Количество: ${lead.quantity}\n` +
     `Комментарий: ${comment}\n` +
     `Контакт: ${contact}\n` +
     `Источник: ${source}\n` +
@@ -199,12 +167,12 @@ function clientLeadCalledBackMessage() {
   return "Менеджер свяжется с вами в ближайшее время. Ожидайте звонка или сообщения!";
 }
 
-function clientLeadProposalSentMessage() {
-  return "По вашей заявке подготовлено предложение. Проверьте детали, а если нужно что-то уточнить, просто ответьте в этот чат.";
+function clientLeadAwaitingPaymentMessage() {
+  return "Ваша заявка подтверждена. Ожидаем оплату — реквизиты уже отправлены или будут высланы менеджером.";
 }
 
 function clientLeadFulfilledMessage() {
-  return "Ваша заявка выполнена. Если понадобится новый запрос, просто напишите нам снова.";
+  return "Ваша заявка выполнена. Спасибо за покупку! Будем рады снова помочь 🎉";
 }
 
 function conversationResolvedMessage() {
@@ -213,18 +181,6 @@ function conversationResolvedMessage() {
 
 function rateLimitMessage() {
   return "Вы отправляете сообщения слишком часто. Пожалуйста, подождите немного.";
-}
-
-function nonAdminCommandMessage() {
-  return "Эта команда доступна только администратору.";
-}
-
-function callbackRateLimitMessage() {
-  return "Слишком часто. Подождите немного.";
-}
-
-function botErrorUserMessage() {
-  return "Произошла ошибка. Попробуйте позже.";
 }
 
 function clientLeadStatusMessage(lead) {
@@ -243,25 +199,10 @@ function clientLeadStatusMessage(lead) {
     minute: "2-digit",
   });
 
-  let linesBlock = "";
-  if (lead.line_items_json) {
-    try {
-      const items = JSON.parse(lead.line_items_json);
-      if (Array.isArray(items) && items.length) {
-        linesBlock = `${items.map((i) => `• ${i.productName} ×${i.quantity}`).join("\n")}\n\n`;
-      }
-    } catch {
-      linesBlock = "";
-    }
-  }
-
-  const productBlock = linesBlock
-    ? `${linesBlock}Всего единиц: ${lead.quantity}\n`
-    : `Товар: ${lead.product_name}\nКоличество: ${lead.quantity}\n`;
-
   return (
     `Ваша последняя заявка #${lead.id}:\n\n` +
-    productBlock +
+    `Товар: ${lead.product_name}\n` +
+    `Количество: ${lead.quantity}\n` +
     `Комментарий: ${comment}\n` +
     `Контакт: ${contact}\n` +
     `Статус: ${statusLabel}\n` +
@@ -272,9 +213,6 @@ function clientLeadStatusMessage(lead) {
 module.exports = {
   conversationResolvedMessage,
   rateLimitMessage,
-  nonAdminCommandMessage,
-  callbackRateLimitMessage,
-  botErrorUserMessage,
   welcomeMessage,
   helpMessage,
   howToOrderMessage,
@@ -296,7 +234,7 @@ module.exports = {
   clientLeadOutOfStockMessage,
   clientLeadNotRelevantMessage,
   clientLeadCalledBackMessage,
-  clientLeadProposalSentMessage,
+  clientLeadAwaitingPaymentMessage,
   clientLeadFulfilledMessage,
   clientLeadStatusMessage,
 };

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { fetchCatalog, submitWebLead, type Product } from "@/lib/api";
 
 type Step = "product" | "details" | "contact" | "confirm" | "success";
-const canTrackLead = true;
+const canTrackLead = process.env.NODE_ENV !== "production";
 
 export function LeadForm({ preselectedProduct }: { preselectedProduct: string }) {
   const [step, setStep] = useState<Step>("product");
@@ -56,7 +56,7 @@ export function LeadForm({ preselectedProduct }: { preselectedProduct: string })
       <div className="rounded-xl border border-border bg-card p-8 text-center space-y-4">
         <p className="text-2xl font-bold">Заявка отправлена!</p>
         <p className="text-muted-foreground">
-          Номер отслеживания: <span className="font-mono">{createdLeadToken}</span>
+          Токен отслеживания: <span className="font-mono">{createdLeadToken}</span>
         </p>
         <p className="text-sm text-muted-foreground">Мы свяжемся с вами в ближайшее время.</p>
         <div className="flex gap-3 justify-center mt-4">
@@ -65,7 +65,7 @@ export function LeadForm({ preselectedProduct }: { preselectedProduct: string })
               href={`/track/${createdLeadToken}`}
               className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
             >
-              Проверить статус
+              Отследить статус
             </Link>
           )}
           <Link

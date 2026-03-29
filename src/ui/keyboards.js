@@ -1,6 +1,5 @@
 const { Markup } = require("telegraf");
 const { ACTIONS, ACTION_PREFIXES, buildAction } = require("../utils/actions");
-const { CATALOG_PAGE_SIZE } = require("./catalog-view");
 
 function backToMainKeyboard() {
   return Markup.inlineKeyboard([
@@ -16,59 +15,12 @@ function clientMiniAppKeyboard(webAppUrl) {
 }
 
 function catalogKeyboard(products) {
-  return catalogKeyboardPaged(products, 0, { cartItemCount: 0 });
-}
-
-function catalogKeyboardPaged(allProducts, page, options = {}) {
-  const { cartItemCount = 0 } = options;
-  const totalPages = Math.max(
-    1,
-    Math.ceil(allProducts.length / CATALOG_PAGE_SIZE),
-  );
-  const safePage = Math.min(Math.max(0, page), totalPages - 1);
-  const slice = allProducts.slice(
-    safePage * CATALOG_PAGE_SIZE,
-    safePage * CATALOG_PAGE_SIZE + CATALOG_PAGE_SIZE,
-  );
-
-  const rows = slice.map((product) => [
+  const rows = products.map((product) => [
     Markup.button.callback(
       product.title,
       buildAction(ACTION_PREFIXES.CATALOG_PRODUCT, product.id),
     ),
   ]);
-
-  if (totalPages > 1) {
-    const nav = [];
-    if (safePage > 0) {
-      nav.push(
-        Markup.button.callback(
-          "◀",
-          buildAction(ACTION_PREFIXES.CATALOG_PAGE, safePage - 1),
-        ),
-      );
-    }
-    if (safePage < totalPages - 1) {
-      nav.push(
-        Markup.button.callback(
-          "▶",
-          buildAction(ACTION_PREFIXES.CATALOG_PAGE, safePage + 1),
-        ),
-      );
-    }
-    if (nav.length) {
-      rows.push(nav);
-    }
-  }
-
-  if (cartItemCount > 0) {
-    rows.push([
-      Markup.button.callback(
-        `Оформить корзину (${cartItemCount})`,
-        ACTIONS.CART_CHECKOUT,
-      ),
-    ]);
-  }
 
   rows.push([Markup.button.callback("Главное меню", ACTIONS.MENU_MAIN)]);
   return Markup.inlineKeyboard(rows);
@@ -80,12 +32,6 @@ function productCardKeyboard(productId) {
       Markup.button.callback(
         "Оставить заявку на этот товар",
         buildAction(ACTION_PREFIXES.LEAD_PRODUCT, productId),
-      ),
-    ],
-    [
-      Markup.button.callback(
-        "В корзину",
-        buildAction(ACTION_PREFIXES.CART_ADD, productId),
       ),
     ],
     [Markup.button.callback("Назад в каталог", ACTIONS.CATALOG_ROOT)],
@@ -152,22 +98,6 @@ function confirmLeadKeyboard(draft = {}) {
   const commentButtonLabel = draft.comment
     ? "Изменить комментарий"
     : "Добавить комментарий";
-
-  if (draft.items && draft.items.length) {
-    return Markup.inlineKeyboard([
-      [Markup.button.callback("Подтвердить заявку", ACTIONS.LEAD_CONFIRM)],
-      [
-        Markup.button.callback("Изменить корзину", ACTIONS.LEAD_EDIT_QUANTITY),
-        Markup.button.callback(commentButtonLabel, ACTIONS.LEAD_EDIT_COMMENT),
-      ],
-      [Markup.button.callback("Изменить контакт", ACTIONS.LEAD_EDIT_CONTACT)],
-      [
-        Markup.button.callback("Назад", ACTIONS.LEAD_BACK),
-        Markup.button.callback("Отмена", ACTIONS.LEAD_CANCEL),
-      ],
-      [Markup.button.callback("Главное меню", ACTIONS.MENU_MAIN)],
-    ]);
-  }
 
   return Markup.inlineKeyboard([
     [Markup.button.callback("Подтвердить заявку", ACTIONS.LEAD_CONFIRM)],
@@ -259,7 +189,10 @@ function adminLeadKeyboard(leadId, clientId) {
 function adminQuickReplyKeyboard(clientId) {
   return Markup.inlineKeyboard([
     [
-      Markup.button.callback("Подтвердить", `admin:template:ack:${clientId}`),
+      Markup.button.callback(
+        "Подтвердить",
+        `admin:template:ack:${clientId}`,
+      ),
       Markup.button.callback("Сроки", `admin:template:terms:${clientId}`),
     ],
     [
@@ -267,11 +200,17 @@ function adminQuickReplyKeyboard(clientId) {
         "Наличие",
         `admin:template:availability:${clientId}`,
       ),
-      Markup.button.callback("Контакт", `admin:template:contact:${clientId}`),
+      Markup.button.callback(
+        "Контакт",
+        `admin:template:contact:${clientId}`,
+      ),
     ],
     [
       Markup.button.callback("Оплата", `admin:template:payment:${clientId}`),
-      Markup.button.callback("Доставка", `admin:template:delivery:${clientId}`),
+      Markup.button.callback(
+        "Доставка",
+        `admin:template:delivery:${clientId}`,
+      ),
     ],
     [
       Markup.button.callback("Inbox", ACTIONS.ADMIN_INBOX),
@@ -290,12 +229,9 @@ function _clientButtonLabel(dialog) {
   return `id:${dialog.client_telegram_id}`;
 }
 
-function adminInboxKeyboard(
-  dialogs,
-  { offset = 0, pageSize = 8, hasMore = false } = {},
-) {
+function adminInboxKeyboard(dialogs) {
   const rows = dialogs
-    .slice(0, pageSize)
+    .slice(0, 8)
     .map((dialog) => [
       Markup.button.callback(
         `Открыть ${_clientButtonLabel(dialog)}`,
@@ -303,60 +239,14 @@ function adminInboxKeyboard(
       ),
     ]);
 
-  const nav = [];
-  if (offset > 0) {
-    nav.push(
-      Markup.button.callback(
-        "◀ Раньше",
-        `${ACTION_PREFIXES.ADMIN_LIST}dialogs:${Math.max(0, offset - pageSize)}`,
-      ),
-    );
-  }
-  if (hasMore) {
-    nav.push(
-      Markup.button.callback(
-        "Ещё ▶",
-        `${ACTION_PREFIXES.ADMIN_LIST}dialogs:${offset + pageSize}`,
-      ),
-    );
-  }
-  if (nav.length) {
-    rows.push(nav);
-  }
-
   rows.push([Markup.button.callback("Обновить inbox", ACTIONS.ADMIN_INBOX)]);
   return Markup.inlineKeyboard(rows);
-}
-
-function adminListPaginationKeyboard(kind, offset, pageSize, hasMore) {
-  const nav = [];
-  if (offset > 0) {
-    nav.push(
-      Markup.button.callback(
-        "◀ Раньше",
-        `${ACTION_PREFIXES.ADMIN_LIST}${kind}:${Math.max(0, offset - pageSize)}`,
-      ),
-    );
-  }
-  if (hasMore) {
-    nav.push(
-      Markup.button.callback(
-        "Ещё ▶",
-        `${ACTION_PREFIXES.ADMIN_LIST}${kind}:${offset + pageSize}`,
-      ),
-    );
-  }
-  if (!nav.length) {
-    return null;
-  }
-  return Markup.inlineKeyboard([nav]);
 }
 
 module.exports = {
   clientMiniAppKeyboard,
   backToMainKeyboard,
   catalogKeyboard,
-  catalogKeyboardPaged,
   productCardKeyboard,
   quantityKeyboard,
   commentKeyboard,
@@ -368,5 +258,4 @@ module.exports = {
   adminLeadKeyboard,
   adminQuickReplyKeyboard,
   adminInboxKeyboard,
-  adminListPaginationKeyboard,
 };

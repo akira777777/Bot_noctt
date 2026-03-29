@@ -60,7 +60,7 @@ test("lead status service rejects unsupported statuses without touching reposito
     },
   });
 
-  const result = await service.updateStatus(123, "unsupported_status");
+  const result = await service.updateStatus(123, "open");
 
   assert.equal(result, null);
   assert.equal(updateCalls, 0);

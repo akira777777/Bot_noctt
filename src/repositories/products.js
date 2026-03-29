@@ -8,19 +8,34 @@ function createProductsRepo(db) {
   const getById = db.prepare(`SELECT * FROM products WHERE id = ?`);
   const getByCode = db.prepare(`SELECT * FROM products WHERE code = ?`);
   const insert = db.prepare(`
-    INSERT INTO products (code, title, description, price_text, is_active, sort_order)
-    VALUES (@code, @title, @description, @price_text, 1, @sort_order)
+    INSERT INTO products (code, title, description, price_text, image_url, is_active, sort_order)
+    VALUES (@code, @title, @description, @price_text, @image_url, 1, @sort_order)
     RETURNING *
   `);
   const update = db.prepare(`
     UPDATE products
-    SET title = @title, description = @description, price_text = @price_text, sort_order = @sort_order
+    SET title = @title, description = @description, price_text = @price_text,
+        image_url = @image_url, sort_order = @sort_order
     WHERE id = @id
     RETURNING *
   `);
   const setActive = db.prepare(
     `UPDATE products SET is_active = ? WHERE id = ? RETURNING *`,
   );
+
+  function normalizeCreatePayload(payload) {
+    return {
+      ...payload,
+      image_url: payload.image_url ?? null,
+    };
+  }
+
+  function normalizeUpdatePayload(payload) {
+    return {
+      ...payload,
+      image_url: payload.image_url ?? null,
+    };
+  }
 
   return {
     list() {
@@ -36,10 +51,10 @@ function createProductsRepo(db) {
       return getByCode.get(code);
     },
     create(payload) {
-      return insert.get(payload);
+      return insert.get(normalizeCreatePayload(payload));
     },
     update(payload) {
-      return update.get(payload);
+      return update.get(normalizeUpdatePayload(payload));
     },
     setActive(id, isActive) {
       return setActive.get(isActive ? 1 : 0, id);

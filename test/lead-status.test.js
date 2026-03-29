@@ -14,7 +14,7 @@ test("canonical lead statuses exclude legacy aliases", () => {
     "new",
     "in_progress",
     "called_back",
-    "proposal_sent",
+    "awaiting_payment",
     "fulfilled",
     "closed",
   ]);
@@ -22,9 +22,8 @@ test("canonical lead statuses exclude legacy aliases", () => {
   assert.equal(LEAD_STATUSES.includes("open"), false);
 });
 
-test("normalizeLeadStatus maps legacy aliases to canonical statuses", () => {
+test("normalizeLeadStatus maps legacy open alias to new", () => {
   assert.equal(normalizeLeadStatus("open"), "new");
-  assert.equal(normalizeLeadStatus("awaiting_payment"), "proposal_sent");
   assert.equal(normalizeLeadStatus("new"), "new");
   assert.equal(normalizeLeadStatus("closed"), "closed");
 });
@@ -42,6 +41,4 @@ test("every canonical lead status has a display label", () => {
     assert.equal(typeof LEAD_STATUS_LABELS[status], "string");
     assert.ok(LEAD_STATUS_LABELS[status].length > 0);
   }
-
-  assert.match(LEAD_STATUS_LABELS.proposal_sent, /предложение/i);
 });

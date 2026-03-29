@@ -7,7 +7,7 @@ const STATUSES = [
   { key: "new", label: "Новая" },
   { key: "in_progress", label: "В работе" },
   { key: "called_back", label: "Перезвонили" },
-  { key: "proposal_sent", label: "Предложение отправлено" },
+  { key: "awaiting_payment", label: "Ожидает оплаты" },
   { key: "fulfilled", label: "Выполнена" },
   { key: "closed", label: "Закрыта" },
 ];

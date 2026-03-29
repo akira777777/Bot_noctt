@@ -1,9 +1,5 @@
 const express = require("express");
-const {
-  getLeadStatusLabel,
-  isCanonicalLeadStatus,
-  normalizeLeadStatus,
-} = require("../../domain/lead-status");
+const { getLeadStatusLabel, isCanonicalLeadStatus } = require("../../domain/lead-status");
 
 function createAdminRoutes({
   repos,
@@ -19,9 +15,7 @@ function createAdminRoutes({
     const page = Math.max(1, Number(req.query.page) || 1);
     const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
     const offset = (page - 1) * limit;
-    const requestedStatus =
-      typeof req.query.status === "string" ? req.query.status : null;
-    const status = normalizeLeadStatus(requestedStatus);
+    const status = req.query.status || null;
 
     let leads;
     let total;
@@ -58,14 +52,14 @@ function createAdminRoutes({
   });
 
   router.patch("/leads/:id/status", async (req, res) => {
-    const normalizedStatus = normalizeLeadStatus(req.body?.status);
-    if (!normalizedStatus || !isCanonicalLeadStatus(normalizedStatus)) {
+    const { status } = req.body;
+    if (!status || !isCanonicalLeadStatus(status)) {
       return res.status(400).json({ ok: false, error: "Invalid status" });
     }
 
     const lead = await leadStatusService.updateStatus(
       Number(req.params.id),
-      normalizedStatus,
+      status,
     );
     if (!lead) {
       return res.status(404).json({ ok: false, error: "Lead not found" });
@@ -119,12 +113,6 @@ function createAdminRoutes({
       });
       res.json({ ok: true });
     } catch (error) {
-      if (error?.code === "TELEGRAM_DELIVERY_DISABLED") {
-        return res.status(503).json({
-          ok: false,
-          error: "Telegram delivery is disabled for this runtime",
-        });
-      }
       res.status(500).json({ ok: false, error: "Failed to send reply" });
     }
   });

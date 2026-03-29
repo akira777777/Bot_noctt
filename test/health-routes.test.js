@@ -1,7 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 
-const { NODE_ENV } = require("../src/config/env");
 const { createWebServer } = require("../src/web/server");
 const {
   createTempDb,
@@ -62,7 +61,7 @@ test("health endpoints report healthy runtime details when dependencies are avai
   assert.equal(health.status, 200);
   const healthPayload = await health.json();
   assert.equal(healthPayload.status, "healthy");
-  assert.equal(healthPayload.environment, NODE_ENV);
+  assert.equal(healthPayload.environment, "production");
   assert.equal(healthPayload.checks.cache.mode, "redis");
 });
 

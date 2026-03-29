@@ -3,19 +3,18 @@
     "new",
     "in_progress",
     "called_back",
-    "proposal_sent",
+    "awaiting_payment",
     "fulfilled",
     "closed"
   ],
   "aliases": {
-    "open": "new",
-    "awaiting_payment": "proposal_sent"
+    "open": "new"
   },
   "labels": {
     "new": "Новая — ожидает рассмотрения",
     "in_progress": "В работе — менеджер занимается вашей заявкой",
     "called_back": "Перезвонили — менеджер связывается с вами",
-    "proposal_sent": "Предложение отправлено — ожидаем ваше подтверждение",
+    "awaiting_payment": "Ожидает оплаты",
     "fulfilled": "Выполнена",
     "closed": "Закрыта"
   }

@@ -1,5 +1,5 @@
 const { generateText } = require("ai");
-const { createGateway } = require("@ai-sdk/gateway");
+const { gateway } = require("@ai-sdk/gateway");
 const { AI_ENABLED, AI_GATEWAY_API_KEY } = require("../config/env");
 const { logError } = require("../utils/logger");
 
@@ -46,9 +46,10 @@ function createAiService() {
     };
   }
 
-  // createGateway picks up VERCEL_OIDC_TOKEN automatically when on Vercel.
-  // For standalone deployments, pass AI_GATEWAY_API_KEY explicitly.
-  const gw = createGateway(AI_GATEWAY_API_KEY ? { apiKey: AI_GATEWAY_API_KEY } : {});
+  // gateway() picks up VERCEL_OIDC_TOKEN automatically when on Vercel.
+  // For standalone deployments, AI_GATEWAY_API_KEY is passed explicitly.
+  const gw = (modelId) =>
+    AI_GATEWAY_API_KEY ? gateway(modelId, { apiKey: AI_GATEWAY_API_KEY }) : gateway(modelId);
 
   async function generateClientAutoReply({ products, conversationMessages, clientMessage }) {
     const catalogText = buildProductCatalogContext(products);

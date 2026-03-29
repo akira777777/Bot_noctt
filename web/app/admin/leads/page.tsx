@@ -8,7 +8,7 @@ const STATUS_TABS = [
   { key: "new", label: "Новые" },
   { key: "in_progress", label: "В работе" },
   { key: "called_back", label: "Перезвонили" },
-  { key: "proposal_sent", label: "Предложение отправлено" },
+  { key: "awaiting_payment", label: "Ожидает оплаты" },
   { key: "fulfilled", label: "Выполнены" },
   { key: "closed", label: "Закрыты" },
 ];

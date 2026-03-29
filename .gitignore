@@ -21,6 +21,7 @@ coverage/
 
 # Vercel
 .vercel/
+.claude/worktrees/
 
 # Local env overrides
 .env.local

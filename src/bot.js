@@ -1,5 +1,6 @@
 const { Telegraf } = require("telegraf");
-const { AI_ENABLED, AI_MODEL } = require("./config/env");
+const { BOT_TOKEN, ADMIN_ID, WEB_APP_URL, AI_MODEL, AI_ENABLED } = require("./config/env");
+const { createAiAgentService } = require("./services/ai-agent-service");
 const {
   createConversationService,
 } = require("./services/conversation-service");
@@ -23,35 +24,25 @@ const {
   handleClientText,
   handleClientAction,
   handleClientMedia,
+  handleClientCancel,
 } = require("./handlers/client");
 const { createAiService } = require("./services/ai-service");
-const { createAiAgentService } = require("./services/ai-agent-service");
 const { logError } = require("./utils/logger");
 
-function createBot({
-  db,
-  repos,
-  botToken,
-  adminId,
-  webAppUrl = null,
-  cacheService = null,
-  queueService = null,
-}) {
-  const bot = new Telegraf(botToken);
+function createBot({ db, repos, cacheService = null, queueService = null }) {
+  const bot = new Telegraf(BOT_TOKEN);
 
   const catalog = createCatalogService({ repos });
   const ai = createAiService({ repos });
-  const aiAgent = AI_ENABLED
-    ? createAiAgentService({
-        repos,
-        catalogService: catalog,
-        config: { enabled: true, aiModel: AI_MODEL },
-      })
-    : null;
+  const aiAgent = createAiAgentService({
+    repos,
+    catalogService: catalog,
+    config: { enabled: AI_ENABLED, aiModel: AI_MODEL },
+  });
   const conversation = createConversationService({
     repos,
     bot,
-    adminId,
+    adminId: ADMIN_ID,
     cacheService,
     queueService,
     aiService: ai,
@@ -63,7 +54,7 @@ function createBot({
     db,
     repos,
     bot,
-    adminId,
+    adminId: ADMIN_ID,
     catalogService: catalog,
     conversationService: conversation,
   });
@@ -82,15 +73,20 @@ function createBot({
       ai,
       aiAgent,
     },
-    adminId,
-    webAppUrl,
+    adminId: ADMIN_ID,
+    webAppUrl: WEB_APP_URL,
   };
 
   bot.catch((error, ctx) => {
     const updateId = ctx?.update?.update_id ?? "unknown";
     logError(`Unhandled bot error for update ${updateId}`, error);
+    // Notify the user so they don't see a frozen bot
+    ctx?.reply?.("Произошла ошибка. Попробуйте ещё раз или вернитесь в меню /start.")
+      ?.catch(() => {});
   });
 
+<<<<<<< Updated upstream
+=======
   // Set persistent menu button and command list
   if (webAppUrl) {
     bot.telegram
@@ -109,11 +105,13 @@ function createBot({
       { command: "app", description: "Открыть мини-приложение" },
       { command: "menu", description: "Показать меню" },
       { command: "status", description: "Статус заявки" },
+      { command: "cancel", description: "Отменить текущую заявку" },
       { command: "help", description: "Помощь" },
       { command: "myid", description: "Узнать свой Telegram ID" },
     ])
     .catch(() => {});
 
+>>>>>>> Stashed changes
   registerAdminCommands(bot, deps);
 
   bot.start((ctx) => {
@@ -129,6 +127,11 @@ function createBot({
   bot.command("status", (ctx) => handleClientStatus(ctx, deps));
   bot.command("app", (ctx) => handleClientMiniApp(ctx, deps));
   bot.command("myid", (ctx) => ctx.reply(`Ваш Telegram ID: ${ctx.from.id}`));
+  bot.command("cancel", async (ctx) => {
+    if (ctx.from.id === deps.adminId) return;
+    if (ctx.chat.type !== "private") return;
+    await handleClientCancel(ctx, deps);
+  });
 
   bot.action(/^(catalog|lead|contact|info|menu):.*$/, (ctx) =>
     handleClientAction(ctx, deps),
@@ -165,6 +168,18 @@ function createBot({
       return;
     }
     await handleClientMedia(ctx, deps, "document");
+  });
+
+  // Graceful reply for unsupported media types
+  bot.on(["voice", "video", "video_note", "sticker", "animation"], async (ctx) => {
+    if (ctx.chat.type !== "private" || ctx.from.id === deps.adminId) {
+      return;
+    }
+    await ctx
+      .reply(
+        "Этот тип сообщения не поддерживается. Напишите текстовое сообщение или откройте /menu.",
+      )
+      .catch(() => {});
   });
 
   return bot;

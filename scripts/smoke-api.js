@@ -98,14 +98,9 @@ async function main() {
   const baseUrl = `http://127.0.0.1:${port}`;
 
   // Start API server (index.js) in a child process.
-  // Smoke defaults to API-only mode so it can validate health and public routes
-  // without requiring Telegram secrets. Callers can override BOT_ENABLED explicitly.
+  // Bot polling/webhook failures are allowed (index.js continues in API-only mode in non-production).
   const child = spawn(process.execPath, ["index.js"], {
-    env: {
-      ...process.env,
-      PORT: String(port),
-      BOT_ENABLED: process.env.BOT_ENABLED ?? "false",
-    },
+    env: { ...process.env, PORT: String(port) },
     stdio: "inherit",
   });
 
