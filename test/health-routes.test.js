@@ -61,7 +61,7 @@ test("health endpoints report healthy runtime details when dependencies are avai
   assert.equal(health.status, 200);
   const healthPayload = await health.json();
   assert.equal(healthPayload.status, "healthy");
-  assert.equal(healthPayload.environment, "production");
+  assert.equal(healthPayload.environment, "development");
   assert.equal(healthPayload.checks.cache.mode, "redis");
 });
 

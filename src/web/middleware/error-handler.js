@@ -205,14 +205,11 @@ function requestLogger(req, res, next) {
 }
 
 /**
- * Trust proxy middleware (for getting real IP behind load balancer)
+ * Express "trust proxy" setting should be driven by the current app runtime,
+ * not by request objects or shared module state.
  */
-function trustProxy(req) {
-  // In production, trust common proxy headers
-  if (NODE_ENV === "production") {
-    return true;
-  }
-  return false;
+function trustProxy({ isProduction = false } = {}) {
+  return Boolean(isProduction);
 }
 
 module.exports = {

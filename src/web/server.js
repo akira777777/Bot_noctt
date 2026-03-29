@@ -10,11 +10,7 @@ const compression = require("compression");
 const { createPublicRoutes } = require("./routes/public");
 const { createAdminRoutes } = require("./routes/admin");
 const { createLeadStatusService } = require("../services/lead-status-service");
-const {
-  router: healthRouter,
-  setDbCheckFunction,
-  setCacheCheckService,
-} = require("./routes/health");
+const { createHealthRouter } = require("./routes/health");
 const { createApiKeyAuth } = require("./middleware/api-key-auth");
 const { createRateLimiter } = require("./middleware/rate-limit");
 const {
@@ -22,8 +18,8 @@ const {
   notFoundHandler,
   requestLogger,
   asyncHandler,
+  trustProxy,
 } = require("./middleware/error-handler");
-const log = require("../utils/logger-enhanced");
 
 function createWebServer({
   repos,
@@ -38,8 +34,9 @@ function createWebServer({
   queueService = null,
 }) {
   const app = express();
-  app.set("trust proxy", 1);
+  app.set("trust proxy", trustProxy({ isProduction }));
   const leadStatusService = createLeadStatusService({ repos, bot });
+  const environment = isProduction ? "production" : "development";
 
   // ==========================================================================
   // Security Middleware
@@ -106,24 +103,25 @@ function createWebServer({
   // Health & Monitoring Routes
   // ==========================================================================
 
-  // Set database check function for health routes
-  if (repos && repos.users && typeof repos.users.getById === "function") {
-    setDbCheckFunction(async () => {
-      try {
-        repos.users.getById(-1);
-        return { status: "ok" };
-      } catch (error) {
-        return { status: "error", message: error.message };
-      }
-    });
-  }
-
-  if (cacheService) {
-    setCacheCheckService(cacheService);
-  }
-
   // Mount health routes
-  app.use("/", healthRouter);
+  app.use(
+    "/",
+    createHealthRouter({
+      environment,
+      dbCheck:
+        repos && repos.users && typeof repos.users.getById === "function"
+          ? async () => {
+              try {
+                repos.users.getById(-1);
+                return { status: "ok" };
+              } catch (error) {
+                return { status: "error", message: error.message };
+              }
+            }
+          : null,
+      cacheService,
+    }),
+  );
 
   // ==========================================================================
   // API Routes

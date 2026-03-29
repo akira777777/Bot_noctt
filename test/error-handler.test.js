@@ -97,6 +97,8 @@ test("asyncHandler forwards async failures to next", async () => {
   assert.equal(capturedError.message, "boom");
 });
 
-test("trustProxy is enabled in production runtime", () => {
-  assert.equal(trustProxy({}), true);
+test("trustProxy is enabled only when the server runs in production mode", () => {
+  assert.equal(trustProxy({ isProduction: true }), true);
+  assert.equal(trustProxy({ isProduction: false }), false);
+  assert.equal(trustProxy(), false);
 });
