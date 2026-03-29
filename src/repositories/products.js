@@ -23,14 +23,7 @@ function createProductsRepo(db) {
     `UPDATE products SET is_active = ? WHERE id = ? RETURNING *`,
   );
 
-  function normalizeCreatePayload(payload) {
-    return {
-      ...payload,
-      image_url: payload.image_url ?? null,
-    };
-  }
-
-  function normalizeUpdatePayload(payload) {
+  function normalizePayload(payload) {
     return {
       ...payload,
       image_url: payload.image_url ?? null,
@@ -51,10 +44,10 @@ function createProductsRepo(db) {
       return getByCode.get(code);
     },
     create(payload) {
-      return insert.get(normalizeCreatePayload(payload));
+      return insert.get(normalizePayload(payload));
     },
     update(payload) {
-      return update.get(normalizeUpdatePayload(payload));
+      return update.get(normalizePayload(payload));
     },
     setActive(id, isActive) {
       return setActive.get(isActive ? 1 : 0, id);

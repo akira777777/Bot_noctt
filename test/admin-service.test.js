@@ -139,62 +139,6 @@ test("admin dashboard stats summarize funnel and response windows for 24h and 7d
   assert.equal(dashboard.last24Hours.topSources[0].source_payload, "quote_channel");
   assert.ok("conversionRate" in dashboard.last7Days);
 });
-<<<<<<< Updated upstream
-=======
-
-test("broadcastToClients delivers to clients without queue (direct path)", async () => {
-  const { repos, service } = createAdminHarness();
-
-  repos.users.upsert({
-    telegram_id: 901,
-    username: "c901",
-    first_name: "C",
-    last_name: null,
-    role: "client",
-  });
-
-  const calls = [];
-  const bot = {
-    telegram: {
-      sendMessage: async (chatId, text) => {
-        calls.push({ chatId, text });
-      },
-    },
-  };
-
-  const result = await service.broadcastToClients(bot, "Broadcast text");
-  assert.deepEqual(result, { total: 1, sent: 1, failed: 0 });
-  assert.deepEqual(calls, [{ chatId: 901, text: "Broadcast text" }]);
-});
-
-test("broadcastToClients uses queue when queueBulkMessages is available", async () => {
-  const { repos, service } = createAdminHarness();
-
-  repos.users.upsert({
-    telegram_id: 902,
-    username: "c902",
-    first_name: "C",
-    last_name: null,
-    role: "client",
-  });
-
-  const queueService = {
-    async queueBulkMessages(chatIds, text) {
-      assert.deepEqual(chatIds, [902]);
-      assert.equal(text, "x");
-      return {
-        finished: async () => [
-          { chatId: 902, success: true },
-        ],
-      };
-    },
-  };
-
-  const svc = createAdminService({ repos, queueService });
-  const bot = { telegram: { sendMessage: async () => {} } };
-  const result = await svc.broadcastToClients(bot, "x");
-  assert.deepEqual(result, { total: 1, sent: 1, failed: 0 });
-});
 
 test("markLeadAwaitingPayment persists canonical proposal_sent status", () => {
   const { repos, service } = createAdminHarness();
@@ -223,4 +167,3 @@ test("markLeadAwaitingPayment persists canonical proposal_sent status", () => {
   assert.equal(updated.status, "proposal_sent");
   assert.equal(repos.leads.getById(lead.id).status, "proposal_sent");
 });
->>>>>>> Stashed changes
