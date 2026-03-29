@@ -1,6 +1,4 @@
-const {
-  generateLeadTrackingToken,
-} = require("../domain/tracking-token");
+const { generateLeadTrackingToken } = require("../domain/tracking-token");
 
 function createLeadsRepo(db) {
   const create = db.prepare(`
@@ -17,7 +15,8 @@ function createLeadsRepo(db) {
       first_admin_reply_at,
       closed_reason,
       next_follow_up_at,
-      tracking_token
+      tracking_token,
+      line_items_json
     )
     VALUES (
       @client_telegram_id,
@@ -32,7 +31,8 @@ function createLeadsRepo(db) {
       @first_admin_reply_at,
       @closed_reason,
       @next_follow_up_at,
-      @tracking_token
+      @tracking_token,
+      @line_items_json
     )
     RETURNING *
   `);
@@ -217,6 +217,53 @@ function createLeadsRepo(db) {
       END ASC
     LIMIT ?
   `);
+  const listPriorityInboxPaginated = db.prepare(`
+    SELECT
+      c.*,
+      u.username,
+      u.first_name,
+      u.last_name,
+      l.id AS lead_id,
+      l.status AS lead_status,
+      l.product_name,
+      l.created_at AS lead_created_at,
+      l.updated_at AS lead_updated_at,
+      l.first_admin_reply_at,
+      l.next_follow_up_at,
+      (
+        SELECT m.message_text
+        FROM messages m
+        WHERE m.conversation_id = c.id
+        ORDER BY m.created_at DESC
+        LIMIT 1
+      ) AS last_message_text
+    FROM conversations c
+    LEFT JOIN users u ON u.telegram_id = c.client_telegram_id
+    LEFT JOIN leads l ON l.id = (
+      SELECT l2.id
+      FROM leads l2
+      WHERE l2.client_telegram_id = c.client_telegram_id
+        AND l2.status NOT IN ('closed', 'fulfilled')
+      ORDER BY l2.created_at DESC
+      LIMIT 1
+    )
+    ORDER BY
+      CASE
+        WHEN l.status = 'new' AND l.first_admin_reply_at IS NULL THEN 0
+        WHEN l.status = 'in_progress'
+          AND l.next_follow_up_at IS NOT NULL
+          AND l.next_follow_up_at <= CURRENT_TIMESTAMP THEN 1
+        ELSE 2
+      END ASC,
+      CASE
+        WHEN l.status = 'new' AND l.first_admin_reply_at IS NULL THEN l.created_at
+        WHEN l.status = 'in_progress'
+          AND l.next_follow_up_at IS NOT NULL
+          AND l.next_follow_up_at <= CURRENT_TIMESTAMP THEN l.next_follow_up_at
+        ELSE c.last_message_at
+      END ASC
+    LIMIT ? OFFSET ?
+  `);
   const countOverdue = db.prepare(`
     SELECT COUNT(*) AS cnt
     FROM leads
@@ -262,6 +309,7 @@ function createLeadsRepo(db) {
         closed_reason: payload.closed_reason || null,
         next_follow_up_at: payload.next_follow_up_at || null,
         last_client_activity_at: payload.last_client_activity_at || null,
+        line_items_json: payload.line_items_json ?? null,
       };
 
       try {
@@ -367,6 +415,9 @@ function createLeadsRepo(db) {
     },
     listPriorityInbox(limit = 10) {
       return listPriorityInbox.all(limit);
+    },
+    listPriorityInboxPaginated(limit = 10, offset = 0) {
+      return listPriorityInboxPaginated.all(limit, offset);
     },
     countOverdue() {
       return countOverdue.get().cnt;

@@ -3,12 +3,12 @@ import { fetchLeadStatus } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
-const STATUS_STEPS = ["new", "in_progress", "called_back", "awaiting_payment", "fulfilled"];
+const STATUS_STEPS = ["new", "in_progress", "called_back", "proposal_sent", "fulfilled"];
 const STATUS_LABELS: Record<string, string> = {
   new: "Новая",
   in_progress: "В работе",
   called_back: "Перезвонили",
-  awaiting_payment: "Ожидает оплаты",
+  proposal_sent: "Предложение отправлено",
   fulfilled: "Выполнена",
   closed: "Закрыта",
 };
@@ -102,7 +102,7 @@ export default async function TrackLeadPage({ params }: Props) {
           {/* Lead details */}
           <div className="rounded-xl border border-border bg-card p-6 space-y-3">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Товар</span>
+              <span className="text-muted-foreground">Позиция</span>
               <span>{lead.product_name}</span>
             </div>
             <div className="flex justify-between text-sm">

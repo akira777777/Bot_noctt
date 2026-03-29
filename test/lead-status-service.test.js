@@ -60,7 +60,7 @@ test("lead status service rejects unsupported statuses without touching reposito
     },
   });
 
-  const result = await service.updateStatus(123, "open");
+  const result = await service.updateStatus(123, "unsupported_status");
 
   assert.equal(result, null);
   assert.equal(updateCalls, 0);
@@ -221,6 +221,52 @@ test("lead status service persists closed reason and follow-up timestamp metadat
       },
     },
   ]);
+});
+
+test("lead status service still returns lead and notifies client when leadEvents.create throws", async () => {
+  const notifications = [];
+  const { createLeadStatusService } = loadLeadStatusService({
+    safeSendMessageImpl: async (...args) => {
+      notifications.push(args);
+      return { ok: true };
+    },
+  });
+
+  const lead = {
+    id: 88,
+    status: "closed",
+    closed_reason: null,
+    client_telegram_id: 555,
+    source_payload: null,
+  };
+
+  const service = createLeadStatusService({
+    repos: {
+      leads: {
+        updateStatus() {
+          return lead;
+        },
+      },
+      leadEvents: {
+        create() {
+          throw new Error("DB write failure");
+        },
+      },
+    },
+    bot: {
+      telegram: {
+        sendMessage() {},
+      },
+    },
+  });
+
+  // Should not throw despite leadEvents.create failing
+  const result = await service.updateStatus(88, "closed");
+
+  assert.equal(result, lead);
+  // Client notification should still be sent
+  assert.equal(notifications.length, 1);
+  assert.equal(notifications[0][1], 555);
 });
 
 test("lead status service uses a specific client notification for out_of_stock closes", async () => {

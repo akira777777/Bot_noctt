@@ -21,10 +21,13 @@ const {
   clientLeadTakenMessage,
   clientLeadClosedMessage,
   clientLeadCalledBackMessage,
-  clientLeadAwaitingPaymentMessage,
+  clientLeadProposalSentMessage,
   clientLeadFulfilledMessage,
   conversationResolvedMessage,
   rateLimitMessage,
+  nonAdminCommandMessage,
+  callbackRateLimitMessage,
+  botErrorUserMessage,
   clientLeadStatusMessage,
 } = require("../src/ui/messages");
 const {
@@ -66,7 +69,7 @@ test("message builders render lead and admin text variants", () => {
   assert.match(welcomeMessage({ source: "channel", title: "Из канала" }), /Из канала/);
   assert.match(welcomeMessage(), /Здравствуйте/);
   assert.match(helpMessage(), /\/status/);
-  assert.match(howToOrderMessage(), /Как оформить заказ/);
+  assert.match(howToOrderMessage(), /Как оформить заявку/);
   assert.match(askQuantityMessage({ title: "Товар" }), /Вы выбрали "Товар"/);
   assert.match(askCommentMessage(), /Оставить без комментария/);
   assert.match(askContactMessage(), /Как с вами удобнее связаться/);
@@ -82,7 +85,7 @@ test("message builders render lead and admin text variants", () => {
     /Без комментария/,
   );
   assert.match(leadCreatedMessage(), /Заявка отправлена/);
-  assert.match(contactManagerMessage(), /любой товар или услуга/);
+  assert.match(contactManagerMessage(), /подберём решение/i);
   assert.match(clientMessageDelivered(), /Сообщение отправлено менеджеру/);
   assert.match(adminSelectedClientMessage(12), /клиентом 12 открыт/);
   assert.match(adminNoClientSelectedMessage(), /ни один клиент не выбран/);
@@ -108,10 +111,13 @@ test("message builders render lead and admin text variants", () => {
   assert.match(clientLeadTakenMessage(), /в работу/);
   assert.match(clientLeadClosedMessage(), /закрыта/);
   assert.match(clientLeadCalledBackMessage(), /ближайшее время/);
-  assert.match(clientLeadAwaitingPaymentMessage(), /Ожидаем оплату/);
-  assert.match(clientLeadFulfilledMessage(), /Спасибо за покупку/);
+  assert.match(clientLeadProposalSentMessage(), /предложение/i);
+  assert.match(clientLeadFulfilledMessage(), /выполнена/i);
   assert.match(conversationResolvedMessage(), /обработан и закрыт/);
   assert.match(rateLimitMessage(), /слишком часто/);
+  assert.match(nonAdminCommandMessage(), /только администратору/);
+  assert.match(callbackRateLimitMessage(), /Слишком часто/);
+  assert.match(botErrorUserMessage(), /Произошла ошибка/);
   assert.match(clientLeadStatusMessage(null), /пока нет ни одной заявки/);
   assert.match(
     clientLeadStatusMessage({

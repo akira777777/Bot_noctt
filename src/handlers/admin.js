@@ -1,12 +1,15 @@
 const { adminQuickReplyKeyboard, adminInboxKeyboard } = require("../ui/keyboards");
+const { removeReplyKeyboard } = require("../ui/reply-keyboards");
 const {
   adminSelectedClientMessage,
   adminNoClientSelectedMessage,
   conversationResolvedMessage,
+  nonAdminCommandMessage,
 } = require("../ui/messages");
 const { formatConversationRow, formatLeadRow } = require("../utils/formatters");
 const { safeAnswerCbQuery, safeSendMessage } = require("../utils/telegram");
 const { parseActionId } = require("../utils/actions");
+const { logWarn } = require("../utils/logger");
 
 // Ephemeral cache: stores AI suggestions shown to admin until they are sent or discarded.
 // Key: `${adminId}:${clientId}`, value: suggestion text string.
@@ -19,6 +22,9 @@ function isAdmin(ctx, deps) {
 function createAdminOnlyGuard(deps) {
   return (handler) => async (ctx) => {
     if (!isAdmin(ctx, deps)) {
+      try {
+        await ctx.reply(nonAdminCommandMessage());
+      } catch (_) {}
       return;
     }
     await handler(ctx);
@@ -30,7 +36,12 @@ async function replaceWithStatusButton(ctx, text) {
     await ctx.editMessageReplyMarkup({
       inline_keyboard: [[{ text, callback_data: "admin:noop" }]],
     });
-  } catch (_) {}
+  } catch (err) {
+    // Telegram may reject edits on old or already-modified messages; this is expected.
+    logWarn("editMessageReplyMarkup failed (message may be too old)", {
+      error: err.message,
+    });
+  }
 }
 
 async function selectClient(ctx, deps, clientId) {
@@ -53,16 +64,71 @@ async function sendAdminReply(ctx, deps, clientId, text) {
   );
 }
 
-async function showInbox(ctx, deps, title = "Inbox") {
-  const dialogs = deps.services.admin.listInbox(8);
-  if (!dialogs.length) {
+async function showInbox(ctx, deps, title = "Inbox", offset = 0) {
+  const page = deps.services.admin.listInboxPage(offset);
+  if (!page.rows.length) {
     await ctx.reply("Inbox пока пуст. Новые обращения появятся здесь.");
     return;
   }
 
-  const text = [title].concat(dialogs.map(formatConversationRow)).join("\n");
+  const text = [title].concat(page.rows.map(formatConversationRow)).join("\n");
 
-  await ctx.reply(text, adminInboxKeyboard(dialogs));
+  await ctx.reply(
+    text,
+    adminInboxKeyboard(page.rows, {
+      offset,
+      pageSize: deps.services.admin.ADMIN_PAGE_SIZE,
+      hasMore: page.hasMore,
+    }),
+  );
+}
+
+async function showClientsPage(ctx, deps, offset = 0) {
+  const page = deps.services.admin.listRecentDialogsPage(offset);
+  if (!page.rows.length) {
+    await ctx.reply("Активных клиентов пока нет.");
+    return;
+  }
+
+  const text = ["Последние клиенты:"]
+    .concat(page.rows.map(formatConversationRow))
+    .join("\n");
+
+  const nav = adminListPaginationKeyboard(
+    "clients",
+    offset,
+    deps.services.admin.ADMIN_PAGE_SIZE,
+    page.hasMore,
+  );
+  if (nav) {
+    await ctx.reply(text, nav);
+  } else {
+    await ctx.reply(text);
+  }
+}
+
+async function showLeadsPage(ctx, deps, offset = 0) {
+  const page = deps.services.admin.listRecentLeadsPage(offset);
+  if (!page.rows.length) {
+    await ctx.reply("Заявок пока нет.");
+    return;
+  }
+
+  const text = ["Последние заявки:"]
+    .concat(page.rows.map(formatLeadRow))
+    .join("\n");
+
+  const nav = adminListPaginationKeyboard(
+    "leads",
+    offset,
+    deps.services.admin.ADMIN_PAGE_SIZE,
+    page.hasMore,
+  );
+  if (nav) {
+    await ctx.reply(text, nav);
+  } else {
+    await ctx.reply(text);
+  }
 }
 
 async function applyLeadStatusAction({
@@ -75,7 +141,11 @@ async function applyLeadStatusAction({
   adminReplyText,
   options = {},
 }) {
-  const lead = await deps.services.leadStatus.updateStatus(leadId, status, options);
+  const lead = await deps.services.leadStatus.updateStatus(
+    leadId,
+    status,
+    options,
+  );
   if (!lead) {
     await safeAnswerCbQuery(ctx, "Заявка не найдена");
     return false;
@@ -98,41 +168,21 @@ function registerAdminCommands(bot, deps) {
   bot.command(
     "clients",
     adminOnly(async (ctx) => {
-      const rows = deps.services.admin.listRecentDialogs(10);
-      if (rows.length === 0) {
-        await ctx.reply("Активных клиентов пока нет.");
-        return;
-      }
-
-      const text = ["Последние клиенты:"]
-        .concat(rows.map(formatConversationRow))
-        .join("\n");
-
-      await ctx.reply(text);
+      await showClientsPage(ctx, deps, 0);
     }),
   );
 
   bot.command(
     "dialogs",
     adminOnly(async (ctx) => {
-      await showInbox(ctx, deps, "Приоритетный inbox:");
+      await showInbox(ctx, deps, "Приоритетный inbox:", 0);
     }),
   );
 
   bot.command(
     "leads",
     adminOnly(async (ctx) => {
-      const rows = deps.services.admin.listRecentLeads(10);
-      if (rows.length === 0) {
-        await ctx.reply("Заявок пока нет.");
-        return;
-      }
-
-      const text = ["Последние заявки:"]
-        .concat(rows.map(formatLeadRow))
-        .join("\n");
-
-      await ctx.reply(text);
+      await showLeadsPage(ctx, deps, 0);
     }),
   );
 
@@ -511,7 +561,9 @@ function registerAdminCommands(bot, deps) {
     "suggest",
     adminOnly(async (ctx) => {
       if (!deps.services.ai?.isEnabled) {
-        await ctx.reply("AI не настроен. Добавьте AI_GATEWAY_API_KEY в окружение.");
+        await ctx.reply(
+          "AI не настроен. Добавьте AI_GATEWAY_API_KEY в окружение.",
+        );
         return;
       }
 
@@ -546,7 +598,12 @@ function registerAdminCommands(bot, deps) {
       await ctx.reply(
         `💡 Предложенный ответ:\n\n${suggestion}`,
         M.inlineKeyboard([
-          [M.button.callback("✉️ Отправить клиенту", `admin:ai_send:${clientId}`)],
+          [
+            M.button.callback(
+              "✉️ Отправить клиенту",
+              `admin:ai_send:${clientId}`,
+            ),
+          ],
           [M.button.callback("❌ Не отправлять", "admin:noop")],
         ]),
       );
@@ -557,7 +614,9 @@ function registerAdminCommands(bot, deps) {
     "summarize",
     adminOnly(async (ctx) => {
       if (!deps.services.ai?.isEnabled) {
-        await ctx.reply("AI не настроен. Добавьте AI_GATEWAY_API_KEY в окружение.");
+        await ctx.reply(
+          "AI не настроен. Добавьте AI_GATEWAY_API_KEY в окружение.",
+        );
         return;
       }
 
@@ -568,7 +627,9 @@ function registerAdminCommands(bot, deps) {
       );
 
       if (!clientId) {
-        await ctx.reply("Укажите клиента: /summarize <telegram_id> или выберите через /dialogs.");
+        await ctx.reply(
+          "Укажите клиента: /summarize <telegram_id> или выберите через /dialogs.",
+        );
         return;
       }
 
@@ -688,7 +749,7 @@ async function handleAdminStart(ctx, deps) {
     "/suggest — предложить ответ для активного клиента\n" +
     "/summarize [id] — резюме диалога с клиентом\n" +
     "/ai <запрос> — AI-ассистент (статистика, заявки, история)";
-  await ctx.reply(message);
+  await ctx.reply(message, removeReplyKeyboard());
 }
 
 async function handleAdminText(ctx, deps) {
@@ -714,9 +775,28 @@ async function handleAdminAction(ctx, deps) {
 
   deps.services.admin.upsertAdmin(ctx.from);
 
+  if (action.startsWith("admin:list:")) {
+    const parts = action.split(":");
+    const kind = parts[2];
+    const offset = Number(parts[3]) || 0;
+    await safeAnswerCbQuery(ctx);
+    if (kind === "dialogs") {
+      await showInbox(ctx, deps, "Приоритетный inbox:", offset);
+      return;
+    }
+    if (kind === "clients") {
+      await showClientsPage(ctx, deps, offset);
+      return;
+    }
+    if (kind === "leads") {
+      await showLeadsPage(ctx, deps, offset);
+      return;
+    }
+  }
+
   if (action === "admin:inbox") {
     await safeAnswerCbQuery(ctx);
-    await showInbox(ctx, deps, "Inbox:");
+    await showInbox(ctx, deps, "Inbox:", 0);
     return;
   }
 
@@ -749,7 +829,9 @@ async function handleAdminAction(ctx, deps) {
 
   if (action.startsWith("admin:lead_snooze:")) {
     const leadId = parseActionId(action);
-    const nextFollowUpAt = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();
+    const nextFollowUpAt = new Date(
+      Date.now() + 2 * 60 * 60 * 1000,
+    ).toISOString();
     await applyLeadStatusAction({
       ctx,
       deps,
@@ -834,17 +916,20 @@ async function handleAdminAction(ctx, deps) {
     return;
   }
 
-  if (action.startsWith("admin:lead_awaiting_payment:")) {
+  if (
+    action.startsWith("admin:lead_proposal_sent:") ||
+    action.startsWith("admin:lead_awaiting_payment:")
+  ) {
     const leadId = parseActionId(action);
     await applyLeadStatusAction({
       ctx,
       deps,
       leadId,
-      status: "awaiting_payment",
-      cbSuccessText: "Статус: Ждём оплату",
-      buttonText: "✅ Ждём оплату",
+      status: "proposal_sent",
+      cbSuccessText: "Статус: Предложение отправлено",
+      buttonText: "✅ Предложение отправлено",
       adminReplyText: (id) =>
-        `Заявка #${id} переведена в статус "awaiting_payment".`,
+        `Заявка #${id} переведена в статус "proposal_sent".`,
     });
     return;
   }
@@ -884,7 +969,10 @@ async function handleAdminAction(ctx, deps) {
     const suggestion = pendingSuggestions.get(cacheKey);
 
     if (!suggestion) {
-      await safeAnswerCbQuery(ctx, "Предложение устарело — запустите /suggest снова");
+      await safeAnswerCbQuery(
+        ctx,
+        "Предложение устарело — запустите /suggest снова",
+      );
       return;
     }
 

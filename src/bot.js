@@ -1,6 +1,5 @@
 const { Telegraf } = require("telegraf");
-const { BOT_TOKEN, ADMIN_ID, WEB_APP_URL, AI_MODEL, AI_ENABLED } = require("./config/env");
-const { createAiAgentService } = require("./services/ai-agent-service");
+const { AI_ENABLED, AI_MODEL } = require("./config/env");
 const {
   createConversationService,
 } = require("./services/conversation-service");
@@ -26,22 +25,33 @@ const {
   handleClientMedia,
 } = require("./handlers/client");
 const { createAiService } = require("./services/ai-service");
+const { createAiAgentService } = require("./services/ai-agent-service");
 const { logError } = require("./utils/logger");
 
-function createBot({ db, repos, cacheService = null, queueService = null }) {
-  const bot = new Telegraf(BOT_TOKEN);
+function createBot({
+  db,
+  repos,
+  botToken,
+  adminId,
+  webAppUrl = null,
+  cacheService = null,
+  queueService = null,
+}) {
+  const bot = new Telegraf(botToken);
 
   const catalog = createCatalogService({ repos });
   const ai = createAiService({ repos });
-  const aiAgent = createAiAgentService({
-    repos,
-    catalogService: catalog,
-    config: { enabled: AI_ENABLED, aiModel: AI_MODEL },
-  });
+  const aiAgent = AI_ENABLED
+    ? createAiAgentService({
+        repos,
+        catalogService: catalog,
+        config: { enabled: true, aiModel: AI_MODEL },
+      })
+    : null;
   const conversation = createConversationService({
     repos,
     bot,
-    adminId: ADMIN_ID,
+    adminId,
     cacheService,
     queueService,
     aiService: ai,
@@ -53,7 +63,7 @@ function createBot({ db, repos, cacheService = null, queueService = null }) {
     db,
     repos,
     bot,
-    adminId: ADMIN_ID,
+    adminId,
     catalogService: catalog,
     conversationService: conversation,
   });
@@ -72,14 +82,37 @@ function createBot({ db, repos, cacheService = null, queueService = null }) {
       ai,
       aiAgent,
     },
-    adminId: ADMIN_ID,
-    webAppUrl: WEB_APP_URL,
+    adminId,
+    webAppUrl,
   };
 
   bot.catch((error, ctx) => {
     const updateId = ctx?.update?.update_id ?? "unknown";
     logError(`Unhandled bot error for update ${updateId}`, error);
   });
+
+  // Set persistent menu button and command list
+  if (webAppUrl) {
+    bot.telegram
+      .setChatMenuButton({
+        menu_button: {
+          type: "web_app",
+          text: "Открыть",
+          web_app: { url: webAppUrl },
+        },
+      })
+      .catch(() => {});
+  }
+  bot.telegram
+    .setMyCommands([
+      { command: "start", description: "Главное меню" },
+      { command: "app", description: "Открыть мини-приложение" },
+      { command: "menu", description: "Показать меню" },
+      { command: "status", description: "Статус заявки" },
+      { command: "help", description: "Помощь" },
+      { command: "myid", description: "Узнать свой Telegram ID" },
+    ])
+    .catch(() => {});
 
   registerAdminCommands(bot, deps);
 

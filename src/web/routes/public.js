@@ -5,6 +5,7 @@ const { getLeadStatusLabel } = require("../../domain/lead-status");
 const {
   normalizeLeadTrackingToken,
 } = require("../../domain/tracking-token");
+const { logWarn } = require("../../utils/logger");
 
 const WEB_LEAD_CLIENT_ID = 0;
 
@@ -93,7 +94,12 @@ function createPublicRoutes({ repos, bot, adminId, isProduction }) {
         `Комментарий: ${lead.comment || "—"}\n` +
         `Контакт: ${lead.contact_label}`;
 
-      bot.telegram.sendMessage(adminId, text).catch(() => {});
+      bot.telegram.sendMessage(adminId, text).catch((err) => {
+        logWarn("Failed to notify admin about web lead", {
+          leadId: lead.id,
+          error: err.message,
+        });
+      });
     }
 
     res.status(201).json({

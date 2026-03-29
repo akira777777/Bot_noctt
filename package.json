@@ -1,7 +1,7 @@
 {
   "name": "bot_noct",
   "version": "1.0.0",
-  "description": "Telegram support bot for channel using Telegraf",
+  "description": "Telegram inquiry and support bot with Express API, SQLite, and Next.js admin",
   "main": "index.js",
   "type": "commonjs",
   "scripts": {

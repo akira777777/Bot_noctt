@@ -5,13 +5,12 @@ const DEFAULT_QUICK_TEMPLATES = {
     "Проверяю сроки и доступный объём. Вернусь с ответом в ближайшее время.",
   contact:
     "Чтобы не потерять заявку, пришлите удобный контакт для связи, если Telegram неудобен.",
-  ack:
-    "Заявка уже в работе. Я на связи и вернусь с апдейтом в рамках текущего окна ответа.",
-  payment:
-    "После подтверждения деталей пришлю доступные варианты оплаты.",
-  delivery:
-    "После подтверждения заявки подберём удобный вариант доставки.",
+  ack: "Заявка уже в работе. Я на связи и вернусь с апдейтом в рамках текущего окна ответа.",
+  payment: "После подтверждения деталей пришлю доступные варианты оплаты.",
+  delivery: "После подтверждения заявки подберём удобный вариант доставки.",
 };
+
+const { logWarn } = require("../utils/logger");
 
 function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
   function upsertAdmin(from) {
@@ -50,6 +49,36 @@ function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
 
   function listRecentLeads(limit = 10) {
     return repos.leads.list(limit);
+  }
+
+  function listRecentDialogsPage(offset = 0) {
+    const rows = repos.conversations.listRecentPaginated(
+      ADMIN_PAGE_SIZE + 1,
+      offset,
+    );
+    return {
+      rows: rows.slice(0, ADMIN_PAGE_SIZE),
+      hasMore: rows.length > ADMIN_PAGE_SIZE,
+    };
+  }
+
+  function listInboxPage(offset = 0) {
+    const rows = repos.leads.listPriorityInboxPaginated(
+      ADMIN_PAGE_SIZE + 1,
+      offset,
+    );
+    return {
+      rows: rows.slice(0, ADMIN_PAGE_SIZE),
+      hasMore: rows.length > ADMIN_PAGE_SIZE,
+    };
+  }
+
+  function listRecentLeadsPage(offset = 0) {
+    const rows = repos.leads.listPaginated(ADMIN_PAGE_SIZE + 1, offset);
+    return {
+      rows: rows.slice(0, ADMIN_PAGE_SIZE),
+      hasMore: rows.length > ADMIN_PAGE_SIZE,
+    };
   }
 
   function getLatestLeadByClient(clientId) {
@@ -132,7 +161,9 @@ function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
   }
 
   function getDashboardWindowStats(hours) {
-    const sinceIso = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
+    const sinceIso = new Date(
+      Date.now() - hours * 60 * 60 * 1000,
+    ).toISOString();
     const draftsStarted = repos.leadEvents.countByTypeSince(
       "lead_flow_started",
       sinceIso,
@@ -241,14 +272,42 @@ function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
 
   async function broadcastToClients(bot, text) {
     const clients = repos.users.listClients();
+    const chatIds = clients.map((c) => c.telegram_id);
+
+    if (
+      queueService &&
+      typeof queueService.queueBulkMessages === "function" &&
+      chatIds.length > 0
+    ) {
+      try {
+        const job = await queueService.queueBulkMessages(chatIds, text, {});
+        const results = await job.finished();
+        const sent = results.filter((r) => r.success).length;
+        const failed = results.filter((r) => !r.success).length;
+        return { total: clients.length, sent, failed };
+      } catch (err) {
+        logError("broadcast queue failed; falling back to direct send", err);
+      }
+    }
+
     let sent = 0;
     let failed = 0;
-    for (const client of clients) {
+    for (let i = 0; i < clients.length; i++) {
+      const client = clients[i];
       try {
         await bot.telegram.sendMessage(client.telegram_id, text);
         sent++;
-      } catch (_) {
+      } catch (err) {
+        logWarn("Broadcast delivery failed for client", {
+          clientId: client.telegram_id,
+          error: err.message,
+        });
         failed++;
+      }
+      if (i < clients.length - 1) {
+        await new Promise((resolve) =>
+          setTimeout(resolve, BROADCAST_DIRECT_DELAY_MS),
+        );
       }
     }
     return { total: clients.length, sent, failed };
@@ -284,9 +343,13 @@ function createAdminService({ repos, templates = DEFAULT_QUICK_TEMPLATES }) {
     getActiveClientId,
     selectClient,
     clearSelectedClient,
+    ADMIN_PAGE_SIZE,
     listRecentDialogs,
     listInbox,
     listRecentLeads,
+    listRecentDialogsPage,
+    listInboxPage,
+    listRecentLeadsPage,
     getLatestLeadByClient,
     takeLead,
     closeLead,

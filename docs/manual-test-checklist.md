@@ -2,134 +2,143 @@
 
 ## Preconditions
 
-- `npm test` passes.
-- `npm run test:coverage` passes.
-- `npm run build:web` was executed for web dashboard checks.
-- `npm run smoke:api` passes.
-- Bot is running locally.
-- `ADMIN_ID` points to the admin account.
-- Client and admin are tested from different Telegram accounts.
+- `npm test` passes
+- `npm run build:web` passes
+- `npm run smoke:api` passes
+- Bot is running locally when testing Telegram flows
+- `ADMIN_ID` points to the admin account
+- Client and admin are tested from different Telegram accounts
 
-For rollback/recovery operations, use `docs/runbook.md`.
+For rollback and recovery procedures, use `docs/runbook.md`.
 
 ## Channel Entry
 
-- Open `?start=from_channel`.
-  Expected: generic channel welcome and home actions.
+- Open `?start=from_channel`
+  Expected: neutral welcome and main menu
 
-- Open `?start=quote_channel`.
-  Expected: channel welcome plus fast path into lead-oriented UX.
+- Open `?start=quote_channel`
+  Expected: welcome plus fast path into request flow
 
-- Open `?start=support_channel`.
-  Expected: support-oriented welcome and message-to-manager prompt.
+- Open `?start=support_channel`
+  Expected: support-oriented welcome and prompt to contact a manager
 
-- Open `?start=catalog_channel`.
-  Expected: catalog opens after the welcome message.
+- Open `?start=catalog_channel`
+  Expected: catalog opens after the welcome message
 
 ## Client Menu
 
-- Tap each top-level action from the client chat.
-  Expected: every screen clearly explains the next step.
+- Tap each top-level action in the client chat
+  Expected: each screen clearly explains the next step
 
-- Return to main menu from inline `Главное меню`.
-  Expected: home screen reappears and source context stays intact.
+- Return via `Главное меню`
+  Expected: home screen reappears and source context is preserved
 
 ## Catalog
 
-- Open catalog.
-  Expected: product list appears.
+- Open catalog
+  Expected: active positions are listed
 
-- Open a product card.
-  Expected: description, price, and CTA are shown.
+- Open a position card
+  Expected: description, price text, and action button are shown
 
-## Lead Flow
+## Request Flow
 
-- Start a lead from main menu.
-- Choose a product.
-- Enter invalid quantity.
-  Expected: validation error.
+- Start a new request from the main menu
+- Choose a position
+- Enter invalid quantity
+  Expected: validation error
 
-- Enter valid quantity.
-  Expected: move to comment step.
+- Enter valid quantity
+  Expected: move to comment step
 
-- Skip comment.
-  Expected: move to contact selection step.
+- Skip comment
+  Expected: move to contact selection
 
-- Choose `Ответить в Telegram`.
-  Expected: move to confirmation step with source and contact label.
+- Choose `Ответить в Telegram`
+  Expected: move to confirmation with source and contact label
 
-- Confirm.
+- Confirm
   Expected:
-  - lead is stored in SQLite;
-  - session is cleared;
-  - admin receives a lead card;
-  - client sees success message.
+  - request is stored in SQLite
+  - session is cleared
+  - admin receives a request card
+  - client sees confirmation
 
-- Start another lead and choose `Указать другой контакт`.
-  Expected: custom contact text is requested and saved.
+- Start another request and choose `Указать другой контакт`
+  Expected: custom contact text is requested and saved
 
-- Use `Назад` and `Отмена` in the lead flow.
-  Expected: step navigation works and cancellation returns to home state.
+- Use `Назад` and `Отмена`
+  Expected: navigation works and cancellation returns to the home state
 
 ## Support Messages
 
-- Send a free-text message from the client outside the lead flow.
+- Send free text outside the request flow
   Expected:
-  - conversation is created or updated;
-  - admin receives message card;
-  - client sees delivery confirmation.
+  - conversation is created or updated
+  - admin receives the message card
+  - client sees delivery confirmation
 
 ## Admin Inbox
 
-- Run `/dialogs`.
-  Expected: inbox list with recent dialogs and last message context.
+- Run `/dialogs`
+  Expected: recent dialogs with last-message context
 
-- Open a dialog from inline `Открыть`.
-  Expected: active client is selected.
+- Open a dialog via `Открыть`
+  Expected: active client is selected
 
-- Send admin reply text.
+- Send an admin reply
   Expected:
-  - client receives admin message;
-  - message is logged into `messages`.
+  - client receives the message
+  - message is stored in `messages`
 
-- Send quick template.
-  Expected: template is delivered to the selected client.
+- Send a quick template
+  Expected: template is delivered to the selected client
 
-## Lead Status Workflow
+## Request Status Workflow
 
-- Create a fresh lead and verify the initial stored/admin-visible status is `new`.
+- Create a fresh request
+  Expected: initial status is `new`
 
-- Press `Взять в работу` on a lead card.
+- Press `Взять в работу`
   Expected:
-  - lead status becomes `in_progress`;
-  - client receives "taken in work" notification.
+  - status becomes `in_progress`
+  - client receives an in-progress notification
 
-- Press `📞 Перезвонили`.
+- Press `📞 Перезвонили`
   Expected:
-  - lead status becomes `called_back`;
-  - client receives callback notification.
+  - status becomes `called_back`
+  - client receives a callback notification
 
-- Press `💳 Ждём оплату`.
+- Press `📄 Предложение отправлено`
   Expected:
-  - lead status becomes `awaiting_payment`;
-  - client receives payment-waiting notification.
+  - status becomes `proposal_sent`
+  - client receives a proposal notification
 
-- Press `✅ Выполнена`.
+- Press `✅ Выполнена`
   Expected:
-  - lead status becomes `fulfilled`;
-  - client receives fulfillment notification.
+  - status becomes `fulfilled`
+  - client receives a completion notification
 
-- Press `Закрыть заявку`.
+- Press `Закрыть заявку`
   Expected:
-  - lead status becomes `closed`;
-  - client receives closure notification.
+  - status becomes `closed`
+  - client receives a closure notification
 
 ## Restart Safety
 
-- Stop the bot.
-- Start the bot again.
-- Re-run `/dialogs` and `/leads`.
+- Stop the bot
+- Start the bot again
+- Re-run `/dialogs` and `/leads`
   Expected:
-  - stored dialogs remain;
-  - lead statuses remain;
-  - products remain available.
+  - dialogs remain
+  - request statuses remain
+  - catalog positions remain available
+
+## API-Only Mode
+
+- Start with `BOT_ENABLED=false`
+- Call `/healthz` and `/api/catalog`
+  Expected: both endpoints work without `BOT_TOKEN`
+
+- Try admin reply API without Telegram runtime
+  Expected: endpoint returns `503` with a clear Telegram-disabled error

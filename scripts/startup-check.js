@@ -1,14 +1,13 @@
 #!/usr/bin/env node
 /**
  * Startup Validation Script
- * Run this before starting the bot in production
+ * Run this before starting the service in production
  */
 
-const fs = require("fs");
 const {
   NODE_ENV,
-  TELEGRAM_DELIVERY_MODE,
-  WEBHOOK_DOMAIN,
+  BOT_ENABLED,
+  ADMIN_ID,
   REDIS_CONFIG,
   API_COMPRESSION,
   LOG_FORMAT,
@@ -16,8 +15,9 @@ const {
   MEMORY_LIMIT_WARN,
   MEMORY_LIMIT_CRITICAL,
 } = require("../src/config/env");
+const { resolveBotConfig } = require("../src/config/bot");
 
-const required = ["BOT_TOKEN", "ADMIN_ID", "API_SECRET"];
+const required = ["API_SECRET"];
 const warnings = [];
 
 function checkEnvVariable(name) {
@@ -46,20 +46,16 @@ function checkEnvVariable(name) {
   return { name, valid: true, value };
 }
 
-function checkFile(filePath) {
-  try {
-    return fs.existsSync(filePath);
-  } catch {
-    return false;
-  }
-}
-
 console.log("🔍 Bot_noct Startup Validation\n");
 console.log("=".repeat(50));
 
 // Check required environment variables
 console.log("\n📋 Environment Variables:");
 let allValid = true;
+
+if (BOT_ENABLED) {
+  required.unshift("ADMIN_ID", "BOT_TOKEN");
+}
 
 for (const varName of required) {
   const result = checkEnvVariable(varName);
@@ -84,7 +80,10 @@ console.log("\n⚙️  Environment:");
 const isProduction = NODE_ENV === "production";
 const envEmoji = isProduction ? "🟢" : "🟡";
 console.log(`${envEmoji} NODE_ENV: ${NODE_ENV}`);
-console.log(`📨 Telegram delivery: ${TELEGRAM_DELIVERY_MODE}`);
+console.log(`🤖 Telegram runtime: ${BOT_ENABLED ? "enabled" : "disabled"}`);
+if (BOT_ENABLED && ADMIN_ID) {
+  console.log(`👤 ADMIN_ID: ${ADMIN_ID}`);
+}
 console.log(`🗜 API compression: ${API_COMPRESSION ? "enabled" : "disabled"}`);
 console.log(`🪵 Logging: level=${LOG_LEVEL}, format=${LOG_FORMAT}`);
 console.log(
@@ -95,11 +94,36 @@ if (!isProduction) {
   console.log("⚠️  Warning: Not running in production mode");
 }
 
-if (TELEGRAM_DELIVERY_MODE === "webhook" && !WEBHOOK_DOMAIN) {
-  console.log("❌ WEBHOOK_DOMAIN is required when TELEGRAM_DELIVERY_MODE=webhook");
-  allValid = false;
-} else if (TELEGRAM_DELIVERY_MODE === "webhook") {
-  console.log(`✅ WEBHOOK_DOMAIN: ${WEBHOOK_DOMAIN}`);
+if (BOT_ENABLED) {
+  try {
+    const botConfig = resolveBotConfig({
+      BOT_ENABLED,
+      ADMIN_ID,
+      isProduction,
+    });
+    console.log(`📨 Telegram delivery: ${botConfig.TELEGRAM_DELIVERY_MODE}`);
+    if (botConfig.TELEGRAM_DELIVERY_MODE === "webhook") {
+      if (!botConfig.WEBHOOK_DOMAIN) {
+        console.log(
+          "⚠️  WEBHOOK_DOMAIN is not set; runtime will fallback to polling",
+        );
+        warnings.push("WEBHOOK_DOMAIN");
+      } else {
+        console.log(`✅ WEBHOOK_DOMAIN: ${botConfig.WEBHOOK_DOMAIN}`);
+      }
+    }
+    console.log(
+      `⏱ Startup timeout: ${botConfig.TELEGRAM_STARTUP_TIMEOUT_MS}ms`,
+    );
+    console.log(
+      `🛟 Allow bot launch failure: ${botConfig.ALLOW_BOT_LAUNCH_FAILURE ? "yes" : "no"}`,
+    );
+  } catch (error) {
+    console.log(`❌ Telegram configuration: ${error.message}`);
+    allValid = false;
+  }
+} else {
+  console.log("📨 Telegram delivery: skipped (BOT_ENABLED=false)");
 }
 
 // Security checks

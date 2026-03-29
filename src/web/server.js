@@ -14,9 +14,9 @@ const { createHealthRouter } = require("./routes/health");
 const { createApiKeyAuth } = require("./middleware/api-key-auth");
 const { createRateLimiter } = require("./middleware/rate-limit");
 const {
-  errorHandler,
-  notFoundHandler,
-  requestLogger,
+  createErrorHandler,
+  createNotFoundHandler,
+  createRequestLogger,
   asyncHandler,
   trustProxy,
 } = require("./middleware/error-handler");
@@ -32,11 +32,11 @@ function createWebServer({
   compressionEnabled = true,
   cacheService = null,
   queueService = null,
+  environment = isProduction ? "production" : "development",
 }) {
   const app = express();
   app.set("trust proxy", trustProxy({ isProduction }));
   const leadStatusService = createLeadStatusService({ repos, bot });
-  const environment = isProduction ? "production" : "development";
 
   // ==========================================================================
   // Security Middleware
@@ -97,7 +97,7 @@ function createWebServer({
   });
 
   // Request logging
-  app.use(requestLogger);
+  app.use(createRequestLogger());
 
   // ==========================================================================
   // Health & Monitoring Routes
@@ -265,10 +265,10 @@ function createWebServer({
   // ==========================================================================
 
   // 404 handler
-  app.use(notFoundHandler);
+  app.use(createNotFoundHandler());
 
   // Global error handler
-  app.use(errorHandler);
+  app.use(createErrorHandler({ isProduction }));
 
   return app;
 }
